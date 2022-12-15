@@ -30,3 +30,9 @@ In regards to the python code, there really isn't a ton of lines to write here. 
 It makes sense to have some sort of overarching table class to manage all of this. This table class will contain the individual arduinos and provide top level methods for our APIs to call when they need to. This probably gets built last. Most of this code is simply hardware descriptive in that we will be changing and altering it as the functionality and physical design of the table itself changes.
 
 What would be incredibly useful is some sort of build script that goes in and builds all of the arduino code uploads it and then starts the python running and the webservers.
+
+## Arduino Sub-Modules
+We'll likely need to use different Arduinos for the seperate parts of our hardware system, so it's a good idea to define these systems earlier on. These may change later when hardware starts getting put together but the general split could be:
+- Shuffler and relevant input/output apparatus'
+- Dealer and relevant input/output apparatus'
+- User displays and LED indicators and everything player-viewable
