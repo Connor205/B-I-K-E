@@ -1,4 +1,7 @@
 #include <Arduino.h>
+#include <Turret.hpp>
+
+Turret turret = Turret();
 
 void setup() {
   // put your setup code here, to run once:
