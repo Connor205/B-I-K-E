@@ -5,12 +5,17 @@ class Turret {
 public:
 	Turret();
 
-	// Initalize
 	void init();
 	void calibrate();
 
-	// Getters
+	void killAllPower();
+	void turnToAngle(float targetDegrees);
+	void powerFlywheel(float voltage);
+	void powerIndexer(float voltage);
+	void indexOneCard();
+
 private:
 	StepperMotor turretMotor;
 	/* DC Motors*/
+	/* Sensors*/
 };
