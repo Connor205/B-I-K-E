@@ -13,7 +13,11 @@ class Arduino:
     stateLock: threading.Lock = threading.Lock()
     logger: logging.Logger = None
 
-    def __init__(self, port: str, baud=9600):
+    def __init__(
+        self,
+        port: str,
+        baud=9600,
+    ):
         self.logger = logging.getLogger(__name__)
         self.logger.addHandler(logging.StreamHandler(sys.stdout))
         self.port = port
@@ -41,6 +45,9 @@ class Arduino:
             # Sleep for a bit
             time.sleep(0.1)
 
+    def read_handler(self, command, value):
+        raise NotImplementedError("Read Handler Is Not Implemented")
+
     def readInput(self) -> None:
         # Read the state of the Arduino
         # Pipes the output into self.state
@@ -50,10 +57,8 @@ class Arduino:
             self.logger.debug(f'Arduino Output --{input}--')
             command, value = input.split(':')
             self.logger.debug("Command: {} | Value: {}".format(command, value))
-            if command == 'STATE':
-                with self.stateLock:
-                    self.state = value
-                self.logger.debug("Updated Arduino State to: {}".format(value))
+            self.read_handler(command, value)
+
         except UnicodeDecodeError:
             self.logger.warning("UnicodeDecodeError")
 
