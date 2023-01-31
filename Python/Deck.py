@@ -14,3 +14,7 @@ class Deck():
     def shuffleDeck(self):
         """Shuffles this deck of cards"""
         self.cards.shuffle()
+
+    def reorderDeck(self, newOrder: Card[52]):
+        """Sets the order of this deck to the given deck"""
+        self.cards = newOrder
