@@ -7,7 +7,6 @@ class Seat(Enum):
     TWO = 2
     THREE = 3
     FOUR = 4
-    FIVE = 5
 
     def compare(self, other: 'Seat') -> int:
         """Compares another Seat with this Seat.
@@ -72,3 +71,39 @@ class Value(Enum):
             0 if the same Value value.
         """
         return self.value - other.value
+
+class HandRanking(Enum):
+    """An Enum representing poker hand rankings."""
+    HIGH_CARD = 1
+    PAIR = 2
+    TWO_PAIR = 3
+    THREE_OF_A_KIND = 4
+    STRAIGHT = 5
+    FLUSH = 6
+    FULL_HOUSE = 7
+    FOUR_OF_A_KIND = 8
+    STRAIGHT_FLUSH = 9
+    ROYAL_FLUSH = 10
+
+    def compare(self, other: 'HandRanking') -> int:
+        """Compares another HandRanking with this HandRanking.
+
+        Args:
+            other (HandRanking): Other HandRanking to compare.
+
+        Returns:
+            int: Negative value if this HandRanking is of lesser value.
+            Positive value if this HandRanking is of greater value.
+            0 if the same HandRanking value.
+        """
+        return self.value - other.value
+
+
+class GameState(Enum):
+    """An Enum representing the states of a poker game."""
+    PREPARING = 1
+    PREFLOP = 2
+    FLOP = 3
+    TURN = 4
+    RIVER = 5
+    SHOWDOWN = 6
