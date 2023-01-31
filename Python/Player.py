@@ -34,3 +34,7 @@ class Player():
     def winPot(self, potSize:int) -> None:
         """Changing stack size based off of the player's win"""
         self.stackSize += potSize
+
+    def buyIn(self, buyInAmt: int) -> None:
+        """Changing stack size based off of the player's buy in"""
+        self.stackSize += buyInAmt
