@@ -8,5 +8,6 @@ Members:
 <li>Adin Moses (ECE)</li>
 <li>Jackson Heun (EE + Physics)</li>
 </ul>
+
 # Project Description
 Our goal is to build an automated robotic poker table that will handle most of the functions a human dealer would, such as shuffling, dealing, and facilitating the game.
