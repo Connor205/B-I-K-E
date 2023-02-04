@@ -1,7 +1,8 @@
-import Deck
-import Card
-import PlayerHand
+from Deck import Deck
+from Card import Card
+from PlayerHand import PlayerHand
 from Enums import GameState
+from Player import Player
 
 class PokerRound():
     potSize: int
@@ -10,6 +11,9 @@ class PokerRound():
     communityCards: list[Card]
     deck: Deck
     playerIDs: list[int]
+    turnIndex: int # keeps track of who's turn it is to bet
+    currentPlayer: Player # keeps track of who's turn it is to bet
+    betToMatch: int # the current bet to match
 
     def __init__(self) -> None:
         self.playerIDs = []
@@ -18,7 +22,4 @@ class PokerRound():
         self.hands = []
         self.communityCards = []
         self.deck = Deck()
-
-    
-
-
+        self.turnIndex = 0

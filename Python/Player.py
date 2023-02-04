@@ -1,5 +1,5 @@
 from Enums import Seat
-import PlayerHand
+from PlayerHand import PlayerHand
 
 class Player():
     name: str
@@ -8,6 +8,8 @@ class Player():
     stackSize: int
     inGame: bool
     hand: PlayerHand
+    potentialBet: int
+    isReady: bool
 
     def __init__(self, name: str, playerID: int) -> None:
         self.name = name
@@ -16,6 +18,8 @@ class Player():
         self.stackSize = 0
         self.inGame = False
         self.hand = None
+        self.potentialBet = 0
+        self.isReady = False
 
     def addToGame(self, seatNumber: Seat) -> None:
         """Adds a player to a game at the given seat"""
@@ -38,3 +42,11 @@ class Player():
     def buyIn(self, buyInAmt: int) -> None:
         """Changing stack size based off of the player's buy in"""
         self.stackSize += buyInAmt
+
+    def updateBet(self, betSize: int) -> None:
+        """Changing the player's potential bet"""
+        self.potentialBet = betSize
+
+    def toggleReady(self) -> None:
+        """Player is ready to play"""
+        self.isReady = not self.isReady

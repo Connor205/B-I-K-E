@@ -1,4 +1,5 @@
 from Card import Card
+from Enums import Value, Suit
 
 class Deck():
     """Class representing a Deck of Cards in poker"""
@@ -6,8 +7,8 @@ class Deck():
 
     def __init__(self) -> None:
         """Initializes an unshuffled deck of 52 cards"""
-        for suit in suit:
-            for value in value:
+        for suit in Suit:
+            for value in Value:
                 newCard = Card(value, suit)
                 self.cards.append(newCard)
     

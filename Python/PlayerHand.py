@@ -1,6 +1,6 @@
-import Card
-import HandRanking
-import Player
+from Card import Card
+from Enums import HandRanking
+from Player import Player
 
 class PlayerHand():
     holeCards: list[Card]
