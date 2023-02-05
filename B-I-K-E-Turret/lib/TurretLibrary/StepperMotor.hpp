@@ -21,7 +21,7 @@ public:
 	void setSpeed(float speed);
 	void setDirection(bool CW);
 	void setTarget(int targetStep);
-	void setAngle();
+	void setTargetAngle(float targetAngleDegrees);
 
 	// State Methods
 	bool isMoving();
@@ -51,6 +51,7 @@ private:
 	float currentSpeed;
 	long currentDelay;
 	// Private methods
+	void setAngle();
 	float degreeToSteps(float targetAngleDegrees);
 	long getDelayFromSpeed(float s);
 };

@@ -83,6 +83,21 @@ void StepperMotor::setTarget(int targetStep) {
 }
 
 /**
+ * @brief Sets the target to the given target angle. Also sets direction.
+ * 			 	This method converts the given target angle to steps and then calls
+ * 				setTarget(int targetStep)
+ *
+ * @note This metod does not move the motor. It only sets the target and direction.
+ * 			 This method will not update the target if the motor is currently moving.
+ *
+ * @param targetAngleDegrees the absolute target angle
+ */
+void StepperMotor::setTargetAngle(float targetAngleDegrees) {
+	int steps = round(degreeToSteps(targetAngleDegrees));
+	setTarget(steps);
+}
+
+/**
  * @brief Sets the current angle of the motor based on the current step
  *
  */
