@@ -21,19 +21,18 @@ public:
 	void setSpeed(float speed);
 	void setDirection(bool CW);
 	void setTarget(int targetStep);
+	void setAngle();
 
-	// Updating Methods
-	void updateAngle();
-	void updateMotor();
-	void updateUntilTarget();
+	// State Methods
+	bool isMoving();
 
-	// StepperMotor Methods
-	void stepMotorOnce();
-	void stepMotorToTarget(int targetStep);
-	void stepMotorToAngle(float targetAngleDegrees);
+	// Movement Methods
+	void stepMotor();
+	void update();
+	void moveToTarget(int targetStep);
+	void moveToAngle(float targetAngleDegrees);
 
-	// Math Methods
-	float degreeToSteps(float targetAngleDegrees);
+	bool updateToTarget();
 
 private:
 	// Constructor Arguments
@@ -52,5 +51,6 @@ private:
 	float currentSpeed;
 	long currentDelay;
 	// Private methods
+	float degreeToSteps(float targetAngleDegrees);
 	long getDelayFromSpeed(float s);
 };
