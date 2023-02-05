@@ -7,12 +7,13 @@ public:
 
 	void init();
 	void calibrate();
-
 	void killAllPower();
+
 	void turnToAngle(float targetDegrees);
-	void powerFlywheel(float voltage);
-	void powerIndexer(float voltage);
-	void indexOneCard();
+	void setIndexerPower(int power);
+	void setFlywheelPower(int power);
+	void powerFlywheel(bool on);
+	void powerIndexer(bool on);
 
 private:
 	StepperMotor turretMotor;

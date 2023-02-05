@@ -4,9 +4,10 @@ class StepperMotor {
 public:
 	StepperMotor(int stepPin, int dirPin, float outputGearRatio);
 
-	// Initalize
+	// Initialize
 	void init();
 	void calibrate();
+	void killPower();
 
 	// Getters
 	float getTarget();

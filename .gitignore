@@ -1,5 +1,6 @@
 CAD/
 CAD/Turret/
+/CAD
 *.SLDPRT
 
 # Byte-compiled / optimized / DLL files
