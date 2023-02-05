@@ -1,6 +1,6 @@
 #include "StepperMotor.hpp"
-#include <Arduino.h>
 #include "TurretConstants.hpp"
+#include <Arduino.h>
 
 StepperMotor::StepperMotor(int stepPin, int dirPin, float outputGearRatio) {
 	this->stepPin = stepPin;
@@ -14,6 +14,10 @@ void StepperMotor::init() {
 }
 
 void StepperMotor::calibrate() {}
+
+void StepperMotor::killPower() {
+	this->currentlyRunning = false;
+}
 
 
 float StepperMotor::degreeToSteps(float degree) {

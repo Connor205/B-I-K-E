@@ -1,9 +1,9 @@
-#include "Turret.hpp
-#include <Arduino.h>
+#include "Turret.hpp"
 #include "TurretConstants.hpp"
+#include <Arduino.h>
 
 Turret::Turret() {
-	turretMotor = StepperMotor(TURRET_STEP_PIN, TURRET_DIR_PIN, TURRET_OUTPUT_GEAR_RATIO);
+	this->turretMotor = StepperMotor(TURRET_STEP_PIN, TURRET_DIR_PIN, TURRET_OUTPUT_GEAR_RATIO);
 }
 
 void Turret::init() {

@@ -2,6 +2,7 @@
 
 class StepperMotor {
 public:
+	StepperMotor() = default;
 	StepperMotor(int stepPin, int dirPin, float outputGearRatio);
 
 	// Initialize

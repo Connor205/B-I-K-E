@@ -1,8 +1,7 @@
 #include <Arduino.h>
-#include <TurretConstants.hpp>
-#include <Turret.hpp>
+#include <TurretLibrary.hpp>
 
-Turret turret = new Turret();
+Turret turret;
 
 void setup() {
   // put your setup code here, to run once:
@@ -14,7 +13,8 @@ void loop() {
   // put your main code here, to run repeatedly:
   turret.powerFlywheel(true);
   turret.powerIndexer(true);
-  delay(2000);
+  delay(1000);
   turret.powerFlywheel(false);
   turret.powerIndexer(false);
+  delay(1000);
 }
