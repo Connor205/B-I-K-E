@@ -1,12 +1,17 @@
 #include <Arduino.h>
 #include <TurretLibrary.hpp>
 
-Turret turret;
+Turret turret = new Turret();
 
 void setup() {
   // put your setup code here, to run once:
   turret.init();
   turret.calibrate();
+
+  turret.turnToAngle(45);
+  turret.turnToAngle(0);
+  turret.turnToAngle(-90);
+  turret.turnToAngle(0);
 }
 
 void loop() {

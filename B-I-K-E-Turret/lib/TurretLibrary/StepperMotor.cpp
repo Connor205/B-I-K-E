@@ -23,7 +23,10 @@ void StepperMotor::init() {
 	this->currentlyRunning = false;
 }
 
-void StepperMotor::calibrate() {/* TODO */ }
+void StepperMotor::calibrate() {
+	// TODO: Calibration should ensure motor starts at the correct angle
+	// NOTE: Could use a limit switch to check boundaries and then assign 0 there
+}
 
 /**
  * @brief Regardless of the current state of the motor, this method will stop the motor

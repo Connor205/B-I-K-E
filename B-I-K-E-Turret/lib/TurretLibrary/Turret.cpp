@@ -28,11 +28,13 @@ void Turret::init() {
 
 	// Turn off motors
 	killAllPower();
+
+	// Assign DC Motor Power
+	this->setIndexerPower(255);
+	this->setFlywheelPower(255);
 }
 
-void Turret::calibrate() {
-	this->turretMotor.calibrate();
-}
+void Turret::calibrate() { this->turretMotor.calibrate(); }
 
 
 void Turret::killAllPower() {
@@ -51,8 +53,21 @@ void Turret::killAllPower() {
  *
  * @param targetDegrees the target angle in degrees [0, 360)
  */
-void Turret::turnToAngle(float targetDegrees) {
-	this->turretMotor.moveToAngle(targetDegrees);
+void Turret::turnToAngle(float targetDegrees) { this->turretMotor.moveToAngle(targetDegrees); }
+
+/**
+ * @brief Indexes one card into the flywheel barrel by
+ * 				powering the indexer motor for a certain amount of time
+ *
+ */
+void Turret::indexOneCard() {
+	if (this->cardInMagazine()) {
+		this->powerIndexer(true);
+		delay(INDEXER_ONE_CARD_DELAY_MS);
+		this->powerIndexer(false);
+	} else {
+		Serial.println("No card in magazine, cannot index a card");
+	}
 }
 
 /**
@@ -60,18 +75,14 @@ void Turret::turnToAngle(float targetDegrees) {
  *
  * @param power the PWM value [0, 255]
  */
-void Turret::setIndexerPower(int power) {
-	analogWrite(INDEXER_MOTOR_EN_PIN, power);
-}
+void Turret::setIndexerPower(int power) { analogWrite(INDEXER_MOTOR_EN_PIN, power); }
 
 /**
  * @brief Sets the PWM for the Flywheel Motor
  *
  * @param power the PWM value [0, 255]
  */
-void Turret::setFlywheelPower(int power) {
-	analogWrite(FLYWHEEL_MOTOR_EN_PIN, power);
-}
+void Turret::setFlywheelPower(int power) { analogWrite(FLYWHEEL_MOTOR_EN_PIN, power); }
 
 /**
  * @brief Powers the flywheel motor on or off
@@ -105,23 +116,5 @@ void Turret::powerIndexer(bool on) {
 
 float Turret::getTurretAngle() { return this->turretMotor.getCurrentAngle(); }
 
-/**
- * @brief Gets the distance the ultrasonic sensor is reading [cm]
- *
- * @return float in centimeters representing the distance
- */
-float Turret::getDistance() {
-	long duration, cm;
-	digitalWrite(ULTRASONIC_TRIG_PIN, LOW);
-	delayMicroseconds(2);
-	digitalWrite(ULTRASONIC_TRIG_PIN, HIGH);
-	delayMicroseconds(10);
-	digitalWrite(ULTRASONIC_TRIG_PIN, LOW);
-	duration = pulseIn(ULTRASONIC_ECHO_PIN, HIGH);
-	cm = duration / 29 / 2;
-	return cm;
-}
-
-bool Turret::cardInMagazine() {
-	return digitalRead(MAGAZINE_SENSOR_PIN);
-}
+bool Turret::cardInMagazine() { return digitalRead(MAGAZINE_SENSOR_PIN); }
+bool Turret::cardInFlywheelBarrel() { return digitalRead(FLYWHEEL_BARREL_SENSOR_PIN); }

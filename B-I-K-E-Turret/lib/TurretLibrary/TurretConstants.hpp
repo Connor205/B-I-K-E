@@ -2,7 +2,8 @@
 
 // Control Constants
 constexpr float STEPS_PER_REV = 400.0f;
-constexpr float MAX_RPM = 75.0f;
+constexpr float MAX_RPM = 100.0f;
+constexpr float INDEXER_ONE_CARD_DELAY_MS = 2500; // TODO: Tune this value
 
 // Stepper Motor Constants
 constexpr float TURRET_OUTPUT_GEAR_RATIO = 1.0f;
@@ -24,5 +25,3 @@ constexpr int INDEXER_ENCODER_B_PLUS_PIN = -1;
 constexpr int INDEXER_ENCODER_B_MINUS_PIN = -1;
 constexpr int MAGAZINE_SENSOR_PIN = -1; // Photoresistor
 constexpr int FLYWHEEL_BARREL_SENSOR_PIN = -1; // Photoresistor
-constexpr int ULTRASONIC_TRIG_PIN = -1;
-constexpr int ULTRASONIC_ECHO_PIN = -1;
