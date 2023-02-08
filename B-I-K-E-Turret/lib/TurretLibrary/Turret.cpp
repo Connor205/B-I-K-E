@@ -23,15 +23,13 @@ void Turret::init() {
 	pinMode(INDEXER_ENCODER_B_MINUS_PIN, INPUT);
 	pinMode(MAGAZINE_SENSOR_PIN, INPUT);
 	pinMode(FLYWHEEL_BARREL_SENSOR_PIN, INPUT);
-	pinMode(ULTRASONIC_TRIG_PIN, OUTPUT);
-	pinMode(ULTRASONIC_ECHO_PIN, INPUT);
 
 	// Turn off motors
 	killAllPower();
 
 	// Assign DC Motor Power
-	this->setIndexerPower(255);
-	this->setFlywheelPower(255);
+	// this->setIndexerPower(255);
+	// this->setFlywheelPower(255);
 }
 
 void Turret::calibrate() { this->turretMotor.calibrate(); }

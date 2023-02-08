@@ -13,6 +13,10 @@ public:
 	// Motor Control
 	void turnToAngle(float targetDegrees);
 	void indexOneCard();
+	void setIndexerPower(int power);
+	void setFlywheelPower(int power);
+	void powerFlywheel(bool on);
+	void powerIndexer(bool on);
 
 	// Sensor Control
 	float getTurretAngle();
@@ -21,9 +25,4 @@ public:
 
 private:
 	StepperMotor turretMotor;
-
-	void setIndexerPower(int power);
-	void setFlywheelPower(int power);
-	void powerFlywheel(bool on);
-	void powerIndexer(bool on);
 };

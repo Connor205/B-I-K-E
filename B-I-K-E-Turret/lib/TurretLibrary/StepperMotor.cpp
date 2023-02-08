@@ -208,7 +208,7 @@ bool StepperMotor::updateToTarget() {
  * @return long representing the delay in microseconds between steps
  */
 long StepperMotor::getDelayFromSpeed(float speed) {
-	return (long)(1000000.0f / s);
+	return (long)(1000000.0f / speed);
 }
 
 /**

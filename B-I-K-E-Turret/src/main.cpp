@@ -1,25 +1,35 @@
 #include <Arduino.h>
 #include <TurretLibrary.hpp>
 
-Turret turret = new Turret();
+Turret turret = Turret();
+
+void testTurretRotate() {
+  turret.turnToAngle(45);
+  delay(2000);
+  turret.turnToAngle(0);
+  delay(2000);
+  turret.turnToAngle(-90);
+  delay(2000);
+  turret.turnToAngle(0);
+  delay(2000);
+}
+
+void testDCMotors() {
+  turret.powerFlywheel(true);
+  turret.powerIndexer(true);
+  delay(2000);
+  turret.powerFlywheel(false);
+  turret.powerIndexer(false);
+  delay(2000);
+}
 
 void setup() {
-  // put your setup code here, to run once:
   turret.init();
   turret.calibrate();
 
-  turret.turnToAngle(45);
-  turret.turnToAngle(0);
-  turret.turnToAngle(-90);
-  turret.turnToAngle(0);
+  delay(3000);
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  turret.powerFlywheel(true);
-  turret.powerIndexer(true);
-  delay(1000);
-  turret.powerFlywheel(false);
-  turret.powerIndexer(false);
-  delay(1000);
+  testDCMotors();
 }
