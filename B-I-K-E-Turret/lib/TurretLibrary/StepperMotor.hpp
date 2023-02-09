@@ -8,7 +8,6 @@ public:
 	// Initialize
 	void init();
 	void calibrate();
-	void killPower();
 
 	// Getters
 	float getTarget();

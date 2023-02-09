@@ -2,6 +2,7 @@
 #include <TurretLibrary.hpp>
 
 Turret turret = Turret();
+long now = millis();
 
 void testTurretRotate() {
   turret.turnToAngle(45);
@@ -26,8 +27,6 @@ void testDCMotors() {
 void setup() {
   turret.init();
   turret.calibrate();
-
-  delay(3000);
 }
 
 void loop() {

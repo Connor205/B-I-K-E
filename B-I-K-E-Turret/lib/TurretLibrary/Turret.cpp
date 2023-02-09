@@ -26,24 +26,16 @@ void Turret::init() {
 
 	// Turn off motors
 	killAllPower();
-
-	// Default DC Motor Power to max voltage
-	this->setIndexerPower(255);
-	this->setFlywheelPower(255);
 }
 
 void Turret::calibrate() { this->turretMotor.calibrate(); }
 
 
 void Turret::killAllPower() {
-	// Kill DC Motors
 	digitalWrite(INDEXER_MOTOR_PLUS_PIN, LOW);
 	digitalWrite(INDEXER_MOTOR_MINUS_PIN, LOW);
 	digitalWrite(FLYWHEEL_MOTOR_PLUS_PIN, LOW);
 	digitalWrite(FLYWHEEL_MOTOR_MINUS_PIN, LOW);
-
-	// Kill Stepper Motor
-	this->turretMotor.killPower();
 }
 
 /**
@@ -67,20 +59,6 @@ void Turret::indexOneCard() {
 		Serial.println("No card in magazine, cannot index a card");
 	}
 }
-
-/**
- * @brief Sets the PWM for the Indexer Motor
- *
- * @param power the PWM value [0, 255]
- */
-void Turret::setIndexerPower(int power) { analogWrite(INDEXER_MOTOR_EN_PIN, power); }
-
-/**
- * @brief Sets the PWM for the Flywheel Motor
- *
- * @param power the PWM value [0, 255]
- */
-void Turret::setFlywheelPower(int power) { analogWrite(FLYWHEEL_MOTOR_EN_PIN, power); }
 
 /**
  * @brief Powers the flywheel motor on or off

@@ -13,8 +13,6 @@ public:
 	// Motor Control
 	void turnToAngle(float targetDegrees);
 	void indexOneCard();
-	void setIndexerPower(int power);
-	void setFlywheelPower(int power);
 	void powerFlywheel(bool on);
 	void powerIndexer(bool on);
 
