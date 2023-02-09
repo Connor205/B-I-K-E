@@ -27,9 +27,9 @@ void Turret::init() {
 	// Turn off motors
 	killAllPower();
 
-	// Assign DC Motor Power
-	// this->setIndexerPower(255);
-	// this->setFlywheelPower(255);
+	// Default DC Motor Power to max voltage
+	this->setIndexerPower(255);
+	this->setFlywheelPower(255);
 }
 
 void Turret::calibrate() { this->turretMotor.calibrate(); }

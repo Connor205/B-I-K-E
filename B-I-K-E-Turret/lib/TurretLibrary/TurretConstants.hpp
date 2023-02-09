@@ -11,10 +11,10 @@ constexpr float TURRET_STEP_PIN = 3;
 constexpr float TURRET_DIR_PIN = 4;
 
 // DC Motor Constants
-constexpr int INDEXER_MOTOR_EN_PIN = 5;
+constexpr int INDEXER_MOTOR_EN_PIN = 6;
 constexpr int INDEXER_MOTOR_PLUS_PIN = 9;
 constexpr int INDEXER_MOTOR_MINUS_PIN = 11;
-constexpr int FLYWHEEL_MOTOR_EN_PIN = 6;
+constexpr int FLYWHEEL_MOTOR_EN_PIN = 5;
 constexpr int FLYWHEEL_MOTOR_PLUS_PIN = 8;
 constexpr int FLYWHEEL_MOTOR_MINUS_PIN = 10;
 
