@@ -28,15 +28,6 @@ void StepperMotor::calibrate() {
 	// NOTE: Could use a limit switch to check boundaries and then assign 0 there
 }
 
-/**
- * @brief Regardless of the current state of the motor, this method will stop the motor
- *
- */
-void StepperMotor::killPower() {
-	digitalWrite(this->stepPin, LOW);
-	this->target = this->current;
-}
-
 float StepperMotor::getTarget() { return this->target; }
 float StepperMotor::getSpeed() { return this->currentSpeed; }
 long StepperMotor::getDelay() { return this->currentDelay; }
