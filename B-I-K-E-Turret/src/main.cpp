@@ -1,18 +1,15 @@
 #include <Arduino.h>
 #include <TurretLibrary.hpp>
+#include <Vector.h>
 
 Turret turret = Turret();
 long now = millis();
 
-void testTurretRotate() {
-  turret.turnToAngle(45);
-  delay(2000);
-  turret.turnToAngle(0);
-  delay(2000);
-  turret.turnToAngle(-90);
-  delay(2000);
-  turret.turnToAngle(0);
-  delay(2000);
+void testTurretRotate(Vector<float> angles) {
+  for (int i = 0; i < angles.size(); i++) {
+    turret.turnToAngle(angles[i]);
+    delay(2000);
+  }
 }
 
 void testDCMotors() {
@@ -30,5 +27,11 @@ void setup() {
 }
 
 void loop() {
-  testDCMotors();
+  // testDCMotors();
+  Vector<float> angles = Vector<float>();
+  angles.push_back(90);
+  angles.push_back(180);
+  angles.push_back(270);
+  angles.push_back(0);
+  testTurretRotate(angles);
 }
