@@ -5,11 +5,20 @@
 Turret turret = Turret();
 long now = millis();
 
+Vector<float> angles = Vector<float>();
+
+
 void testTurretRotate(Vector<float> angles) {
-  for (int i = 0; i < angles.size(); i++) {
-    turret.turnToAngle(angles[i]);
-    delay(2000);
-  }
+  // for (int i = 0; i < angles.size(); i++) {
+
+  //   delay(2000);
+  // }
+  turret.turnToAngle(90);
+  delay(2000);
+  turret.turnToAngle(45);
+  delay(2000);
+  turret.turnToAngle(0);
+  delay(2000);
 }
 
 void testDCMotors() {
@@ -24,14 +33,14 @@ void testDCMotors() {
 void setup() {
   turret.init();
   turret.calibrate();
-}
 
-void loop() {
-  // testDCMotors();
-  Vector<float> angles = Vector<float>();
   angles.push_back(90);
   angles.push_back(180);
   angles.push_back(270);
   angles.push_back(0);
+}
+
+void loop() {
+  // testDCMotors();
   testTurretRotate(angles);
 }

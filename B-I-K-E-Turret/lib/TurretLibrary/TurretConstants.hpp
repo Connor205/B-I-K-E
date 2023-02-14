@@ -1,7 +1,7 @@
 #pragma once
 
 // Control Constants
-constexpr float STEPS_PER_REV = 400.0f;
+constexpr float STEPS_PER_REV = 3200.0f;
 constexpr float MAX_RPM = 100.0f;
 constexpr float INDEXER_ONE_CARD_DELAY_MS = 2500; // TODO: Tune this value
 
