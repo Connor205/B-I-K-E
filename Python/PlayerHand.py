@@ -1,16 +1,13 @@
 from Card import Card
 from Enums import HandRanking
-from Player import Player
 
 class PlayerHand():
     holeCards: list[Card]
     bestHand: list[Card]
     ranking: HandRanking
-    player: Player
 
-    def __init__(self, holeCards: list[Card], player: Player) -> None:
+    def __init__(self, holeCards: list[Card]) -> None:
         self.holeCards = holeCards
-        self.player = player
         self.bestHand = []
         self.ranking = None
 
