@@ -3,24 +3,27 @@
 
 class Turret {
 public:
-	Turret();
+    Turret();
 
-	// Initialize
-	void init();
-	void calibrate();
-	void killAllPower();
+    // Initialize
+    void init();
+    void calibrate();
+    void killAllPower();
 
-	// Motor Control
-	void turnToAngle(float targetDegrees);
-	void indexOneCard();
-	void powerFlywheel(bool on);
-	void powerIndexer(bool on);
+    // Motor Control
+    void turnToAngle(float targetDegrees);
+    void indexOneCard();
+    void powerFlywheel(bool on);
+    void powerIndexer(bool on);
 
-	// Sensor Control
-	float getTurretAngle();
-	bool cardInMagazine();
-	bool cardInFlywheelBarrel();
+    // Sensor Control
+    float getTurretAngle();
+    int getBarrelReading();
+    bool cardInMagazine();
+    bool cardInFlywheelBarrel();
+
+    void dealSingleCard();
 
 private:
-	StepperMotor turretMotor;
+    StepperMotor turretMotor;
 };

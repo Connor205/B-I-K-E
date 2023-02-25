@@ -1,4 +1,5 @@
 #pragma once
+#include "Arduino.h"
 
 // Control Constants
 constexpr float STEPS_PER_REV = 3200.0f;
@@ -22,4 +23,6 @@ constexpr int INDEXER_ENCODER_A_MINUS_PIN = -1;
 constexpr int INDEXER_ENCODER_B_PLUS_PIN = -1;
 constexpr int INDEXER_ENCODER_B_MINUS_PIN = -1;
 constexpr int MAGAZINE_SENSOR_PIN = -1; // Photoresistor
-constexpr int FLYWHEEL_BARREL_SENSOR_PIN = -1; // Photoresistor
+constexpr int FLYWHEEL_BARREL_SENSOR_PIN = A0; // Photoresistor
+
+constexpr int FLYWHEEL_BARREL_SENSOR_THRESHOLD = 10;

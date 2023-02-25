@@ -106,4 +106,22 @@ void Turret::powerIndexer(bool on)
 float Turret::getTurretAngle() { return this->turretMotor.getCurrentAngle(); }
 
 bool Turret::cardInMagazine() { return digitalRead(MAGAZINE_SENSOR_PIN); }
-bool Turret::cardInFlywheelBarrel() { return digitalRead(FLYWHEEL_BARREL_SENSOR_PIN); }
+
+bool Turret::cardInFlywheelBarrel() { return this->getBarrelReading() > FLYWHEEL_BARREL_SENSOR_THRESHOLD; }
+
+/*Generates a value between 0 and 1023 for the barrel sensor */
+int Turret::getBarrelReading()
+{
+    int sensorValue = analogRead(FLYWHEEL_BARREL_SENSOR_PIN);
+    return map(sensorValue, 0, 1023, 0, 255);
+}
+
+void Turret::dealSingleCard()
+{
+    this->powerFlywheel(true);
+    this->powerIndexer(true);
+    while (this->getBarrelReading() > FLYWHEEL_BARREL_SENSOR_THRESHOLD) {
+        delay(5);
+    }
+    this->powerIndexer(false);
+}
