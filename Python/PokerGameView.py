@@ -15,6 +15,8 @@ class PokerGameView:
     playerSprites: pygame.sprite.RenderUpdates
     communitySprites: pygame.sprite.RenderUpdates
 
+    testPointPosition: list[int]
+
     # Constants... but set at runtime based on screen size
     constTurretPosition: list[int]
     constPlayer1Position: list[int]
@@ -30,7 +32,7 @@ class PokerGameView:
         self.model = model
 
         # setup the screen and load the background
-        self.screen = pygame.display.set_mode((0,0))
+        self.screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
         self.background = pygame.Surface(self.screen.get_size())
         self.background = self.background.convert()
         self.background.fill((250, 250, 250))
@@ -52,6 +54,9 @@ class PokerGameView:
         # Add the table sprite to the background
         newSprite = TableSprite(self.screen.get_size(), self.backSprites)
 
+        self.testPointPosition = [self.screen.get_width() / 2, self.screen.get_height() / 2]
+        print("Screen size: " + str(self.screen.get_size()))
+
     def testMovingCards(self, show: bool) -> None:
         # Create a five random cards to test that will go to each player position
         card = Card(random.choice(list(Value)), random.choice(list(Suit)))
@@ -66,6 +71,28 @@ class PokerGameView:
         card = Card(random.choice(list(Value)), random.choice(list(Suit)))
         newSprite = CardSprite(card, self.constTurretPosition, self.constPlayer4Position, showCard=show, group=self.communitySprites)
         newSprite = None
+
+    def testDrawPoint(self, direction, dist) -> None:
+        # This test method is to draw a point on the screen to get coordinates
+        # and eventually use to set the positions of the players
+        # It'll be given a direction to move the point, and will redraw the point
+        # and print out the current position
+        if direction == "up":
+            self.testPointPosition[1] -= dist
+        elif direction == "down":
+            self.testPointPosition[1] += dist
+        elif direction == "left":
+            self.testPointPosition[0] -= dist
+        elif direction == "right":
+            self.testPointPosition[0] += dist
+        elif direction == "reset":
+            self.testPointPosition = [self.screen.get_width() / 2, self.screen.get_height() / 2]
+        else:
+            print("Invalid direction")
+        
+        pygame.display.flip()
+        print(self.testPointPosition)
+
 
     def update(self) -> None:
         
@@ -85,10 +112,13 @@ class PokerGameView:
         dirtyRects1 = self.backSprites.draw(self.screen)
         dirtyRects2 = self.playerSprites.draw(self.screen)
         dirtyRects3 = self.communitySprites.draw(self.screen)
+        pygame.draw.circle(self.screen, (0, 0, 0), self.testPointPosition, 5)
 
         # Update the display
         dirtyRects = dirtyRects1 + dirtyRects2 + dirtyRects3
         pygame.display.update(dirtyRects)
+
+        
         
 
     def drawPlayer(self, player) -> None:
@@ -148,4 +178,25 @@ while True:
             # s key moves card fronts to each player position
             if event.key == pygame.K_s:
                 view.testMovingCards(True)
+
+    keys = pygame.key.get_pressed()
+    dist = 1
+    if keys[pygame.K_RSHIFT]:
+        dist = 10
+    # up key moves the test point up
+    if keys[pygame.K_UP]:
+        view.testDrawPoint("up", dist)
+    # down key moves the test point down
+    if keys[pygame.K_DOWN]:
+        view.testDrawPoint("down", dist)
+    # left key moves the test point left
+    if keys[pygame.K_LEFT]:
+        view.testDrawPoint("left", dist)
+    # right key moves the test point right
+    if keys[pygame.K_RIGHT]:
+        view.testDrawPoint("right", dist)
+    # r key resets the test point to the center of the screen
+    if keys[pygame.K_r]:
+        view.testDrawPoint("reset", 0)
+
     view.update()
