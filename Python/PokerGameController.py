@@ -2,6 +2,7 @@ from PokerGameModel import PokerGameModel
 from PokerGameView import PokerGameView
 from Turret import Turret
 from Shuffler import Shuffler
+from Enums import Button
 
 class PokerGameController():
     model: PokerGameModel = None
@@ -16,10 +17,40 @@ class PokerGameController():
         self.shuffler = shuffler
 
     def buttonListener(self, buttonStatus) -> None:
-        # This is the listener for the buttons on the arduino side
-        # We need to figure out what button was pressed and then call the appropriate function
-        # We still need to figure out the format/type of buttonStatus
-        raise NotImplementedError("buttonListener is not implemented")
+        match buttonStatus[0]:
+            case Button.FOLD:
+                self.fold(buttonStatus[1])
+            case Button.CHECK:
+                self.bet(buttonStatus[1], 0)
+            case Button.CALL:
+                # TODO
+                # betToCall = XXX
+                betToCall = 0
+                self.bet(buttonStatus[1], betToCall)
+            case Button.BET:
+                # TODO
+                # betToMake = XXX
+                betToMake = 0
+                self.bet(buttonStatus[1], betToMake)
+            case Button.WHITE_CHIP:
+                # TODO
+                # whiteChipValue = XXX
+                whiteChipValue = 0
+                self.updateBet(buttonStatus[1], whiteChipValue)
+            case Button.RED_CHIP:
+                # TODO
+                # redChipValue = XXX
+                redChipValue = 0
+                self.updateBet(buttonStatus[1], redChipValue)
+            case Button.BLUE_CHIP:
+                # TODO
+                # blueChipValue = XXX
+                blueChipValue = 0
+                self.updateBet(buttonStatus[1], blueChipValue)
+            case Button.SETTINGS:
+                self.settings()
+            case _:
+                raise NotImplementedError("Unrecognized button")
 
     def updatePlayers(self, seats) -> None:
         # Based on input from the Arduino-side,
@@ -45,7 +76,7 @@ class PokerGameController():
         # Update the bet amount displayed in the view
         raise NotImplementedError("updateBets is not implemented")
 
-    def makeBet(self, bet) -> None:
+    def makeBet(self, seat, bet) -> None:
         # Based on input from the buttons for each player
         # Update the bet amount displayed in view
         # Update the model to reflect the bet amount
@@ -77,3 +108,7 @@ class PokerGameController():
     def shuffle(self) -> None:
         # Command the shuffler to shuffle deck
         raise NotImplementedError("shuffle is not implemented")
+    
+    def settings(self) -> None:
+        # Toggle the settings menu
+        raise NotImplementedError("settings is not impleemented")
