@@ -1,7 +1,8 @@
 CAD/
 CAD/Turret/
-/CAD
+/CAD/*
 *.SLDPRT
+*.SLDASM
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
