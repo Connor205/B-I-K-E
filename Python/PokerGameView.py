@@ -1,28 +1,80 @@
 import pygame
 import random
 from PokerGameModel import PokerGameModel
-from Sprites import CardSprite, TableSprite
+from Sprites import *
 from Card import Card
 from Enums import *
 class PokerGameView:
+    # CONSTANTS
+    # Sizes denote the actual sizes/lengths
+    # Positions denote the center of the object at a coordinate
+
+    # Boundaries
+    # Full monitor size: 1920x1080
+    # Desired resolution: 1280x720
+    SCREEN_SIZE = [1280, 720]
+    TABLE_SIZE = [int(SCREEN_SIZE[0] * 4/5), SCREEN_SIZE[1]]
+    STATS_SIZE = [int(SCREEN_SIZE[0] * 1/2), SCREEN_SIZE[1]]
+
+    # Sizes
+    # Keeping it slightly to scale, table width is 60 inches, 
+    # say card height is 5 inches and width is 2/3 of that
+    CARD_SIZE = [int(TABLE_SIZE[0] * (5*2/3)/60), int(TABLE_SIZE[0] * 5/60)]
+    FONT_HEIGHT = int(TABLE_SIZE[1] * 1/30)
+
+    # Positions
+    TURRET_POSITION = [int(0.5 * TABLE_SIZE[0]), int(0.1 * TABLE_SIZE[1])]
+    BURN_POSITION = [int(TURRET_POSITION[0] - 2 * CARD_SIZE[0]), TURRET_POSITION[1]]
+    DEAL_POSITION = [int(TURRET_POSITION[0] + 2 * CARD_SIZE[0]), TURRET_POSITION[1]]
+
+    COMMUNITY_3_POSITION = [int(TURRET_POSITION[0] + 0 * CARD_SIZE[0]), int(TURRET_POSITION[1] + 0.2 * TABLE_SIZE[1])]
+    COMMUNITY_2_POSITION = [int(COMMUNITY_3_POSITION[0] - 1.25 * CARD_SIZE[0]), COMMUNITY_3_POSITION[1]]
+    COMMUNITY_1_POSITION = [int(COMMUNITY_2_POSITION[0] - 1.25 * CARD_SIZE[0]), COMMUNITY_3_POSITION[1]]
+    COMMUNITY_4_POSITION = [int(COMMUNITY_3_POSITION[0] + 1.25 * CARD_SIZE[0]), COMMUNITY_3_POSITION[1]]
+    COMMUNITY_5_POSITION = [int(COMMUNITY_4_POSITION[0] + 1.25 * CARD_SIZE[0]), COMMUNITY_3_POSITION[1]]
+
+    POT_POSITION = [int(TURRET_POSITION[0]), int(COMMUNITY_3_POSITION[1] + 0.75 * CARD_SIZE[1])]
+
+    # The hub positions are center positions of the 4 player hubs which will have several sprites
+    PLAYER_1_HUB_POSITION = [int(TURRET_POSITION[0] - 0.3 * TABLE_SIZE[0]), int(TURRET_POSITION[1] + 0.1 * TABLE_SIZE[1])]
+    PLAYER_1_NAME_POSITION = [int(PLAYER_1_HUB_POSITION[0]), int(PLAYER_1_HUB_POSITION[1] - 0.75 * CARD_SIZE[1])]
+    PLAYER_1_CARD_1_POSITION = [int(PLAYER_1_HUB_POSITION[0] - 0.6 * CARD_SIZE[0]), int(PLAYER_1_HUB_POSITION[1])]
+    PLAYER_1_CARD_2_POSITION = [int(PLAYER_1_HUB_POSITION[0] + 0.6 * CARD_SIZE[0]), int(PLAYER_1_HUB_POSITION[1])]
+    PLAYER_1_STACK_POSITION = [int(PLAYER_1_HUB_POSITION[0]), int(PLAYER_1_HUB_POSITION[1] + 0.75 * CARD_SIZE[1])]
+    PLAYER_1_BET_POSITION = [int(PLAYER_1_HUB_POSITION[0]), int(PLAYER_1_STACK_POSITION[1] + 1.25 * FONT_HEIGHT)]
+    PLAYER_1_BLIND_POSITION = [int(PLAYER_1_HUB_POSITION[0]), int(PLAYER_1_NAME_POSITION[1] - 1.25 * FONT_HEIGHT)]
+
+    PLAYER_2_HUB_POSITION = [int(TURRET_POSITION[0] - 0.2 * TABLE_SIZE[0]), int(TURRET_POSITION[1] + 0.5 * TABLE_SIZE[1])]
+    PLAYER_2_NAME_POSITION = [int(PLAYER_2_HUB_POSITION[0]), int(PLAYER_2_HUB_POSITION[1] - 0.75 * CARD_SIZE[1])]
+    PLAYER_2_CARD_1_POSITION = [int(PLAYER_2_HUB_POSITION[0] - 0.6 * CARD_SIZE[0]), int(PLAYER_2_HUB_POSITION[1])]
+    PLAYER_2_CARD_2_POSITION = [int(PLAYER_2_HUB_POSITION[0] + 0.6 * CARD_SIZE[0]), int(PLAYER_2_HUB_POSITION[1])]
+    PLAYER_2_STACK_POSITION = [int(PLAYER_2_HUB_POSITION[0]), int(PLAYER_2_HUB_POSITION[1] + 0.75 * CARD_SIZE[1])]
+    PLAYER_2_BET_POSITION = [int(PLAYER_2_HUB_POSITION[0]), int(PLAYER_2_STACK_POSITION[1] + 1.25 * FONT_HEIGHT)]
+    PLAYER_2_BLIND_POSITION = [int(PLAYER_2_HUB_POSITION[0]), int(PLAYER_2_NAME_POSITION[1] - 1.25 * FONT_HEIGHT)]
+
+    PLAYER_3_HUB_POSITION = [int(TURRET_POSITION[0] + 0.2 * TABLE_SIZE[0]), int(TURRET_POSITION[1] + 0.5 * TABLE_SIZE[1])]
+    PLAYER_3_NAME_POSITION = [int(PLAYER_3_HUB_POSITION[0]), int(PLAYER_3_HUB_POSITION[1] - 0.75 * CARD_SIZE[1])]
+    PLAYER_3_CARD_1_POSITION = [int(PLAYER_3_HUB_POSITION[0] - 0.6 * CARD_SIZE[0]), int(PLAYER_3_HUB_POSITION[1])]
+    PLAYER_3_CARD_2_POSITION = [int(PLAYER_3_HUB_POSITION[0] + 0.6 * CARD_SIZE[0]), int(PLAYER_3_HUB_POSITION[1])]
+    PLAYER_3_STACK_POSITION = [int(PLAYER_3_HUB_POSITION[0]), int(PLAYER_3_HUB_POSITION[1] + 0.75 * CARD_SIZE[1])]
+    PLAYER_3_BET_POSITION = [int(PLAYER_3_HUB_POSITION[0]), int(PLAYER_3_STACK_POSITION[1] + 1.25 * FONT_HEIGHT)]
+    PLAYER_3_BLIND_POSITION = [int(PLAYER_3_HUB_POSITION[0]), int(PLAYER_3_NAME_POSITION[1] - 1.25 * FONT_HEIGHT)]
+
+    PLAYER_4_HUB_POSITION = [int(TURRET_POSITION[0] + 0.3 * TABLE_SIZE[0]), int(TURRET_POSITION[1] + 0.1 * TABLE_SIZE[1])]
+    PLAYER_4_NAME_POSITION = [int(PLAYER_4_HUB_POSITION[0]), int(PLAYER_4_HUB_POSITION[1] - 0.75 * CARD_SIZE[1])]
+    PLAYER_4_CARD_1_POSITION = [int(PLAYER_4_HUB_POSITION[0] - 0.6 * CARD_SIZE[0]), int(PLAYER_4_HUB_POSITION[1])]
+    PLAYER_4_CARD_2_POSITION = [int(PLAYER_4_HUB_POSITION[0] + 0.6 * CARD_SIZE[0]), int(PLAYER_4_HUB_POSITION[1])]
+    PLAYER_4_STACK_POSITION = [int(PLAYER_4_HUB_POSITION[0]), int(PLAYER_4_HUB_POSITION[1] + 0.75 * CARD_SIZE[1])]
+    PLAYER_4_BET_POSITION = [int(PLAYER_4_HUB_POSITION[0]), int(PLAYER_4_STACK_POSITION[1] + 1.25 * FONT_HEIGHT)]
+    PLAYER_4_BLIND_POSITION = [int(PLAYER_4_HUB_POSITION[0]), int(PLAYER_4_NAME_POSITION[1] - 1.25 * FONT_HEIGHT)]
+
     model: PokerGameModel
     screen: pygame.Surface
     background: pygame.Surface
     font: pygame.font.Font
-    text: pygame.Surface
-    textpos: pygame.Rect
     backSprites: pygame.sprite.RenderUpdates
     playerSprites: pygame.sprite.RenderUpdates
     communitySprites: pygame.sprite.RenderUpdates
-
-    testPointPosition: list[int]
-
-    # Constants... but set at runtime based on screen size
-    constTurretPosition: list[int]
-    constPlayer1Position: list[int]
-    constPlayer2Position: list[int]
-    constPlayer3Position: list[int]
-    constPlayer4Position: list[int]
 
     def __init__(self, model) -> None:
         # init pygame
@@ -32,19 +84,13 @@ class PokerGameView:
         self.model = model
 
         # setup the screen and load the background
-        self.screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
-        self.background = pygame.Surface(self.screen.get_size())
+        self.screen = pygame.display.set_mode((self.SCREEN_SIZE[0], self.SCREEN_SIZE[1]), pygame.NOFRAME)
+        self.background = pygame.Surface(self.SCREEN_SIZE)
         self.background = self.background.convert()
         self.background.fill((250, 250, 250))
 
-        # Set the turret position based on the screen size
-        self.constTurretPosition = [self.screen.get_width() / 2, self.screen.get_height() / 9]
-
-        # Set the player positions based on the screen size and the turret position
-        self.constPlayer1Position = [self.constTurretPosition[0] - 500, self.constTurretPosition[1] + 150]
-        self.constPlayer2Position = [self.constTurretPosition[0] - 200, self.constTurretPosition[1] + 500]
-        self.constPlayer3Position = [self.constTurretPosition[0] + 200, self.constTurretPosition[1] + 500]
-        self.constPlayer4Position = [self.constTurretPosition[0] + 500, self.constTurretPosition[1] + 150]
+        # load the font
+        self.font = pygame.font.Font(None, self.FONT_HEIGHT)
 
         # Create the render updates groups for the sprite categories
         self.backSprites = pygame.sprite.RenderUpdates()
@@ -52,47 +98,108 @@ class PokerGameView:
         self.communitySprites = pygame.sprite.RenderUpdates()
 
         # Add the table sprite to the background
-        newSprite = TableSprite(self.screen.get_size(), self.backSprites)
+        newSprite = TableSprite(self.TABLE_SIZE, self.backSprites)
 
-        self.testPointPosition = [self.screen.get_width() / 2, self.screen.get_height() / 2]
         print("Screen size: " + str(self.screen.get_size()))
 
-    def testMovingCards(self, show: bool) -> None:
-        # Create a five random cards to test that will go to each player position
+    def testDealCommunity(self, show: bool) -> None:
+        # Create five random cards to test each community card position
         card = Card(random.choice(list(Value)), random.choice(list(Suit)))
-        newSprite = CardSprite(card, self.constTurretPosition, self.constPlayer1Position, showCard=show, group=self.communitySprites)
+        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.COMMUNITY_1_POSITION, showCard=show, group=self.communitySprites)
         newSprite = None
         card = Card(random.choice(list(Value)), random.choice(list(Suit)))
-        newSprite = CardSprite(card, self.constTurretPosition, self.constPlayer2Position, showCard=show, group=self.communitySprites)
+        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.COMMUNITY_2_POSITION, showCard=show, group=self.communitySprites)
         newSprite = None
         card = Card(random.choice(list(Value)), random.choice(list(Suit)))
-        newSprite = CardSprite(card, self.constTurretPosition, self.constPlayer3Position, showCard=show, group=self.communitySprites)
+        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.COMMUNITY_3_POSITION, showCard=show, group=self.communitySprites)
         newSprite = None
         card = Card(random.choice(list(Value)), random.choice(list(Suit)))
-        newSprite = CardSprite(card, self.constTurretPosition, self.constPlayer4Position, showCard=show, group=self.communitySprites)
+        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.COMMUNITY_4_POSITION, showCard=show, group=self.communitySprites)
+        newSprite = None
+        card = Card(random.choice(list(Value)), random.choice(list(Suit)))
+        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.COMMUNITY_5_POSITION, showCard=show, group=self.communitySprites)
+        newSprite = None
+    
+    def testDealPlayer(self, show: bool) -> None:
+        # Create eight random cards to test each player position
+        card = Card(random.choice(list(Value)), random.choice(list(Suit)))
+        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.PLAYER_1_CARD_1_POSITION, showCard=show, group=self.playerSprites)
+        newSprite = None
+        card = Card(random.choice(list(Value)), random.choice(list(Suit)))
+        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.PLAYER_1_CARD_2_POSITION, showCard=show, group=self.playerSprites)
+        newSprite = None
+        card = Card(random.choice(list(Value)), random.choice(list(Suit)))
+        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.PLAYER_2_CARD_1_POSITION, showCard=show, group=self.playerSprites)
+        newSprite = None
+        card = Card(random.choice(list(Value)), random.choice(list(Suit)))
+        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.PLAYER_2_CARD_2_POSITION, showCard=show, group=self.playerSprites)
+        newSprite = None
+        card = Card(random.choice(list(Value)), random.choice(list(Suit)))
+        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.PLAYER_3_CARD_1_POSITION, showCard=show, group=self.playerSprites)
+        newSprite = None
+        card = Card(random.choice(list(Value)), random.choice(list(Suit)))
+        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.PLAYER_3_CARD_2_POSITION, showCard=show, group=self.playerSprites)
+        newSprite = None
+        card = Card(random.choice(list(Value)), random.choice(list(Suit)))
+        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.PLAYER_4_CARD_1_POSITION, showCard=show, group=self.playerSprites)
+        newSprite = None
+        card = Card(random.choice(list(Value)), random.choice(list(Suit)))
+        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.PLAYER_4_CARD_2_POSITION, showCard=show, group=self.playerSprites)
         newSprite = None
 
-    def testDrawPoint(self, direction, dist) -> None:
-        # This test method is to draw a point on the screen to get coordinates
-        # and eventually use to set the positions of the players
-        # It'll be given a direction to move the point, and will redraw the point
-        # and print out the current position
-        if direction == "up":
-            self.testPointPosition[1] -= dist
-        elif direction == "down":
-            self.testPointPosition[1] += dist
-        elif direction == "left":
-            self.testPointPosition[0] -= dist
-        elif direction == "right":
-            self.testPointPosition[0] += dist
-        elif direction == "reset":
-            self.testPointPosition = [self.screen.get_width() / 2, self.screen.get_height() / 2]
-        else:
-            print("Invalid direction")
-        
-        pygame.display.flip()
-        print(self.testPointPosition)
+    def testPlayerText(self) -> None:
+        # Create the text for the player names
+        newSprite = TextSprite("Player 1", self.font, [0, 0, 0], self.PLAYER_1_NAME_POSITION, self.playerSprites)
+        newSprite = None
+        newSprite = TextSprite("Player 2", self.font, [0, 0, 0], self.PLAYER_2_NAME_POSITION, self.playerSprites)
+        newSprite = None
+        newSprite = TextSprite("Player 3", self.font, [0, 0, 0], self.PLAYER_3_NAME_POSITION, self.playerSprites)
+        newSprite = None
+        newSprite = TextSprite("Player 4", self.font, [0, 0, 0], self.PLAYER_4_NAME_POSITION, self.playerSprites)
+        newSprite = None
 
+        # Create the text for the player chips
+        newSprite = TextSprite("Chips: 1000", self.font, [0, 0, 0], self.PLAYER_1_STACK_POSITION, self.playerSprites)
+        newSprite = None
+        newSprite = TextSprite("Chips: 1000", self.font, [0, 0, 0], self.PLAYER_2_STACK_POSITION, self.playerSprites)
+        newSprite = None
+        newSprite = TextSprite("Chips: 1000", self.font, [0, 0, 0], self.PLAYER_3_STACK_POSITION, self.playerSprites)
+        newSprite = None
+        newSprite = TextSprite("Chips: 1000", self.font, [0, 0, 0], self.PLAYER_4_STACK_POSITION, self.playerSprites)
+        newSprite = None
+
+        # Create the text for the player bets
+        newSprite = TextSprite("Bet: 0", self.font, [0, 0, 0], self.PLAYER_1_BET_POSITION, self.playerSprites)
+        newSprite = None
+        newSprite = TextSprite("Bet: 0", self.font, [0, 0, 0], self.PLAYER_2_BET_POSITION, self.playerSprites)
+        newSprite = None
+        newSprite = TextSprite("Bet: 0", self.font, [0, 0, 0], self.PLAYER_3_BET_POSITION, self.playerSprites)
+        newSprite = None
+        newSprite = TextSprite("Bet: 0", self.font, [0, 0, 0], self.PLAYER_4_BET_POSITION, self.playerSprites)
+        newSprite = None
+
+        # Create the text for if the player is small or big blind
+        newSprite = TextSprite("Small Blind", self.font, [0, 0, 0], self.PLAYER_1_BLIND_POSITION, self.playerSprites)
+        newSprite = None
+        newSprite = TextSprite("Big Blind", self.font, [0, 0, 0], self.PLAYER_2_BLIND_POSITION, self.playerSprites)
+        newSprite = None
+        newSprite = TextSprite("Small Blind", self.font, [0, 0, 0], self.PLAYER_3_BLIND_POSITION, self.playerSprites)
+        newSprite = None
+        newSprite = TextSprite("Big Blind", self.font, [0, 0, 0], self.PLAYER_4_BLIND_POSITION, self.playerSprites)
+        newSprite = None
+
+    def testDrawOther(self) -> None:
+        # Create the text for the pot
+        newSprite = TextSprite("Pot: 0", self.font, [0, 0, 0], self.POT_POSITION, self.communitySprites)
+        newSprite = None
+
+        # Deal card to the burn pile
+        newSprite = CardSprite(None, self.CARD_SIZE, self.TURRET_POSITION, self.BURN_POSITION, showCard=False, group=self.communitySprites)
+        newSprite = None
+
+        # Deal card to the deal position
+        newSprite = CardSprite(None, self.CARD_SIZE, self.TURRET_POSITION, self.DEAL_POSITION, showCard=False, group=self.communitySprites)
+        newSprite = None
 
     def update(self) -> None:
         
@@ -112,7 +219,6 @@ class PokerGameView:
         dirtyRects1 = self.backSprites.draw(self.screen)
         dirtyRects2 = self.playerSprites.draw(self.screen)
         dirtyRects3 = self.communitySprites.draw(self.screen)
-        pygame.draw.circle(self.screen, (0, 0, 0), self.testPointPosition, 5)
 
         # Update the display
         dirtyRects = dirtyRects1 + dirtyRects2 + dirtyRects3
@@ -172,31 +278,25 @@ while True:
         if event.type == pygame.QUIT:
             exit()
         if event.type == pygame.KEYDOWN:
-            # w key moves card backs to each player position
+            if event.key == pygame.K_ESCAPE:
+                exit()
+            # w key moves card backs to each community position
             if event.key == pygame.K_w:
-                view.testMovingCards(False)
-            # s key moves card fronts to each player position
+                view.testDealCommunity(False)
+            # s key moves card fronts to each community position
             if event.key == pygame.K_s:
-                view.testMovingCards(True)
-
-    keys = pygame.key.get_pressed()
-    dist = 1
-    if keys[pygame.K_RSHIFT]:
-        dist = 10
-    # up key moves the test point up
-    if keys[pygame.K_UP]:
-        view.testDrawPoint("up", dist)
-    # down key moves the test point down
-    if keys[pygame.K_DOWN]:
-        view.testDrawPoint("down", dist)
-    # left key moves the test point left
-    if keys[pygame.K_LEFT]:
-        view.testDrawPoint("left", dist)
-    # right key moves the test point right
-    if keys[pygame.K_RIGHT]:
-        view.testDrawPoint("right", dist)
-    # r key resets the test point to the center of the screen
-    if keys[pygame.K_r]:
-        view.testDrawPoint("reset", 0)
+                view.testDealCommunity(True)
+            # e key moves card backs to each player position
+            if event.key == pygame.K_e:
+                view.testDealPlayer(False)
+            # d key moves card fronts to each player position
+            if event.key == pygame.K_d:
+                view.testDealPlayer(True)
+            # q key displays the text
+            if event.key == pygame.K_q:
+                view.testPlayerText()
+            # r key displays the other text
+            if event.key == pygame.K_r:
+                view.testDrawOther()
 
     view.update()
