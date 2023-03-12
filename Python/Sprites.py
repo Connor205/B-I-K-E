@@ -13,7 +13,7 @@ class CardSprite(pygame.sprite.Sprite):
     # Constants
     CARD_BACK_PATH = "img/card_back_black.png"
 
-    def __init__(self, card: Card, cardSize: list[int], srcPos: list[int],  destPos: list[int], speed: float=0.6, showCard: bool=False, group=None):
+    def __init__(self, card: Card, cardSize: list[int], srcPos: list[int],  destPos: list[int], speed: float=0.6, showCard: bool=False, group: pygame.sprite.Group=None):
         pygame.sprite.Sprite.__init__(self, group)
         if (showCard):
             self.srcImage = pygame.image.load(self.getCardImagePath(card))
@@ -103,7 +103,7 @@ class TableSprite(pygame.sprite.Sprite):
     image: pygame.Surface
     rect: pygame.Rect
 
-    def __init__(self, screenSize, group=None):
+    def __init__(self, screenSize: list[int], group: pygame.sprite.Group=None):
         pygame.sprite.Sprite.__init__(self, group)
         self.srcImage = pygame.image.load(self.TABLE_PATH)
         self.srcImage = pygame.transform.scale(self.srcImage, screenSize)
@@ -121,7 +121,7 @@ class TextSprite(pygame.sprite.Sprite):
     rect: pygame.Rect
     pos: list[int]
 
-    def __init__(self, text: str, font: pygame.font.Font, color: tuple[int, int, int], pos: list[int], group=None):
+    def __init__(self, text: str, font: pygame.font.Font, color: tuple[int, int, int], pos: list[int], group: pygame.sprite.Group=None):
         pygame.sprite.Sprite.__init__(self, group)
         self.text = text
         self.font = font
