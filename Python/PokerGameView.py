@@ -1,10 +1,13 @@
 import pygame
 import random
-from typing import Tuple
+import logging
+import sys
 from PokerGameModel import PokerGameModel
 from Sprites import *
 from Card import Card
 from Enums import *
+
+
 class PokerGameView:
     # CONSTANTS
     # Sizes denote the actual sizes/lengths
@@ -71,17 +74,25 @@ class PokerGameView:
     PLAYER_4_BET_POSITION = [int(PLAYER_4_HUB_POSITION[0]), int(PLAYER_4_STACK_POSITION[1] + 1.25 * FONT_HEIGHT)]
     PLAYER_4_BLIND_POSITION = [int(PLAYER_4_HUB_POSITION[0]), int(PLAYER_4_NAME_POSITION[1] - 1.25 * FONT_HEIGHT)]
 
+    logger: logging.Logger
     model: PokerGameModel
     screen: pygame.Surface
     background: pygame.Surface
     font: pygame.font.Font
-    fontColor: Tuple[int, int, int]
+    fontColor: tuple[int, int, int]
     backSprites: pygame.sprite.RenderUpdates
-    playerSprites: pygame.sprite.RenderUpdates
+    player1Sprites: pygame.sprite.RenderUpdates
+    player2Sprites: pygame.sprite.RenderUpdates
+    player3Sprites: pygame.sprite.RenderUpdates
+    player4Sprites: pygame.sprite.RenderUpdates
     communitySprites: pygame.sprite.RenderUpdates
     menuSprites: pygame.sprite.RenderUpdates
 
     def __init__(self, model) -> None:
+        # init the logger
+        self.logger = logging.getLogger(__name__)
+        self.logger.addHandler(logging.StreamHandler(sys.stdout))
+
         # init pygame
         pygame.init()
 
@@ -101,7 +112,10 @@ class PokerGameView:
 
         # Create the render updates groups for the sprite categories
         self.backSprites = pygame.sprite.RenderUpdates()
-        self.playerSprites = pygame.sprite.RenderUpdates()
+        self.player1Sprites = pygame.sprite.RenderUpdates()
+        self.player2Sprites = pygame.sprite.RenderUpdates()
+        self.player3Sprites = pygame.sprite.RenderUpdates()
+        self.player4Sprites = pygame.sprite.RenderUpdates()
         self.communitySprites = pygame.sprite.RenderUpdates()
         self.menuSprites = pygame.sprite.RenderUpdates()
 
@@ -131,69 +145,69 @@ class PokerGameView:
     def testDealPlayer(self, show: bool) -> None:
         # Create eight random cards to test each player position
         card = Card(random.choice(list(Value)), random.choice(list(Suit)))
-        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.PLAYER_1_CARD_1_POSITION, showCard=show, group=self.playerSprites)
+        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.PLAYER_1_CARD_1_POSITION, showCard=show, group=self.player1Sprites)
         newSprite = None
         card = Card(random.choice(list(Value)), random.choice(list(Suit)))
-        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.PLAYER_1_CARD_2_POSITION, showCard=show, group=self.playerSprites)
+        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.PLAYER_1_CARD_2_POSITION, showCard=show, group=self.player1Sprites)
         newSprite = None
         card = Card(random.choice(list(Value)), random.choice(list(Suit)))
-        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.PLAYER_2_CARD_1_POSITION, showCard=show, group=self.playerSprites)
+        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.PLAYER_2_CARD_1_POSITION, showCard=show, group=self.player2Sprites)
         newSprite = None
         card = Card(random.choice(list(Value)), random.choice(list(Suit)))
-        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.PLAYER_2_CARD_2_POSITION, showCard=show, group=self.playerSprites)
+        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.PLAYER_2_CARD_2_POSITION, showCard=show, group=self.player2Sprites)
         newSprite = None
         card = Card(random.choice(list(Value)), random.choice(list(Suit)))
-        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.PLAYER_3_CARD_1_POSITION, showCard=show, group=self.playerSprites)
+        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.PLAYER_3_CARD_1_POSITION, showCard=show, group=self.player3Sprites)
         newSprite = None
         card = Card(random.choice(list(Value)), random.choice(list(Suit)))
-        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.PLAYER_3_CARD_2_POSITION, showCard=show, group=self.playerSprites)
+        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.PLAYER_3_CARD_2_POSITION, showCard=show, group=self.player3Sprites)
         newSprite = None
         card = Card(random.choice(list(Value)), random.choice(list(Suit)))
-        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.PLAYER_4_CARD_1_POSITION, showCard=show, group=self.playerSprites)
+        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.PLAYER_4_CARD_1_POSITION, showCard=show, group=self.player4Sprites)
         newSprite = None
         card = Card(random.choice(list(Value)), random.choice(list(Suit)))
-        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.PLAYER_4_CARD_2_POSITION, showCard=show, group=self.playerSprites)
+        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.PLAYER_4_CARD_2_POSITION, showCard=show, group=self.player4Sprites)
         newSprite = None
 
     def testPlayerText(self) -> None:
         # Create the text for the player names
-        newSprite = TextSprite("Player 1", self.font, self.fontColor, self.PLAYER_1_NAME_POSITION, self.playerSprites)
+        newSprite = TextSprite("Player 1", self.font, self.fontColor, self.PLAYER_1_NAME_POSITION, self.player1Sprites)
         newSprite = None
-        newSprite = TextSprite("Player 2", self.font, self.fontColor, self.PLAYER_2_NAME_POSITION, self.playerSprites)
+        newSprite = TextSprite("Player 2", self.font, self.fontColor, self.PLAYER_2_NAME_POSITION, self.player2Sprites)
         newSprite = None
-        newSprite = TextSprite("Player 3", self.font, self.fontColor, self.PLAYER_3_NAME_POSITION, self.playerSprites)
+        newSprite = TextSprite("Player 3", self.font, self.fontColor, self.PLAYER_3_NAME_POSITION, self.player3Sprites)
         newSprite = None
-        newSprite = TextSprite("Player 4", self.font, self.fontColor, self.PLAYER_4_NAME_POSITION, self.playerSprites)
+        newSprite = TextSprite("Player 4", self.font, self.fontColor, self.PLAYER_4_NAME_POSITION, self.player4Sprites)
         newSprite = None
 
         # Create the text for the player chips
-        newSprite = TextSprite("Chips: 1000", self.font, self.fontColor, self.PLAYER_1_STACK_POSITION, self.playerSprites)
+        newSprite = TextSprite("Chips: 1000", self.font, self.fontColor, self.PLAYER_1_STACK_POSITION, self.player1Sprites)
         newSprite = None
-        newSprite = TextSprite("Chips: 1000", self.font, self.fontColor, self.PLAYER_2_STACK_POSITION, self.playerSprites)
+        newSprite = TextSprite("Chips: 1000", self.font, self.fontColor, self.PLAYER_2_STACK_POSITION, self.player2Sprites)
         newSprite = None
-        newSprite = TextSprite("Chips: 1000", self.font, self.fontColor, self.PLAYER_3_STACK_POSITION, self.playerSprites)
+        newSprite = TextSprite("Chips: 1000", self.font, self.fontColor, self.PLAYER_3_STACK_POSITION, self.player3Sprites)
         newSprite = None
-        newSprite = TextSprite("Chips: 1000", self.font, self.fontColor, self.PLAYER_4_STACK_POSITION, self.playerSprites)
+        newSprite = TextSprite("Chips: 1000", self.font, self.fontColor, self.PLAYER_4_STACK_POSITION, self.player4Sprites)
         newSprite = None
 
         # Create the text for the player bets
-        newSprite = TextSprite("Bet: 0", self.font, self.fontColor, self.PLAYER_1_BET_POSITION, self.playerSprites)
+        newSprite = TextSprite("Bet: 0", self.font, self.fontColor, self.PLAYER_1_BET_POSITION, self.player1Sprites)
         newSprite = None
-        newSprite = TextSprite("Bet: 0", self.font, self.fontColor, self.PLAYER_2_BET_POSITION, self.playerSprites)
+        newSprite = TextSprite("Bet: 0", self.font, self.fontColor, self.PLAYER_2_BET_POSITION, self.player2Sprites)
         newSprite = None
-        newSprite = TextSprite("Bet: 0", self.font, self.fontColor, self.PLAYER_3_BET_POSITION, self.playerSprites)
+        newSprite = TextSprite("Bet: 0", self.font, self.fontColor, self.PLAYER_3_BET_POSITION, self.player3Sprites)
         newSprite = None
-        newSprite = TextSprite("Bet: 0", self.font, self.fontColor, self.PLAYER_4_BET_POSITION, self.playerSprites)
+        newSprite = TextSprite("Bet: 0", self.font, self.fontColor, self.PLAYER_4_BET_POSITION, self.player4Sprites)
         newSprite = None
 
         # Create the text for if the player is small or big blind
-        newSprite = TextSprite("Small Blind", self.font, self.fontColor, self.PLAYER_1_BLIND_POSITION, self.playerSprites)
+        newSprite = TextSprite("Small Blind", self.font, self.fontColor, self.PLAYER_1_BLIND_POSITION, self.player1Sprites)
         newSprite = None
-        newSprite = TextSprite("Big Blind", self.font, self.fontColor, self.PLAYER_2_BLIND_POSITION, self.playerSprites)
+        newSprite = TextSprite("Big Blind", self.font, self.fontColor, self.PLAYER_2_BLIND_POSITION, self.player2Sprites)
         newSprite = None
-        newSprite = TextSprite("Small Blind", self.font, self.fontColor, self.PLAYER_3_BLIND_POSITION, self.playerSprites)
+        newSprite = TextSprite("Small Blind", self.font, self.fontColor, self.PLAYER_3_BLIND_POSITION, self.player3Sprites)
         newSprite = None
-        newSprite = TextSprite("Big Blind", self.font, self.fontColor, self.PLAYER_4_BLIND_POSITION, self.playerSprites)
+        newSprite = TextSprite("Big Blind", self.font, self.fontColor, self.PLAYER_4_BLIND_POSITION, self.player4Sprites)
         newSprite = None
 
     def testDrawOther(self) -> None:
@@ -236,68 +250,254 @@ class PokerGameView:
         newSprite = TextSprite("White Chip Value: 1", self.font, self.fontColor, pos, self.menuSprites)
         newSprite = None
 
-    # Method to display the menu
+    def getPlayerPositions(self, seatNumber: Seat) -> dict[str, list[int]]:
+        """
+        Method to get the position constants corresponding to a player
+
+        Args:
+            seatNumber (Seat): The seat number of the player
+
+        Returns:
+            dict[str, list[int]]: The position constants for the player. 
+            The first element is the hub position, 
+            the second is the name position, 
+            the third is the first card position, 
+            the fourth is the second card position, 
+            the fifth is the stack position, 
+            the sixth is the bet position, 
+            and the seventh is the blind position
+        """
+        if seatNumber == Seat.ONE:
+            return {
+                "hub": self.PLAYER_1_HUB_POSITION, 
+                "name": self.PLAYER_1_NAME_POSITION, 
+                "card1": self.PLAYER_1_CARD_1_POSITION, 
+                "card2": self.PLAYER_1_CARD_2_POSITION, 
+                "stack": self.PLAYER_1_STACK_POSITION, 
+                "bet": self.PLAYER_1_BET_POSITION, 
+                "blind": self.PLAYER_1_BLIND_POSITION
+                }
+        elif seatNumber == Seat.TWO:
+            return {
+                "hub": self.PLAYER_2_HUB_POSITION,
+                "name": self.PLAYER_2_NAME_POSITION,
+                "card1": self.PLAYER_2_CARD_1_POSITION,
+                "card2": self.PLAYER_2_CARD_2_POSITION,
+                "stack": self.PLAYER_2_STACK_POSITION,
+                "bet": self.PLAYER_2_BET_POSITION,
+                "blind": self.PLAYER_2_BLIND_POSITION
+                }
+        elif seatNumber == Seat.THREE:
+            return {
+                "hub": self.PLAYER_3_HUB_POSITION,
+                "name": self.PLAYER_3_NAME_POSITION,
+                "card1": self.PLAYER_3_CARD_1_POSITION,
+                "card2": self.PLAYER_3_CARD_2_POSITION,
+                "stack": self.PLAYER_3_STACK_POSITION,
+                "bet": self.PLAYER_3_BET_POSITION,
+                "blind": self.PLAYER_3_BLIND_POSITION
+                }
+        elif seatNumber == Seat.FOUR:
+            return {
+                "hub": self.PLAYER_4_HUB_POSITION,
+                "name": self.PLAYER_4_NAME_POSITION,
+                "card1": self.PLAYER_4_CARD_1_POSITION,
+                "card2": self.PLAYER_4_CARD_2_POSITION,
+                "stack": self.PLAYER_4_STACK_POSITION,
+                "bet": self.PLAYER_4_BET_POSITION,
+                "blind": self.PLAYER_4_BLIND_POSITION
+                }
+        
+    def getPlayerGroup(self, seatNumber: Seat) -> pygame.sprite.Group:
+        """
+        Method to get the sprite group for a player
+
+        Args:
+            seatNumber (Seat): The seat number of the player
+
+        Returns:
+            pygame.sprite.Group: The sprite group for the player
+        """
+        if seatNumber == Seat.ONE:
+            return self.player1Sprites
+        elif seatNumber == Seat.TWO:
+            return self.player2Sprites
+        elif seatNumber == Seat.THREE:
+            return self.player3Sprites
+        elif seatNumber == Seat.FOUR:
+            return self.player4Sprites
+        
+    # TODO: Method to display the menu
     # Update the text menu items based on the model
     # or have the item to be updated passed as an arg but makes more sense to have the model passed
     
-    # Method to create a player hub
-    # Needs to be passed the player number
-    # Displays name - given as arg or get from model or default
-    # Displays chips - maybe have default value
-    # Displays bet - set at 0
+    def createPlayerHub(self, seatNumber: Seat) -> None:
+        """
+        Method to create a player hub
 
-    # Method to remove a player hub
-    # Needs to be passed the player number
-    # Removes the player hub
+        Args:
+            seatNumber (Seat): The seat number of the player
+        """
+        # Get the positions for the player
+        positions = self.getPlayerPositions(seatNumber)
 
-    # Method to indicate the player is the small or big blind
-    # Needs to be passed the player number
-    # Needs to be passed the blind type
-    # Displays the blind type for that player
+        # Get the sprite group for the player
+        playerGroup = self.getPlayerGroup(seatNumber)
 
-    # Method to update the player chips
+        # The player group should be empty
+        # If it isn't, log an error and return
+        if len(playerGroup) > 0:
+            logging.error("Trying to create a player hub for a non-empty layer group")
+            return
+
+        # Create the text for the player name
+        newSprite = TextSprite("Player", self.font, self.fontColor, positions["name"], playerGroup)
+        newSprite = None
+
+        # Create the text for the player chips
+        newSprite = TextSprite("Chips: 1000", self.font, self.fontColor, positions["stack"], playerGroup)
+        newSprite = None
+
+        # Create the text for the player bet
+        newSprite = TextSprite("Bet: 0", self.font, self.fontColor, positions["bet"], playerGroup)
+        newSprite = None
+
+    def removePlayerHub(self, seatNumber: Seat) -> None:
+        """
+        Method to remove a player hub
+
+        Args:
+            seatNumber (Seat): The seat number of the player
+        """
+        # Get the sprite group for the player
+        playerGroup = self.getPlayerGroup(seatNumber)
+
+        # Remove all the sprites from the group
+        playerGroup.empty()
+
+    def setBlind(self, seatNumber: Seat, blindType: Blind) -> None:
+        """
+        Method to set the blind for a player
+
+        Args:
+            seatNumber (Seat): The seat number of the player
+            blindType (Blind): The blind type
+        """
+        # Get the positions for the player
+        positions = self.getPlayerPositions(seatNumber)
+
+        # Get the sprite group for the player
+        playerGroup = self.getPlayerGroup(seatNumber)
+
+        # Create the text for the player blind
+        newSprite = TextSprite(blindType.name, self.font, self.fontColor, positions["blind"], playerGroup)
+        newSprite = None
+
+    # TODO: Method to update the player chips
     # Needs to be passed the player number
     # Needs to be passed the new chip value
     # or alternatively get the values from the model when called
     # Displays the chips for that player
 
-    # Method to update the player bet (updated value)
+    # TODO: Method to update the player bet (updated value)
     # Needs to be passed the player number
     # Needs to be passed the new bet value
     # or alternatively get the values from the model when called
     # Displays the bet for that player
 
-    # Method to update the pot
+    # TODO: Method to update the pot
     # Needs to be passed the new pot value
     # or alternatively get the value from the model when called
     # Displays the pot
 
-    # Method to deal a card to the burn pile
+    # TODO: Method to deal a card to the burn pile
     # Needs to be passed the card to be dealt
     # or alternatively get the card from the model when called
     # Displays the card moving to the burn pile
 
-    # Method to deal the flop
-    # Needs to be passed the cards to be dealt
-    # or alternatively get the cards from the model when called
-    # Displays the 3 cards moving to the flop
+    def dealFlop(self) -> None:
+        """
+        Method to deal the flop
+        """
+        # Get the community cards from the model
+        communityCards = self.model.getCommunityCards()
+        # Ensure there are 3 cards
+        if len(communityCards) < 3:
+            self.logger.error("Not enough community cards to deal flop")
+            return
+        # Deal the first card
+        newSprite = CardSprite(communityCards[0], self.CARD_SIZE, self.TURRET_POSITION, self.COMMUNITY_1_POSITION, showCard=True, group=self.communitySprites)
+        newSprite = None
+        # Deal the second card
+        newSprite = CardSprite(communityCards[1], self.CARD_SIZE, self.TURRET_POSITION, self.COMMUNITY_2_POSITION, showCard=True, group=self.communitySprites)
+        newSprite = None
+        # Deal the third card
+        newSprite = CardSprite(communityCards[2], self.CARD_SIZE, self.TURRET_POSITION, self.COMMUNITY_3_POSITION, showCard=True, group=self.communitySprites)
+        newSprite = None
 
-    # Method to deal the turn
-    # Needs to be passed the card to be dealt
-    # or alternatively get the card from the model when called
-    # Displays the card moving to the turn
+    def dealTurn(self) -> None:
+        """
+        Method to deal the turn
+        """
+        # Get the community cards from the model
+        communityCards = self.model.getCommunityCards()
+        # Ensure there are 4 cards
+        if len(communityCards) < 4:
+            self.logger.error("Not enough community cards to deal turn")
+            return
+        # Deal the card
+        newSprite = CardSprite(communityCards[3], self.CARD_SIZE, self.TURRET_POSITION, self.COMMUNITY_4_POSITION, showCard=True, group=self.communitySprites)
 
-    # Method to deal the river
-    # Needs to be passed the card to be dealt
-    # or alternatively get the card from the model when called
-    # Displays the card moving to the river
+    def dealRiver(self) -> None:
+        """
+        Method to deal the river
+        """
+        # Get the community cards from the model
+        communityCards = self.model.getCommunityCards()
+        # Ensure there are 5 cards
+        if len(communityCards) < 5:
+            self.logger.error("Not enough community cards to deal river")
+            return
+        # Deal the card
+        newSprite = CardSprite(communityCards[4], self.CARD_SIZE, self.TURRET_POSITION, self.COMMUNITY_5_POSITION, showCard=True, group=self.communitySprites)
 
-    # Method to deal a card to a player
-    # Needs to be passed the player number
-    # Needs to be passed the card to be dealt
-    # or alternatively get the card from the model when called
-    # Displays the card moving to the player
-    # Needs to move to the right position
+    def getPlayerCardPosition(self, seatNumber: Seat, cardNumber: int) -> list[int]:
+        """
+        Method to get the position of a player card
+
+        Args:
+            seatNumber (Seat): The seat number of the player
+            cardNumber (int): The card number to be dealt (1 or 2)
+
+        Returns:
+            List[int]: The position of the card. Returns [0, 0] if an error occurs
+        """
+        if (cardNumber < 1) or (cardNumber > 2):
+            self.logger.error("The card number must be 1 or 2")
+            return [0, 0]
+        
+        playerPositions = self.getPlayerPositions(seatNumber)
+        if cardNumber == 1:
+            return playerPositions["card1"]
+        else:
+            return playerPositions["card2"]
+    
+    def dealPlayerCard(self, seatNumber: Seat, card: Card, cardNumber: int) -> None:
+        """
+        Method to deal a card to a player
+
+        Args:
+            seatNumber (Seat): The seat number of the player
+            card (Card): The card to be dealt
+            cardNumber (int): The card number to be dealt (1 or 2)
+        """
+        if (cardNumber < 1) or (cardNumber > 2):
+            self.logger.error("The card number must be 1 or 2")
+            return
+        cardPosition = self.getPlayerCardPosition(seatNumber, cardNumber)
+        playerGroup = self.getPlayerGroup(seatNumber)
+        # Deal the card
+        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, cardPosition, showCard=False, group=playerGroup)
 
     # Method to indicate the player is the winner
     # Needs to be passed the player number
@@ -323,7 +523,10 @@ class PokerGameView:
         
         # Clear the sprites on screen
         self.backSprites.clear(self.screen, self.background)
-        self.playerSprites.clear(self.screen, self.background)
+        self.player1Sprites.clear(self.screen, self.background)
+        self.player2Sprites.clear(self.screen, self.background)
+        self.player3Sprites.clear(self.screen, self.background)
+        self.player4Sprites.clear(self.screen, self.background)
         self.communitySprites.clear(self.screen, self.background)
         self.menuSprites.clear(self.screen, self.background)
 
@@ -331,18 +534,24 @@ class PokerGameView:
 
         # Update the sprites giving the time
         self.backSprites.update(seconds)
-        self.playerSprites.update(seconds)
+        self.player1Sprites.update(seconds)
+        self.player2Sprites.update(seconds)
+        self.player3Sprites.update(seconds)
+        self.player4Sprites.update(seconds)
         self.communitySprites.update(seconds)
         self.menuSprites.update(seconds)
 
         # Draw the sprites on screen
         dirtyRects1 = self.backSprites.draw(self.screen)
-        dirtyRects2 = self.playerSprites.draw(self.screen)
-        dirtyRects3 = self.communitySprites.draw(self.screen)
-        dirtyRects4 = self.menuSprites.draw(self.screen)
+        dirtyRects2 = self.player1Sprites.draw(self.screen)
+        dirtyRects3 = self.player2Sprites.draw(self.screen)
+        dirtyRects4 = self.player3Sprites.draw(self.screen)
+        dirtyRects5 = self.player4Sprites.draw(self.screen)
+        dirtyRects6 = self.communitySprites.draw(self.screen)
+        dirtyRects7 = self.menuSprites.draw(self.screen)
 
         # Update the display
-        dirtyRects = dirtyRects1 + dirtyRects2 + dirtyRects3 + dirtyRects4
+        dirtyRects = dirtyRects1 + dirtyRects2 + dirtyRects3 + dirtyRects4 + dirtyRects5 + dirtyRects6 + dirtyRects7
         pygame.display.update(dirtyRects)
 
 

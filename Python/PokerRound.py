@@ -23,3 +23,6 @@ class PokerRound():
         self.communityCards = []
         self.deck = Deck()
         self.turnIndex = 0
+
+    def getCommunityCards(self) -> list[Card]:
+        return self.communityCards
