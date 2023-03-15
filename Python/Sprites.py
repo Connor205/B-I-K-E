@@ -2,6 +2,7 @@ import pygame
 from Card import Card
 
 class CardSprite(pygame.sprite.Sprite):
+    """Class representing a playing card sprite in poker."""
     card: Card
     srcImage: pygame.Surface
     backImage: pygame.Surface
@@ -16,12 +17,24 @@ class CardSprite(pygame.sprite.Sprite):
     CARD_BACK_PATH = "img/card_back_black.png"
 
     def __init__(self, card: Card, cardSize: list[int], srcPos: list[int],  destPos: list[int], speed: float=0.6, showCard: bool=False, group: pygame.sprite.Group=None):
+        """
+        Constructor for CardSprite.
+
+        Args:
+            card (Card): Card to represent.
+            cardSize (list[int]): Size of the card as (width, height).
+            srcPos (list[int]): Source position of the card.
+            destPos (list[int]): Destination position of the card.
+            speed (float, optional): Speed of the card movement. Defaults to 0.6.
+            showCard (bool, optional): Whether to show the card face or the back. Defaults to False.
+            group (pygame.sprite.Group, optional): Group to add this sprite to. Defaults to None.
+        """
         pygame.sprite.Sprite.__init__(self, group)
         self.srcImage = pygame.image.load(self.getCardImagePath(card))
         self.srcImage = pygame.transform.scale(self.srcImage, cardSize)
         self.backImage = pygame.image.load(self.CARD_BACK_PATH)
         self.backImage = pygame.transform.scale(self.backImage, cardSize)
-        
+
         if (showCard):
             self.image = self.srcImage
         else:
@@ -36,8 +49,8 @@ class CardSprite(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.speed = speed
 
-    # Update this card's position 
     def update(self, seconds: float) -> None:
+        """Updates the position of the card sprite."""
         # updated position over the destination pos
         # calibrate the final pos not over the destPos
         if self.destPos[0] - self.srcPos[0] < 0 \
@@ -64,16 +77,16 @@ class CardSprite(pygame.sprite.Sprite):
         self.rect.centerx = round(self.pos[0], 0)
         self.rect.centery = round(self.pos[1], 0)
 
-    # Get the delta x using the speed and the time
     def getDeltaX(self, seconds: float) -> float:
+        """Get the delta x using the speed and the given time."""
         return (-1.0) *(self.srcPos[0] - self.destPos[0]) / seconds / self.speed
 
-    # Get the delta y using the speed and the time
     def getDeltaY(self, seconds: float) -> float:
+        """Get the delta y using the speed and the given time."""
         return (-1.0) *(self.srcPos[1] - self.destPos[1]) / seconds / self.speed
 
-    # Get the image name of the card
     def getCardImagePath(self, card: Card) -> str:
+        """Get the image path of the card."""
         suit = card.suit
         value = card.value
 
@@ -103,25 +116,33 @@ class CardSprite(pygame.sprite.Sprite):
         path = 'img/' + value_str + suit_str + '.png'
         return path
     
-    # Flip the card
     def flip(self) -> None:
+        """Flip the card by changing the image of the sprite."""
         if self.image == self.srcImage:
             self.image = self.backImage
         else:
             self.image = self.srcImage
 
-    # Get the card
     def getCard(self) -> Card:
+        """Get the card represented by this sprite."""
         return self.card
 
 
 class TableSprite(pygame.sprite.Sprite):
+    """Sprite representing the table."""
     TABLE_PATH = "img/Table.png"
     srcImage: pygame.Surface
     image: pygame.Surface
     rect: pygame.Rect
 
     def __init__(self, screenSize: list[int], group: pygame.sprite.Group=None):
+        """
+        Initialize the table sprite.
+        
+        Args:
+            screenSize (list[int]): Size of the screen as (width, height)
+            group (pygame.sprite.Group, optional): Group to add this sprite to. Defaults to None.
+        """
         pygame.sprite.Sprite.__init__(self, group)
         self.srcImage = pygame.image.load(self.TABLE_PATH)
         self.srcImage = pygame.transform.scale(self.srcImage, screenSize)
@@ -129,9 +150,11 @@ class TableSprite(pygame.sprite.Sprite):
         self.rect = (0, 0)
 
     def update(self, seconds):
+        """Updates the table sprite."""
         pass
 
 class TextSprite(pygame.sprite.Sprite):
+    """Sprite representing text."""
     text: str
     font: pygame.font.Font
     color: tuple[int, int, int]
@@ -140,6 +163,16 @@ class TextSprite(pygame.sprite.Sprite):
     pos: list[int]
 
     def __init__(self, text: str, font: pygame.font.Font, color: tuple[int, int, int], pos: list[int], group: pygame.sprite.Group=None):
+        """
+        Initialize the text sprite.
+        
+        Args:
+            text (str): Text to display
+            font (pygame.font.Font): Font to use
+            color (tuple[int, int, int]): Color of the text
+            pos (list[int]): Position of the text
+            group (pygame.sprite.Group, optional): Group to add this sprite to. Defaults to None.
+        """
         pygame.sprite.Sprite.__init__(self, group)
         self.text = text
         self.font = font
@@ -150,8 +183,10 @@ class TextSprite(pygame.sprite.Sprite):
         self.rect.center = pos
 
     def write(self, text: str):
+        """Write the given text."""
         self.text = text
         self.image = self.font.render(self.text, True, self.color)
 
     def update(self, seconds):
+        """Updates the text sprite."""
         pass
