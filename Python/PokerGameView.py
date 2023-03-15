@@ -216,11 +216,13 @@ class PokerGameView:
         newSprite = None
 
         # Deal card to the burn pile
-        newSprite = CardSprite(None, self.CARD_SIZE, self.TURRET_POSITION, self.BURN_POSITION, showCard=False, group=self.communitySprites)
+        card = Card(random.choice(list(Value)), random.choice(list(Suit)))
+        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.BURN_POSITION, showCard=False, group=self.communitySprites)
         newSprite = None
 
         # Deal card to the deal position
-        newSprite = CardSprite(None, self.CARD_SIZE, self.TURRET_POSITION, self.DEAL_POSITION, showCard=False, group=self.communitySprites)
+        card = Card(random.choice(list(Value)), random.choice(list(Suit)))
+        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.DEAL_POSITION, showCard=False, group=self.communitySprites)
         newSprite = None
 
     def testDrawMenu(self) -> None:
@@ -330,6 +332,20 @@ class PokerGameView:
     # TODO: Method to display the menu
     # Update the text menu items based on the model
     # or have the item to be updated passed as an arg but makes more sense to have the model passed
+
+    def createPot(self) -> None:
+        """
+        Method to create the pot
+        """
+        # The pot group should be empty
+        # If it isn't, log an error and return
+        if len(self.communitySprites) > 0:
+            logging.error("Trying to create a pot for a non-empty layer group")
+            return
+
+        # Create the text for the pot
+        newSprite = TextSprite("Pot: 0", self.font, self.fontColor, self.POT_POSITION, self.communitySprites)
+        newSprite = None
     
     def createPlayerHub(self, seatNumber: Seat) -> None:
         """
@@ -389,26 +405,77 @@ class PokerGameView:
         # Get the sprite group for the player
         playerGroup = self.getPlayerGroup(seatNumber)
 
+        # The player group should be created and have exactly 3 sprites (no cards dealt yet)
+        # If it isn't, log an error and return
+        if len(playerGroup) != 3:
+            logging.error("Trying to set a blind for a player with an invalid number of sprites")
+            return
+
         # Create the text for the player blind
         newSprite = TextSprite(blindType.name, self.font, self.fontColor, positions["blind"], playerGroup)
         newSprite = None
 
-    # TODO: Method to update the player chips
-    # Needs to be passed the player number
-    # Needs to be passed the new chip value
-    # or alternatively get the values from the model when called
-    # Displays the chips for that player
+    def updatePlayerChips(self, seatNumber: Seat, newChipValue: int) -> None:
+        """
+        Method to update the player chips
 
-    # TODO: Method to update the player bet (updated value)
-    # Needs to be passed the player number
-    # Needs to be passed the new bet value
-    # or alternatively get the values from the model when called
-    # Displays the bet for that player
+        Args:
+            seatNumber (Seat): The seat number of the player
+            newChipValue (int): The new chip value
+        """
 
-    # TODO: Method to update the pot
-    # Needs to be passed the new pot value
-    # or alternatively get the value from the model when called
-    # Displays the pot
+        # Get the sprite group for the player
+        playerGroup = self.getPlayerGroup(seatNumber)
+
+        if len(playerGroup) == 0:
+            logging.error("Trying to update the player chips for an empty player group")
+            return
+
+        # Get the player chips text sprite - at index 1
+        playerChipsSprite = playerGroup.sprites()[1]
+
+        # Update the text
+        playerChipsSprite.write("Chips: " + str(newChipValue))
+
+    def updatePlayerBet(self, seatNumber: Seat, newBetValue: int) -> None:
+        """
+        Method to update the player bet
+
+        Args:
+            seatNumber (Seat): The seat number of the player
+            newBetValue (int): The new bet value
+        """
+
+        # Get the sprite group for the player
+        playerGroup = self.getPlayerGroup(seatNumber)
+
+        if len(playerGroup) == 0:
+            logging.error("Trying to update the player bet for an empty player group")
+            return
+
+        # Get the player bet text sprite - at index 2
+        playerBetSprite = playerGroup.sprites()[2]
+
+        # Update the text
+        playerBetSprite.write("Bet: " + str(newBetValue))
+
+    def updatePot(self, newPotValue: int) -> None:
+        """
+        Method to update the pot
+
+        Args:
+            newPotValue (int): The new pot value
+        """
+
+        if len(self.communitySprites) == 0:
+            logging.error("Trying to update the pot for an empty community sprite group")
+            return
+
+        # Get the pot text sprite - at index 0
+        potSprite = self.communitySprites.sprites()[0]
+
+        # Update the text
+        potSprite.write("Pot: " + str(newPotValue))
 
     # TODO: Method to deal a card to the burn pile
     # Needs to be passed the card to be dealt
@@ -499,24 +566,107 @@ class PokerGameView:
         # Deal the card
         newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, cardPosition, showCard=False, group=playerGroup)
 
-    # Method to indicate the player is the winner
+    # TODO: Method to indicate the player is the winner
     # Needs to be passed the player number
     # Displays the winner text for that player
 
-    # Method to indicate the player turn
+    # TODO: Method to indicate the player turn
     # Needs to be passed the player number
     # Displays the indicator for that player
 
-    # Method to flip a card
-    # Needs to be passed the card to be flipped
-    # or alternatively get the card from the model when called
-    # Displays the card flipped
-    # Can be used for the community cards or the player cards
+    def findCardSprite(self, card: Card) -> CardSprite:
+        """
+        Method to find the card sprite for a card. Cards should only be in the player groups or the community group
 
-    # Method to reset the round
-    # Removes all cards from the screen
-    # Resets the pot
-    # Resets the player bets
+        Args:
+            card (Card): The card to find the sprite for
+
+        Returns:
+            CardSprite: The card sprite
+        """
+        for sprite in self.player1Sprites:
+            if type(sprite) == CardSprite and sprite.getCard().isSameCard(card):
+                return sprite
+        for sprite in self.player2Sprites:
+            if type(sprite) == CardSprite and sprite.getCard().isSameCard(card):
+                return sprite
+        for sprite in self.player3Sprites:
+            if type(sprite) == CardSprite and sprite.getCard().isSameCard(card):
+                return sprite
+        for sprite in self.player4Sprites:
+            if type(sprite) == CardSprite and sprite.getCard().isSameCard(card):
+                return sprite
+        for sprite in self.communitySprites:
+            if type(sprite) == CardSprite and sprite.getCard().isSameCard(card):
+                return sprite
+        self.logger.error("Unable to find the card sprite for card " + str(card))
+        return None
+
+    def flipCard(self, card: Card) -> None:
+        """
+        Method to flip a card
+
+        Args:
+            card (Card): The card to be flipped
+        """
+        cardSprite = self.findCardSprite(card)
+        if cardSprite is None:
+            self.logger.error("Unable to find the card sprite to flip for card " + str(card))
+            return
+        cardSprite.flip()
+
+    def resetRound(self) -> None:
+        """
+        Method to reset the round. 
+
+        Removes all cards from the screen,
+        resets the pot, 
+        resets the player bets.
+        """
+
+        # Remove the cards
+        spritesToRemove = []
+        for sprite in self.player1Sprites:
+            if type(sprite) == CardSprite:
+                spritesToRemove.append(sprite)
+        self.player1Sprites.remove(spritesToRemove)
+
+        spritesToRemove = []
+        for sprite in self.player2Sprites:
+            if type(sprite) == CardSprite:
+                spritesToRemove.append(sprite)
+        self.player2Sprites.remove(spritesToRemove)
+
+        spritesToRemove = []
+        for sprite in self.player3Sprites:
+            if type(sprite) == CardSprite:
+                spritesToRemove.append(sprite)
+        self.player3Sprites.remove(spritesToRemove)
+
+        spritesToRemove = []
+        for sprite in self.player4Sprites:
+            if type(sprite) == CardSprite:
+                spritesToRemove.append(sprite)
+        self.player4Sprites.remove(spritesToRemove)
+
+        spritesToRemove = []
+        for sprite in self.communitySprites:
+            if type(sprite) == CardSprite:
+                spritesToRemove.append(sprite)
+        self.communitySprites.remove(spritesToRemove)
+
+        # Reset the pot
+        self.updatePot(0)
+
+        # Reset the player bets
+        if len(self.player1Sprites) > 0:
+            self.updatePlayerBet(Seat.ONE, 0)
+        if len(self.player2Sprites) > 0:
+            self.updatePlayerBet(Seat.TWO, 0)
+        if len(self.player3Sprites) > 0:
+            self.updatePlayerBet(Seat.THREE, 0)
+        if len(self.player4Sprites) > 0:
+            self.updatePlayerBet(Seat.FOUR, 0)
 
 
     def update(self) -> None:
@@ -542,16 +692,14 @@ class PokerGameView:
         self.menuSprites.update(seconds)
 
         # Draw the sprites on screen
-        dirtyRects1 = self.backSprites.draw(self.screen)
-        dirtyRects2 = self.player1Sprites.draw(self.screen)
-        dirtyRects3 = self.player2Sprites.draw(self.screen)
-        dirtyRects4 = self.player3Sprites.draw(self.screen)
-        dirtyRects5 = self.player4Sprites.draw(self.screen)
-        dirtyRects6 = self.communitySprites.draw(self.screen)
-        dirtyRects7 = self.menuSprites.draw(self.screen)
+        dirtyRects = self.backSprites.draw(self.screen)
+        dirtyRects += self.player1Sprites.draw(self.screen)
+        dirtyRects += self.player2Sprites.draw(self.screen)
+        dirtyRects += self.player3Sprites.draw(self.screen)
+        dirtyRects += self.player4Sprites.draw(self.screen)
+        dirtyRects += self.communitySprites.draw(self.screen)
+        dirtyRects += self.menuSprites.draw(self.screen)
 
-        # Update the display
-        dirtyRects = dirtyRects1 + dirtyRects2 + dirtyRects3 + dirtyRects4 + dirtyRects5 + dirtyRects6 + dirtyRects7
         pygame.display.update(dirtyRects)
 
 
@@ -586,5 +734,35 @@ if __name__ == "__main__":
                 # t key displays the menu text
                 if event.key == pygame.K_t:
                     view.testDrawMenu()
+                # y key calls the player menu method
+                if event.key == pygame.K_y:
+                    view.createPlayerHub(Seat.ONE)
+                # u key calls the update chips method
+                if event.key == pygame.K_u:
+                    view.updatePlayerChips(Seat.ONE, 100)
+                # i key calls the update bet method
+                if event.key == pygame.K_i:
+                    view.updatePlayerBet(Seat.ONE, 100)
+                # o key calls the create pot method
+                if event.key == pygame.K_o:
+                    view.createPot()
+                # p key calls the update pot method
+                if event.key == pygame.K_p:
+                    view.updatePot(100)
+                # v key deals a queen of hearts to player 1
+                if event.key == pygame.K_v:
+                    view.dealPlayerCard(Seat.ONE, Card(Value.QUEEN, Suit.HEART), 1)
+                # b key deals an ace of spades to player 2
+                if event.key == pygame.K_b:
+                    view.dealPlayerCard(Seat.TWO, Card(Value.ACE, Suit.SPADE), 1)
+                # n key flips the queen of hearts
+                if event.key == pygame.K_n:
+                    view.flipCard(Card(Value.QUEEN, Suit.HEART))
+                # m key flips the ace of spades
+                if event.key == pygame.K_m:
+                    view.flipCard(Card(Value.ACE, Suit.SPADE))
+                # c key calls the reset method
+                if event.key == pygame.K_c:
+                    view.resetRound()
 
         view.update()

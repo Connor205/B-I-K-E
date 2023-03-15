@@ -2,7 +2,9 @@ import pygame
 from Card import Card
 
 class CardSprite(pygame.sprite.Sprite):
+    card: Card
     srcImage: pygame.Surface
+    backImage: pygame.Surface
     image: pygame.Surface
     pos: list[float]
     destPos: list[int]
@@ -15,12 +17,17 @@ class CardSprite(pygame.sprite.Sprite):
 
     def __init__(self, card: Card, cardSize: list[int], srcPos: list[int],  destPos: list[int], speed: float=0.6, showCard: bool=False, group: pygame.sprite.Group=None):
         pygame.sprite.Sprite.__init__(self, group)
+        self.srcImage = pygame.image.load(self.getCardImagePath(card))
+        self.srcImage = pygame.transform.scale(self.srcImage, cardSize)
+        self.backImage = pygame.image.load(self.CARD_BACK_PATH)
+        self.backImage = pygame.transform.scale(self.backImage, cardSize)
+        
         if (showCard):
-            self.srcImage = pygame.image.load(self.getCardImagePath(card))
+            self.image = self.srcImage
         else:
-            self.srcImage = pygame.image.load(self.CARD_BACK_PATH)
-        self.image = self.srcImage
-        self.image = pygame.transform.scale(self.image, cardSize)
+            self.image = self.backImage
+        self.card = card
+        
         self.pos = [0.0, 0.0]
         self.pos[0] = srcPos[0] * 1.0  # float
         self.pos[1] = srcPos[1] * 1.0  # float
@@ -95,6 +102,17 @@ class CardSprite(pygame.sprite.Sprite):
 
         path = 'img/' + value_str + suit_str + '.png'
         return path
+    
+    # Flip the card
+    def flip(self) -> None:
+        if self.image == self.srcImage:
+            self.image = self.backImage
+        else:
+            self.image = self.srcImage
+
+    # Get the card
+    def getCard(self) -> Card:
+        return self.card
 
 
 class TableSprite(pygame.sprite.Sprite):
