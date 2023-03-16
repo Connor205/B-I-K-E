@@ -36,3 +36,6 @@ class PokerRound():
             self.state = GameState.PREFLOP
             self.currentPlayer = self.players[self.turnIndex]
 
+
+    def getCommunityCards(self) -> list[Card]:
+        return self.communityCards

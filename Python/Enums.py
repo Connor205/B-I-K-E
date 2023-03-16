@@ -121,3 +121,7 @@ class Button(Enum):
     RED_CHIP = 7
     SETTINGS = 8
 
+class Blind(Enum):
+    """An Enum representing the blinds."""
+    SB = 1
+    BB = 2

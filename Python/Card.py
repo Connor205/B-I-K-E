@@ -33,3 +33,17 @@ class Card():
             0 if the same Card value.
         """
         return self.value.compare(other.value)
+    
+    def isSameCard(self, other: 'Card') -> bool:
+        """Given another Card, determines if it is the same card as this Card.
+
+        Args:
+            other (Card): Other Card to compare suit with.
+
+        Returns:
+            bool: True if they are the same card, false if not.
+        """
+        return self.value.compare(other.value) == 0 and self.suit.compare(other.suit) == 0
+    
+    def __str__(self) -> str:
+        return f"{self.value} of {self.suit}"
