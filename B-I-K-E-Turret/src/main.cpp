@@ -91,12 +91,12 @@ void serialReactions()
         while (true) {
             int reading = turret.getBarrelReading();
             writeInfo("Photoresistor reading: " + String(reading));
-            if (reading < FLYWHEEL_BARREL_SENSOR_THRESHOLD) {
-                writeInfo("Card Firing");
-                turret.powerFlywheel(false);
-                turret.powerIndexer(false);
-                break;
-            }
+            // if (reading < FLYWHEEL_BARREL_SENSOR_THRESHOLD) {
+            //     writeInfo("Card Firing");
+            //     turret.powerFlywheel(false);
+            //     turret.powerIndexer(false);
+            //     break;
+            // }
         }
     } else if (input.equals("deal")) {
         turret.dealSingleCard();
