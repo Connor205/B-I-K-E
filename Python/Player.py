@@ -31,9 +31,10 @@ class Player():
         self.seatNumber = None
         self.inGame = False
 
-    def makeBet(self, betSize: int) -> None:
+    def makeBet(self) -> None:
         """Changing stack size based off of this player's bet"""
-        self.stackSize -= betSize
+        self.stackSize -= self.potentialBet
+        self.potentialBet = 0
 
     def winPot(self, potSize:int) -> None:
         """Changing stack size based off of the player's win"""
@@ -45,7 +46,7 @@ class Player():
 
     def updateBet(self, betSize: int) -> None:
         """Changing the player's potential bet"""
-        self.potentialBet = betSize
+        self.potentialBet += betSize
 
     def toggleReady(self) -> None:
         """Player is ready to play"""

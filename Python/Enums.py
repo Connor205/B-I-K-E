@@ -20,6 +20,8 @@ class Seat(Enum):
             0 if the same Seat value.
         """
         return self.value - other.value
+    
+    # TODO def toString(self) -> string:
 
 
 class Suit(Enum):

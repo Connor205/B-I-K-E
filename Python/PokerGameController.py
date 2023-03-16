@@ -5,54 +5,59 @@ from Shuffler import Shuffler
 from Enums import Button
 
 class PokerGameController():
-    model: PokerGameModel = None
-    view: PokerGameView = None
-    turret: Turret = None
-    shuffler: Shuffler = None
+    model: PokerGameModel
+    view: PokerGameView
+    turret: Turret
+    shuffler: Shuffler
+    whiteChipValue: int
+    redChipValue: int
+    blueChipValue: int
 
     def __init__(self, model, view, turret, shuffler) -> None:
         self.model = model
         self.view = view
         self.turret = turret
         self.shuffler = shuffler
+        self.whiteChipValue = 1
+        self.redChipValue = 5
+        self.blueChipValue = 10
 
     def buttonListener(self, buttonStatus) -> None:
         match buttonStatus[0]:
             case Button.FOLD:
-                self.fold(buttonStatus[1])
+                # TODO logic for resetting potential bet if it's > 0
+                if self.model.inSettings:
+                    self.removePlayer(buttonStatus[1])
+                else:
+                    self.fold(buttonStatus[1])
             case Button.CHECK:
-                self.bet(buttonStatus[1], 0)
+                if self.model.inSettings:
+                    self.addPlayer(buttonStatus[1])
+                else:
+                    self.bet(buttonStatus[1])
             case Button.CALL:
-                # TODO
-                # betToCall = XXX
-                betToCall = 0
-                self.bet(buttonStatus[1], betToCall)
+                if self.model.inSettings:
+                    self.changeBlinds(buttonStatus[1])
+                else:
+                    self.bet(buttonStatus[1])
             case Button.BET:
-                # TODO
-                # betToMake = XXX
-                betToMake = 0
-                self.bet(buttonStatus[1], betToMake)
+                if not self.model.inSettings:
+                    self.bet(buttonStatus[1])
             case Button.WHITE_CHIP:
-                # TODO
-                # whiteChipValue = XXX
-                whiteChipValue = 0
-                self.updateBet(buttonStatus[1], whiteChipValue)
+                if not self.model.inSettings:
+                    self.updateBet(buttonStatus[1], self.whiteChipValue)
             case Button.RED_CHIP:
-                # TODO
-                # redChipValue = XXX
-                redChipValue = 0
-                self.updateBet(buttonStatus[1], redChipValue)
+                if not self.model.inSettings:
+                    self.updateBet(buttonStatus[1], self.redChipValue)
             case Button.BLUE_CHIP:
-                # TODO
-                # blueChipValue = XXX
-                blueChipValue = 0
-                self.updateBet(buttonStatus[1], blueChipValue)
+                if not self.model.inSettings:
+                    self.updateBet(buttonStatus[1], self.blueChipValue)
             case Button.SETTINGS:
                 self.settings()
             case _:
                 raise NotImplementedError("Unrecognized button")
 
-    def updatePlayers(self, seats) -> None:
+    def updatePlayers(self, seat) -> None:
         # Based on input from the Arduino-side,
         # update the model to reflect what players are active in the game
         # Has logic to add/remove players
@@ -62,43 +67,43 @@ class PokerGameController():
         # Based on input from the Arduino-side,
         # update the model to reflect what players are active in the game
         # calls model function to add player
-        raise NotImplementedError("addPlayers is not implemented")
+        self.model.addPlayer(seat)
 
     def removePlayer(self, seat) -> None:
         # Based on input from the Arduino-side,
         # update the model to reflect what players are active in the game
         # calls model function to remove player
-        raise NotImplementedError("removePlayers is not implemented")
+        self.model.removePlayer(seat)
 
-    def updateBet(self, seat) -> None:
+    def updateBet(self, seat, bet) -> None:
         # Based on input from the buttons for each player
         # Update the potential bet amount in the model
         # Update the bet amount displayed in the view
-        raise NotImplementedError("updateBets is not implemented")
+        self.model.updateBet(seat, bet)
 
-    def makeBet(self, seat, bet) -> None:
+    def makeBet(self, seat) -> None:
         # Based on input from the buttons for each player
         # Update the bet amount displayed in view
         # Update the model to reflect the bet amount
-        raise NotImplementedError("makeBets is not implemented")
+        self.model.makeBet(seat)
 
     def fold(self, seat) -> None:
         # Based on input from the buttons for each player
         # Based on the seat mapping, updates model to fold those players
         # Update the view to reflect the fold
-        raise NotImplementedError("fold is not implemented")
+        self.model.fold(seat)
 
     def call(self, seat) -> None:
         # Based on input from the buttons for each player
         # Based on the seat mapping, updates model to call those players
         # Update the view to reflect the call
-        raise NotImplementedError("call is not implemented")
+        self.model.call(seat)
 
     def ready(self, seat) -> None:
         # Based on input from the buttons for each player
         # Based on the seat mapping, updates model to ready those players
         # Update the view to reflect the ready
-        raise NotImplementedError("ready is not implemented")
+        self.model.ready(seat)
 
     def deal(self) -> None:
         # Get the game state and the list of seats
@@ -111,4 +116,4 @@ class PokerGameController():
     
     def settings(self) -> None:
         # Toggle the settings menu
-        raise NotImplementedError("settings is not impleemented")
+        self.model.toggleSettings()
