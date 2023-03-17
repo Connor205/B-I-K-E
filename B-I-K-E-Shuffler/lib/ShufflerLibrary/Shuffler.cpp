@@ -10,7 +10,7 @@ void Shuffler::init() {
     this->dispenserMotor.init();
     this->beltMotor.init();
     this->calibrate();
-    this->dispenserMotor.moveToTarget(STEPS_TO_FIRST_LINK);
+    this->dispenserMotor.moveToTarget(DISPENSER_STEPS_TO_FIRST_LINK);
 
     pinMode(DISPENSER_MOTOR_PLUS_PIN, OUTPUT);
     pinMode(DISPENSER_MOTOR_MINUS_PIN, OUTPUT);
@@ -22,7 +22,7 @@ void Shuffler::calibrate() {
 }
 
 void Shuffler::moveDispenserToSlot(int slotNumber) {
-    int steps = STEPS_TO_FIRST_LINK;
+    int steps = DISPENSER_STEPS_TO_FIRST_LINK;
     if (slotNumber < NUM_THREE_WIDE_LINKS) {
         steps += (slotNumber / 3) * STEPS_PER_LINK;
         steps += (slotNumber % 3) * (STEPS_PER_THREE_WIDE_SLOT + STEPS_PER_WALL) + STEPS_PER_THREE_WIDE_SLOT / 2;
@@ -34,13 +34,13 @@ void Shuffler::moveDispenserToSlot(int slotNumber) {
     this->dispenserMotor.moveToTarget(steps);
 }
 
-void Shuffler::moveDispenserToMM(float targetMM) { this->dispenserMotor.moveToTarget(targetMM * STEPS_PER_MM); }
+void Shuffler::moveDispenserToMM(float targetMM) { this->dispenserMotor.moveToTarget(targetMM * DISPENSER_STEPS_PER_MM); }
 
-void Shuffler::moveBeltToMM(float targetMM) { this->beltMotor.moveToTarget(targetMM * STEPS_PER_MM_BELT); }
+void Shuffler::moveBeltToMM(float targetMM) { this->beltMotor.moveToTarget(targetMM * BELT_STEPS_PER_MM); }
 
 void Shuffler::ejectCards() { this->beltMotor.moveToTarget(BELT_LENGTH_STEPS); }
 
-void Shuffler::resetBelt() { this->beltMotor.moveToTarget(STEPS_TO_FIRST_LINK); }
+void Shuffler::resetBelt() { this->beltMotor.moveToTarget(DISPENSER_STEPS_TO_FIRST_LINK); }
 
 void Shuffler::powerDispenser(bool on) {
     if (on) {
