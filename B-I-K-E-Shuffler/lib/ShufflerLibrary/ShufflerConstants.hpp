@@ -37,8 +37,8 @@ constexpr int STEPS_PER_WALL = DISPENSER_STEPS_PER_MM;
 constexpr int STEPS_PER_THREE_WIDE_SLOT = DISPENSER_STEPS_PER_MM * 2;
 constexpr int STEPS_PER_TWO_WIDE_SLOT = DISPENSER_STEPS_PER_MM * 3.5;
 
-constexpr float BELT_MM_PER_REVOLUTION = 88.0f; // Find this value by testing
+constexpr float BELT_MM_PER_REVOLUTION = 88.0f; // Find this value by testing, the length of the belt travelled in 1 stepper motor revolution
 constexpr int BELT_STEPS_PER_MM = BELT_STEPS_PER_REVOLUTION / BELT_MM_PER_REVOLUTION; // This number should be pretty large
 
-constexpr int BELT_LENGTH_MM = 1000; // Find this value by testing
+constexpr int BELT_LENGTH_MM = 1000; // Find this value by testing, the length of the belt in mm
 constexpr int BELT_LENGTH_STEPS = BELT_LENGTH_MM * BELT_STEPS_PER_MM;
