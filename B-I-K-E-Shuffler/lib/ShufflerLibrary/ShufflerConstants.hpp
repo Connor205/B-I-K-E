@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Arduino.h>
+
 // Stepper Motor Constants
 constexpr int DISPENSER_STEP_PIN = 2;
 constexpr int DISPENSER_DIR_PIN = 3;
