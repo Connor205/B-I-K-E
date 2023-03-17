@@ -3,7 +3,7 @@
 class StepperMotor {
 public:
     StepperMotor() = default;
-    StepperMotor(int stepPin, int dirPin, float outputGearRatio, int maxSpeed);
+    StepperMotor(int stepPin, int dirPin, int maxSpeed);
 
     // Initialize
     void init();
@@ -13,7 +13,6 @@ public:
     float getTarget();
     float getSpeed();
     long getDelay();
-    float getOutputGearRatio();
 
     // Setters
     void setSpeed(float speed);
@@ -35,7 +34,6 @@ private:
     // Constructor Arguments
     int stepPin;
     int dirPin;
-    float outputGearRatio;
     // Control Variables
     bool currentDir; // True -> CW, False -> CCW
     int current;

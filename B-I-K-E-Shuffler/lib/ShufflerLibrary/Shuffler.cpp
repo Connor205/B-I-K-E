@@ -1,12 +1,9 @@
-#pragma once
 #include "Shuffler.hpp"
 #include "ShufflerConstants.hpp"
 
 Shuffler::Shuffler() {
-    this->dispenserMotor = StepperMotor(
-        DISPENSER_STEP_PIN, DISPENSER_DIR_PIN, DISPENSER_OUTPUT_GEAR_RATIO, DISPENSER_MOTOR_MAX_STEPS_PER_SECOND);
-    this->beltMotor
-        = StepperMotor(BELT_STEP_PIN, BELT_DIR_PIN, BELT_OUTPUT_GEAR_RATIO, BELT_MOTOR_MAX_STEPS_PER_SECOND);
+    this->dispenserMotor = StepperMotor(DISPENSER_STEP_PIN, DISPENSER_DIR_PIN, DISPENSER_MOTOR_MAX_STEPS_PER_SECOND);
+    this->beltMotor = StepperMotor(BELT_STEP_PIN, BELT_DIR_PIN, BELT_MOTOR_MAX_STEPS_PER_SECOND);
 }
 
 void Shuffler::init() {

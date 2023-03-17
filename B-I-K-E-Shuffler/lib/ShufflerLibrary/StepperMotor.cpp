@@ -1,10 +1,9 @@
 #include "StepperMotor.hpp"
 #include <Arduino.h>
 
-StepperMotor::StepperMotor(int stepPin, int dirPin, float outputGearRatio, int maxSpeed) {
+StepperMotor::StepperMotor(int stepPin, int dirPin, int maxSpeed) {
     this->stepPin = stepPin;
     this->dirPin = dirPin;
-    this->outputGearRatio = outputGearRatio;
     this->maxSpeed = maxSpeed;
 }
 
@@ -30,7 +29,6 @@ void StepperMotor::calibrate() {
 float StepperMotor::getTarget() { return this->target; }
 float StepperMotor::getSpeed() { return this->currentSpeed; }
 long StepperMotor::getDelay() { return this->currentDelay; }
-float StepperMotor::getOutputGearRatio() { return this->outputGearRatio; }
 
 /**
  * @brief Sets the speed [steps per sec] and calculates the required pulse delay
@@ -70,7 +68,7 @@ void StepperMotor::setTarget(int targetStep) {
         return; // Motor is currently moving
     }
     this->previous = this->current;
-    this->target = targetStep * this->outputGearRatio;
+    this->target = targetStep;
     setDirection(this->target > this->current); // True -> CW, False -> CCW
 }
 

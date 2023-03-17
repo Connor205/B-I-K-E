@@ -5,12 +5,10 @@
 // Stepper Motor Constants
 constexpr int DISPENSER_STEP_PIN = 2;
 constexpr int DISPENSER_DIR_PIN = 3;
-constexpr float DISPENSER_OUTPUT_GEAR_RATIO = 1.0f;
 constexpr int DISPENSER_MOTOR_MAX_STEPS_PER_SECOND = 1000;
 
 constexpr int BELT_STEP_PIN = 4;
 constexpr int BELT_DIR_PIN = 5;
-constexpr float BELT_OUTPUT_GEAR_RATIO = 1.0f;
 constexpr int BELT_MOTOR_MAX_STEPS_PER_SECOND = 1000;
 
 // DC Motor Constants
