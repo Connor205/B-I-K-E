@@ -19,21 +19,24 @@ class PokerGameView:
     SCREEN_SIZE = [1280, 720]
     TABLE_SIZE = [int(SCREEN_SIZE[0] * 4/5), SCREEN_SIZE[1]]
     MENU_SIZE = [int(SCREEN_SIZE[0] * 1/5), SCREEN_SIZE[1]]
+    POPUP_SIZE = [int(0.5 * SCREEN_SIZE[1]), int(0.5 * SCREEN_SIZE[1])]
 
     # Sizes
     # Keeping it slightly to scale, table width is 60 inches, 
     # say card height is 5 inches and width is 2/3 of that
     CARD_SIZE = [int(TABLE_SIZE[0] * (5*2/3)/60), int(TABLE_SIZE[0] * 5/60)]
-    FONT_HEIGHT = int(TABLE_SIZE[1] * 1/30)
+    FONT_HEIGHT = int(0.03 * TABLE_SIZE[1])
+    POPUP_FONT_HEIGHT = int(0.1 * POPUP_SIZE[1])
 
     # Positions
+    POPUP_POSITION = [int(SCREEN_SIZE[0]/2), int(SCREEN_SIZE[1]/2)]
     MENU_CORNER_POSITION = [TABLE_SIZE[0], 0]
     MENU_CENTER_POSITION = [int(MENU_CORNER_POSITION[0] + MENU_SIZE[0]/2), int(MENU_CORNER_POSITION[1] + FONT_HEIGHT)]
     TURRET_POSITION = [int(0.5 * TABLE_SIZE[0]), int(0.1 * TABLE_SIZE[1])]
     BURN_POSITION = [int(TURRET_POSITION[0] - 2 * CARD_SIZE[0]), TURRET_POSITION[1]]
     DEAL_POSITION = [int(TURRET_POSITION[0] + 2 * CARD_SIZE[0]), TURRET_POSITION[1]]
 
-    COMMUNITY_3_POSITION = [int(TURRET_POSITION[0] + 0 * CARD_SIZE[0]), int(TURRET_POSITION[1] + 0.2 * TABLE_SIZE[1])]
+    COMMUNITY_3_POSITION = [int(TURRET_POSITION[0] + 0 * CARD_SIZE[0]), int(TURRET_POSITION[1] + 0.17 * TABLE_SIZE[1])]
     COMMUNITY_2_POSITION = [int(COMMUNITY_3_POSITION[0] - 1.25 * CARD_SIZE[0]), COMMUNITY_3_POSITION[1]]
     COMMUNITY_1_POSITION = [int(COMMUNITY_2_POSITION[0] - 1.25 * CARD_SIZE[0]), COMMUNITY_3_POSITION[1]]
     COMMUNITY_4_POSITION = [int(COMMUNITY_3_POSITION[0] + 1.25 * CARD_SIZE[0]), COMMUNITY_3_POSITION[1]]
@@ -50,7 +53,7 @@ class PokerGameView:
     PLAYER_1_BET_POSITION = [int(PLAYER_1_HUB_POSITION[0]), int(PLAYER_1_STACK_POSITION[1] + 1.25 * FONT_HEIGHT)]
     PLAYER_1_BLIND_POSITION = [int(PLAYER_1_HUB_POSITION[0]), int(PLAYER_1_NAME_POSITION[1] - 1.25 * FONT_HEIGHT)]
 
-    PLAYER_2_HUB_POSITION = [int(TURRET_POSITION[0] - 0.2 * TABLE_SIZE[0]), int(TURRET_POSITION[1] + 0.5 * TABLE_SIZE[1])]
+    PLAYER_2_HUB_POSITION = [int(TURRET_POSITION[0] - 0.13 * TABLE_SIZE[0]), int(TURRET_POSITION[1] + 0.45 * TABLE_SIZE[1])]
     PLAYER_2_NAME_POSITION = [int(PLAYER_2_HUB_POSITION[0]), int(PLAYER_2_HUB_POSITION[1] - 0.75 * CARD_SIZE[1])]
     PLAYER_2_CARD_1_POSITION = [int(PLAYER_2_HUB_POSITION[0] - 0.6 * CARD_SIZE[0]), int(PLAYER_2_HUB_POSITION[1])]
     PLAYER_2_CARD_2_POSITION = [int(PLAYER_2_HUB_POSITION[0] + 0.6 * CARD_SIZE[0]), int(PLAYER_2_HUB_POSITION[1])]
@@ -58,7 +61,7 @@ class PokerGameView:
     PLAYER_2_BET_POSITION = [int(PLAYER_2_HUB_POSITION[0]), int(PLAYER_2_STACK_POSITION[1] + 1.25 * FONT_HEIGHT)]
     PLAYER_2_BLIND_POSITION = [int(PLAYER_2_HUB_POSITION[0]), int(PLAYER_2_NAME_POSITION[1] - 1.25 * FONT_HEIGHT)]
 
-    PLAYER_3_HUB_POSITION = [int(TURRET_POSITION[0] + 0.2 * TABLE_SIZE[0]), int(TURRET_POSITION[1] + 0.5 * TABLE_SIZE[1])]
+    PLAYER_3_HUB_POSITION = [int(TURRET_POSITION[0] + 0.13 * TABLE_SIZE[0]), int(TURRET_POSITION[1] + 0.45 * TABLE_SIZE[1])]
     PLAYER_3_NAME_POSITION = [int(PLAYER_3_HUB_POSITION[0]), int(PLAYER_3_HUB_POSITION[1] - 0.75 * CARD_SIZE[1])]
     PLAYER_3_CARD_1_POSITION = [int(PLAYER_3_HUB_POSITION[0] - 0.6 * CARD_SIZE[0]), int(PLAYER_3_HUB_POSITION[1])]
     PLAYER_3_CARD_2_POSITION = [int(PLAYER_3_HUB_POSITION[0] + 0.6 * CARD_SIZE[0]), int(PLAYER_3_HUB_POSITION[1])]
@@ -80,6 +83,8 @@ class PokerGameView:
     background: pygame.Surface
     font: pygame.font.Font
     fontColor: tuple[int, int, int]
+    popupFont: pygame.font.Font
+    popupFontColor: tuple[int, int, int]
     backSprites: pygame.sprite.RenderUpdates # Sprite group for the background-related sprites
     player1Sprites: pygame.sprite.RenderUpdates # Sprite group for non-card sprites of player 1
     player2Sprites: pygame.sprite.RenderUpdates # Sprite group for non-card sprites of player 2
@@ -92,6 +97,7 @@ class PokerGameView:
     player4CardSprites: pygame.sprite.RenderUpdates # Sprite group for card sprites of player 4
     communityCardSprites: pygame.sprite.RenderUpdates # Sprite group for card sprites of the community cards
     menuSprites: pygame.sprite.RenderUpdates # Sprite group for the menu-related sprites
+    popupSprites: pygame.sprite.RenderUpdates # Sprite group for the popup-related sprites
 
     def __init__(self, model) -> None:
         # init the logger
@@ -112,8 +118,12 @@ class PokerGameView:
         self.screen.blit(self.background, (0, 0))
 
         # load the font
-        self.font = pygame.font.Font(None, self.FONT_HEIGHT)
+        self.font = pygame.font.Font("fonts/Designer.otf", self.FONT_HEIGHT)
         self.fontColor = [0, 0, 0]
+
+        # load the popup font
+        self.popupFont = pygame.font.Font("fonts/Designer.otf", self.POPUP_FONT_HEIGHT)
+        self.popupFontColor = [0, 0, 0]
 
         # Create the render updates groups for the sprite categories
         self.backSprites = pygame.sprite.RenderUpdates()
@@ -128,6 +138,7 @@ class PokerGameView:
         self.player4CardSprites = pygame.sprite.RenderUpdates()
         self.communityCardSprites = pygame.sprite.RenderUpdates()
         self.menuSprites = pygame.sprite.RenderUpdates()
+        self.popupSprites = pygame.sprite.RenderUpdates()
 
         # Add the table sprite to the background
         newSprite = TableSprite(self.TABLE_SIZE, self.backSprites)
@@ -683,6 +694,22 @@ class PokerGameView:
         if len(self.player4Sprites) > 3:
             self.player4Sprites.remove(self.player4Sprites.sprites()[3])
 
+    def createPopup(self, text: str) -> None:
+        """
+        Method to create a popup
+
+        Args:
+            text (str): The text to display in the popup
+        """
+        # Create the popup
+        popup = PopUpWindow(text, self.popupFont, self.popupFontColor, self.POPUP_POSITION, self.POPUP_SIZE, self.popupSprites)
+
+    def clearPopups(self) -> None:
+        """
+        Method to clear all popups
+        """
+        self.popupSprites.empty()
+
 
     def update(self) -> None:
         
@@ -699,6 +726,7 @@ class PokerGameView:
         self.player4CardSprites.clear(self.screen, self.background)
         self.communityCardSprites.clear(self.screen, self.background)
         self.menuSprites.clear(self.screen, self.background)
+        self.popupSprites.clear(self.screen, self.background)
 
         seconds = 60
 
@@ -715,6 +743,7 @@ class PokerGameView:
         self.player4CardSprites.update(seconds)
         self.communityCardSprites.update(seconds)
         self.menuSprites.update(seconds)
+        self.popupSprites.update(seconds)
 
         # Draw the sprites on screen
         dirtyRects = self.backSprites.draw(self.screen)
@@ -729,6 +758,7 @@ class PokerGameView:
         dirtyRects += self.player4CardSprites.draw(self.screen)
         dirtyRects += self.communityCardSprites.draw(self.screen)
         dirtyRects += self.menuSprites.draw(self.screen)
+        dirtyRects += self.popupSprites.draw(self.screen)
 
         pygame.display.update(dirtyRects)
 
@@ -794,5 +824,11 @@ if __name__ == "__main__":
                 # c key calls the reset method
                 if event.key == pygame.K_c:
                     view.resetRound()
+                # x key calls the clear popups method
+                if event.key == pygame.K_x:
+                    view.clearPopups()
+                # z key calls the create popup method
+                if event.key == pygame.K_z:
+                    view.createPopup("Place cards in shuffler")
 
         view.update()
