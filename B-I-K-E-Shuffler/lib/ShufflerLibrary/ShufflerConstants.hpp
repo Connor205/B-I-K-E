@@ -1,10 +1,5 @@
 #pragma once
 
-#include "Arduino.h"
-#include "Shuffler.hpp"
-
-// Control Constants
-
 // Stepper Motor Constants
 constexpr int DISPENSER_STEP_PIN = 2;
 constexpr int DISPENSER_DIR_PIN = 3;
@@ -20,6 +15,12 @@ constexpr int BELT_MOTOR_MAX_STEPS_PER_SECOND = 1000;
 constexpr int DISPENSER_MOTOR_PLUS_PIN = 11;
 constexpr int DISPENSER_MOTOR_MINUS_PIN = 10;
 
+// Sensor Constants
+constexpr int DISPENSER_PHOTORESISTOR_PIN = A0;
+constexpr int DISPENSER_MOTOR_ENCODER_A_PIN = 6;
+constexpr int DISPENSER_MOTOR_ENCODER_B_PIN = 7;
+
+// Shuffler Constants
 constexpr int NUM_THREE_WIDE_LINKS = 10;
 constexpr int NUM_TWO_WIDE_LINKS = (52 - NUM_THREE_WIDE_LINKS * 3) / 2;
 

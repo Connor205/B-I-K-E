@@ -2,16 +2,14 @@
 #include "Shuffler.hpp"
 #include "ShufflerConstants.hpp"
 
-Shuffler::Shuffler()
-{
+Shuffler::Shuffler() {
     this->dispenserMotor = StepperMotor(
         DISPENSER_STEP_PIN, DISPENSER_DIR_PIN, DISPENSER_OUTPUT_GEAR_RATIO, DISPENSER_MOTOR_MAX_STEPS_PER_SECOND);
     this->beltMotor
         = StepperMotor(BELT_STEP_PIN, BELT_DIR_PIN, BELT_OUTPUT_GEAR_RATIO, BELT_MOTOR_MAX_STEPS_PER_SECOND);
 }
 
-void Shuffler::init()
-{
+void Shuffler::init() {
     this->dispenserMotor.init();
     this->beltMotor.init();
     this->calibrate();
@@ -21,14 +19,12 @@ void Shuffler::init()
     pinMode(DISPENSER_MOTOR_MINUS_PIN, OUTPUT);
 }
 
-void Shuffler::calibrate()
-{
+void Shuffler::calibrate() {
     this->dispenserMotor.calibrate();
     this->beltMotor.calibrate();
 }
 
-void Shuffler::moveDispenserToSlot(int slotNumber)
-{
+void Shuffler::moveDispenserToSlot(int slotNumber) {
     int steps = STEPS_TO_FIRST_LINK;
     if (slotNumber < NUM_THREE_WIDE_LINKS) {
         steps += (slotNumber / 3) * STEPS_PER_LINK;
@@ -49,8 +45,7 @@ void Shuffler::ejectCards() { this->beltMotor.moveToTarget(BELT_LENGTH_STEPS); }
 
 void Shuffler::resetBelt() { this->beltMotor.moveToTarget(STEPS_TO_FIRST_LINK); }
 
-void Shuffler::powerDispenser(bool on)
-{
+void Shuffler::powerDispenser(bool on) {
     if (on) {
         digitalWrite(DISPENSER_MOTOR_PLUS_PIN, HIGH);
         digitalWrite(DISPENSER_MOTOR_MINUS_PIN, LOW);
@@ -61,8 +56,7 @@ void Shuffler::powerDispenser(bool on)
 }
 
 // TODO:: This is not the way we are going to do this, but it works for now
-void Shuffler::dropCard()
-{
+void Shuffler::dropCard() {
     this->powerDispenser(true);
     delay(1000);
     this->powerDispenser(false);

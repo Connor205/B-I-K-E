@@ -48,7 +48,5 @@ private:
     float currentSpeed;
     long currentDelay;
     // Private methods
-    void setAngle();
-    float degreeToSteps(float targetAngleDegrees);
     long getDelayFromSpeed(float s);
 };
