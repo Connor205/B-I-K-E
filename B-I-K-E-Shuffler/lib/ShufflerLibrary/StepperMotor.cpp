@@ -1,9 +1,10 @@
 #include "StepperMotor.hpp"
 #include <Arduino.h>
 
-StepperMotor::StepperMotor(int stepPin, int dirPin, int maxSpeed) {
+StepperMotor::StepperMotor(int stepPin, int dirPin, int calibratePin, int maxSpeed) {
     this->stepPin = stepPin;
     this->dirPin = dirPin;
+    this->calibratePin = calibratePin;
     this->maxSpeed = maxSpeed;
 }
 
@@ -11,6 +12,8 @@ void StepperMotor::init() {
     // Setup pins
     pinMode(stepPin, OUTPUT);
     pinMode(dirPin, OUTPUT);
+    // TODO: Remove pullup if Hall-Effect sensor is active low (and remove ! in calibrate() method)
+    pinMode(calibratePin, INPUT_PULLUP);
 
     // Setup default values
     this->current = 0;
@@ -22,9 +25,9 @@ void StepperMotor::init() {
 }
 
 void StepperMotor::calibrate() {
-    setDirection(true); // TODO: Assign this to move towards home position
+    setDirection(true);
     setSpeed(this->maxSpeed / 4); // Run at slower speed
-    while (!digitalRead(this->calibratePin)) { // TODO: Remove ! if Hall-Effect sensor is active low
+    while (!digitalRead(this->calibratePin)) {
         stepMotor();
     }
 }

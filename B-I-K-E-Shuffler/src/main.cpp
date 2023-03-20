@@ -5,11 +5,7 @@ Shuffler shuffler = Shuffler();
 
 void testHallEffectSensor() {
   int sensorValue = digitalRead(CONVEYER_HALL_EFFECT_PIN);
-  if (sensorValue == LOW) {
-    digitalWrite(13, HIGH);
-  } else {
-    digitalWrite(13, LOW);
-  }
+  digitalWrite(13, sensorValue);
 }
 
 void setup() {
