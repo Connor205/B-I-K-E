@@ -126,6 +126,11 @@ class CardSprite(pygame.sprite.Sprite):
     def getCard(self) -> Card:
         """Get the card represented by this sprite."""
         return self.card
+    
+    def moveTo(self, destPos: list[int]) -> None:
+        """Move the card to the given destination position."""
+        self.srcPos = int(self.pos[0]), int(self.pos[1])
+        self.destPos = destPos
 
 
 class TableSprite(pygame.sprite.Sprite):
@@ -155,14 +160,22 @@ class TableSprite(pygame.sprite.Sprite):
 
 class TextSprite(pygame.sprite.Sprite):
     """Sprite representing text."""
+    MAX_FONT_MULT = 2
+    SPEED = 0.3
+
     text: str
-    font: pygame.font.Font
+    fontPath: str
+    fontSize: int
+    prevFontSize: int
+    destFontSize: int
     color: tuple[int, int, int]
     image: pygame.Surface
     rect: pygame.Rect
     pos: list[int]
+    growShrinkable: bool
+    repeatCount: int
 
-    def __init__(self, text: str, font: pygame.font.Font, color: tuple[int, int, int], pos: list[int], group: pygame.sprite.Group=None):
+    def __init__(self, text: str, fontPath: str, fontSize: int, color: tuple[int, int, int], pos: list[int], group: pygame.sprite.Group=None):
         """
         Initialize the text sprite.
         
@@ -175,21 +188,62 @@ class TextSprite(pygame.sprite.Sprite):
         """
         pygame.sprite.Sprite.__init__(self, group)
         self.text = text
-        self.font = font
+        self.fontPath = fontPath
+        self.fontSize = fontSize
         self.color = color
         self.pos = pos
-        self.image = self.font.render(self.text, True, self.color)
+        self.write(self.text)
         self.rect = self.image.get_rect()
         self.rect.center = pos
 
-    def write(self, text: str):
+        self.prevFontSize = fontSize
+        self.destFontSize = int(self.MAX_FONT_MULT * fontSize)
+        self.growShrinkable = False
+        self.repeatCount = 0
+
+    def growShrinkOnce(self) -> None:
+        """Grow and shrink the text."""
+        self.repeatCount = 0
+        self.growShrinkable = True
+
+    def write(self, text: str) -> None:
         """Write the given text."""
         self.text = text
-        self.image = self.font.render(self.text, True, self.color)
+        myFont = pygame.font.Font(self.fontPath, self.fontSize)
+        self.image = myFont.render(self.text, True, self.color)
 
     def update(self, seconds):
         """Updates the text sprite."""
-        pass
+        self.write(self.text)
+
+        if self.growShrinkable:
+            self.growShrinkText(seconds)
+
+    def growShrinkText(self, seconds):
+        """Grow or shrink the text."""
+        diff = self.destFontSize - self.prevFontSize
+        if self.repeatCount <= 1:
+            # check if the font size has reached the destination font size
+            # and if so, swap the destination font size with the previous font size
+            if (diff >= 0 and self.fontSize >= self.destFontSize) \
+                    or (diff <= 0 and self.fontSize <= self.destFontSize):
+                tmp = self.prevFontSize
+                self.prevFontSize = self.destFontSize
+                self.destFontSize = tmp
+                diff = self.destFontSize - self.prevFontSize
+                self.repeatCount += 1
+
+            delta_size = diff / seconds / self.SPEED
+            print(delta_size)
+            # if the delta font size is bigger than 5% of current font size
+            # just use 5%
+            if delta_size > 0.05 * self.fontSize :
+                delta_size = 0.05 * self.fontSize
+
+            self.fontSize += int(delta_size)
+        else:
+            self.growShrinkable = False
+
 
 # Class for pop-up windows that will be rectangular and display text
 class PopUpWindow(pygame.sprite.Sprite):

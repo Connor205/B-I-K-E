@@ -10,6 +10,9 @@ from Enums import *
 
 class PokerGameView:
     # CONSTANTS
+    FONT_PATH = "fonts/Designer.otf"
+    FONT_COLOR = (0, 0, 0)
+    POPUP_FONT_COLOR = (0, 0, 0)
     # Sizes denote the actual sizes/lengths
     # Positions denote the center of the object at a coordinate
 
@@ -81,11 +84,8 @@ class PokerGameView:
     model: PokerGameModel
     screen: pygame.Surface
     background: pygame.Surface
-    font: pygame.font.Font
-    fontColor: tuple[int, int, int]
-    popupFont: pygame.font.Font
-    popupFontColor: tuple[int, int, int]
     backSprites: pygame.sprite.RenderUpdates # Sprite group for the background-related sprites
+    burnSprites: pygame.sprite.RenderUpdates # Sprite group for the burn card sprites
     player1Sprites: pygame.sprite.RenderUpdates # Sprite group for non-card sprites of player 1
     player2Sprites: pygame.sprite.RenderUpdates # Sprite group for non-card sprites of player 2
     player3Sprites: pygame.sprite.RenderUpdates # Sprite group for non-card sprites of player 3
@@ -117,16 +117,9 @@ class PokerGameView:
         self.background.fill((255, 255, 255))
         self.screen.blit(self.background, (0, 0))
 
-        # load the font
-        self.font = pygame.font.Font("fonts/Designer.otf", self.FONT_HEIGHT)
-        self.fontColor = [0, 0, 0]
-
-        # load the popup font
-        self.popupFont = pygame.font.Font("fonts/Designer.otf", self.POPUP_FONT_HEIGHT)
-        self.popupFontColor = [0, 0, 0]
-
         # Create the render updates groups for the sprite categories
         self.backSprites = pygame.sprite.RenderUpdates()
+        self.burnSprites = pygame.sprite.RenderUpdates()
         self.player1Sprites = pygame.sprite.RenderUpdates()
         self.player2Sprites = pygame.sprite.RenderUpdates()
         self.player3Sprites = pygame.sprite.RenderUpdates()
@@ -192,48 +185,48 @@ class PokerGameView:
 
     def testPlayerText(self) -> None:
         # Create the text for the player names
-        newSprite = TextSprite("Player 1", self.font, self.fontColor, self.PLAYER_1_NAME_POSITION, self.player1Sprites)
+        newSprite = TextSprite("Player 1", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, self.PLAYER_1_NAME_POSITION, self.player1Sprites)
         newSprite = None
-        newSprite = TextSprite("Player 2", self.font, self.fontColor, self.PLAYER_2_NAME_POSITION, self.player2Sprites)
+        newSprite = TextSprite("Player 2", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, self.PLAYER_2_NAME_POSITION, self.player2Sprites)
         newSprite = None
-        newSprite = TextSprite("Player 3", self.font, self.fontColor, self.PLAYER_3_NAME_POSITION, self.player3Sprites)
+        newSprite = TextSprite("Player 3", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, self.PLAYER_3_NAME_POSITION, self.player3Sprites)
         newSprite = None
-        newSprite = TextSprite("Player 4", self.font, self.fontColor, self.PLAYER_4_NAME_POSITION, self.player4Sprites)
+        newSprite = TextSprite("Player 4", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, self.PLAYER_4_NAME_POSITION, self.player4Sprites)
         newSprite = None
 
         # Create the text for the player chips
-        newSprite = TextSprite("Chips: 1000", self.font, self.fontColor, self.PLAYER_1_STACK_POSITION, self.player1Sprites)
+        newSprite = TextSprite("Chips: 1000", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, self.PLAYER_1_STACK_POSITION, self.player1Sprites)
         newSprite = None
-        newSprite = TextSprite("Chips: 1000", self.font, self.fontColor, self.PLAYER_2_STACK_POSITION, self.player2Sprites)
+        newSprite = TextSprite("Chips: 1000", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, self.PLAYER_2_STACK_POSITION, self.player2Sprites)
         newSprite = None
-        newSprite = TextSprite("Chips: 1000", self.font, self.fontColor, self.PLAYER_3_STACK_POSITION, self.player3Sprites)
+        newSprite = TextSprite("Chips: 1000", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, self.PLAYER_3_STACK_POSITION, self.player3Sprites)
         newSprite = None
-        newSprite = TextSprite("Chips: 1000", self.font, self.fontColor, self.PLAYER_4_STACK_POSITION, self.player4Sprites)
+        newSprite = TextSprite("Chips: 1000", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, self.PLAYER_4_STACK_POSITION, self.player4Sprites)
         newSprite = None
 
         # Create the text for the player bets
-        newSprite = TextSprite("Bet: 0", self.font, self.fontColor, self.PLAYER_1_BET_POSITION, self.player1Sprites)
+        newSprite = TextSprite("Bet: 0", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, self.PLAYER_1_BET_POSITION, self.player1Sprites)
         newSprite = None
-        newSprite = TextSprite("Bet: 0", self.font, self.fontColor, self.PLAYER_2_BET_POSITION, self.player2Sprites)
+        newSprite = TextSprite("Bet: 0", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, self.PLAYER_2_BET_POSITION, self.player2Sprites)
         newSprite = None
-        newSprite = TextSprite("Bet: 0", self.font, self.fontColor, self.PLAYER_3_BET_POSITION, self.player3Sprites)
+        newSprite = TextSprite("Bet: 0", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, self.PLAYER_3_BET_POSITION, self.player3Sprites)
         newSprite = None
-        newSprite = TextSprite("Bet: 0", self.font, self.fontColor, self.PLAYER_4_BET_POSITION, self.player4Sprites)
+        newSprite = TextSprite("Bet: 0", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, self.PLAYER_4_BET_POSITION, self.player4Sprites)
         newSprite = None
 
         # Create the text for if the player is small or big blind
-        newSprite = TextSprite("Small Blind", self.font, self.fontColor, self.PLAYER_1_BLIND_POSITION, self.player1Sprites)
+        newSprite = TextSprite("Small Blind", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, self.PLAYER_1_BLIND_POSITION, self.player1Sprites)
         newSprite = None
-        newSprite = TextSprite("Big Blind", self.font, self.fontColor, self.PLAYER_2_BLIND_POSITION, self.player2Sprites)
+        newSprite = TextSprite("Big Blind", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, self.PLAYER_2_BLIND_POSITION, self.player2Sprites)
         newSprite = None
-        newSprite = TextSprite("Small Blind", self.font, self.fontColor, self.PLAYER_3_BLIND_POSITION, self.player3Sprites)
+        newSprite = TextSprite("Small Blind", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, self.PLAYER_3_BLIND_POSITION, self.player3Sprites)
         newSprite = None
-        newSprite = TextSprite("Big Blind", self.font, self.fontColor, self.PLAYER_4_BLIND_POSITION, self.player4Sprites)
+        newSprite = TextSprite("Big Blind", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, self.PLAYER_4_BLIND_POSITION, self.player4Sprites)
         newSprite = None
 
     def testDrawOther(self) -> None:
         # Create the text for the pot
-        newSprite = TextSprite("Pot: 0", self.font, self.fontColor, self.POT_POSITION, self.communitySprites)
+        newSprite = TextSprite("Pot: 0", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, self.POT_POSITION, self.communitySprites)
         newSprite = None
 
         # Deal card to the burn pile
@@ -250,28 +243,32 @@ class PokerGameView:
         itemCount = 0
         pos = [self.MENU_CENTER_POSITION[0], self.MENU_CENTER_POSITION[1] + itemCount * 2 * self.FONT_HEIGHT]
         # Create the text for the menu
-        newSprite = TextSprite("Menu", self.font, self.fontColor, pos, self.menuSprites)
+        newSprite = TextSprite("Menu", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, pos, self.menuSprites)
         newSprite = None
 
         itemCount += 1
         pos = [self.MENU_CENTER_POSITION[0], self.MENU_CENTER_POSITION[1] + itemCount * 2 * self.FONT_HEIGHT]
-        newSprite = TextSprite("Press Settings to edit settings", self.font, self.fontColor, pos, self.menuSprites)
+        newSprite = TextSprite("Press Settings to edit settings", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, pos, self.menuSprites)
         newSprite = None
 
         itemCount += 1
         pos = [self.MENU_CENTER_POSITION[0], self.MENU_CENTER_POSITION[1] + itemCount * 2 * self.FONT_HEIGHT]
-        newSprite = TextSprite("Small Blind: 1", self.font, self.fontColor, pos, self.menuSprites)
+        newSprite = TextSprite("Small Blind: 1", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, pos, self.menuSprites)
         newSprite = None
 
         itemCount += 1
         pos = [self.MENU_CENTER_POSITION[0], self.MENU_CENTER_POSITION[1] + itemCount * 2 * self.FONT_HEIGHT]
-        newSprite = TextSprite("Big Blind: 2", self.font, self.fontColor, pos, self.menuSprites)
+        newSprite = TextSprite("Big Blind: 2", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, pos, self.menuSprites)
         newSprite = None
 
         itemCount += 1
         pos = [self.MENU_CENTER_POSITION[0], self.MENU_CENTER_POSITION[1] + itemCount * 2 * self.FONT_HEIGHT]
-        newSprite = TextSprite("White Chip Value: 1", self.font, self.fontColor, pos, self.menuSprites)
+        newSprite = TextSprite("White Chip Value: 1", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, pos, self.menuSprites)
         newSprite = None
+    
+    def testGrowShrinkText(self) -> None:
+        newSprite = TextSprite("Player 1", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, self.PLAYER_1_NAME_POSITION, self.player1Sprites)
+        newSprite.growShrinkOnce()
 
     def getPlayerPositions(self, seatNumber: Seat) -> dict[str, list[int]]:
         """
@@ -379,7 +376,7 @@ class PokerGameView:
             return
 
         # Create the text for the pot
-        newSprite = TextSprite("Pot: 0", self.font, self.fontColor, self.POT_POSITION, self.communitySprites)
+        newSprite = TextSprite("Pot: 0", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, self.POT_POSITION, self.communitySprites)
         newSprite = None
     
     def createPlayerHub(self, seatNumber: Seat) -> None:
@@ -405,15 +402,15 @@ class PokerGameView:
             return
 
         # Create the text for the player name
-        newSprite = TextSprite("Player", self.font, self.fontColor, positions["name"], playerGroup)
+        newSprite = TextSprite("Player", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, positions["name"], playerGroup)
         newSprite = None
 
         # Create the text for the player chips
-        newSprite = TextSprite("Chips: 1000", self.font, self.fontColor, positions["stack"], playerGroup)
+        newSprite = TextSprite("Chips: 1000", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, positions["stack"], playerGroup)
         newSprite = None
 
         # Create the text for the player bet
-        newSprite = TextSprite("Bet: 0", self.font, self.fontColor, positions["bet"], playerGroup)
+        newSprite = TextSprite("Bet: 0", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, positions["bet"], playerGroup)
         newSprite = None
 
     def removePlayerHub(self, seatNumber: Seat) -> None:
@@ -428,6 +425,38 @@ class PokerGameView:
 
         # Remove all the sprites from the group
         playerGroup.empty()
+
+    def removePlayerCards(self, seatNumber: Seat) -> None:
+        """
+        Method to remove a player's cards
+
+        Args:
+            seatNumber (Seat): The seat number of the player
+        """
+        # Get the card sprite group for the player
+        playerGroup = self.getPlayerCardGroup(seatNumber)
+
+        # Remove all the sprites from the group
+        playerGroup.empty()
+
+    def addPlayer(self, seatNumber: Seat) -> None:
+        """
+        Method to add a player to the game
+
+        Args:
+            seatNumber (Seat): The seat number of the player
+        """
+        self.createPlayerHub(seatNumber)
+
+    def removePlayer(self, seatNumber: Seat) -> None:
+        """
+        Method to remove a player from the game
+
+        Args:
+            seatNumber (Seat): The seat number of the player
+        """
+        self.removePlayerHub(seatNumber)
+        self.removePlayerCards(seatNumber)
 
     def setBlind(self, seatNumber: Seat, blindType: Blind) -> None:
         """
@@ -451,7 +480,7 @@ class PokerGameView:
             return
 
         # Create the text for the player blind
-        newSprite = TextSprite(blindType.name, self.font, self.fontColor, positions["blind"], playerGroup)
+        newSprite = TextSprite(blindType.name, self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, positions["blind"], playerGroup)
         newSprite = None
 
     def updatePlayerChips(self, seatNumber: Seat, newChipValue: int) -> None:
@@ -498,6 +527,13 @@ class PokerGameView:
         # Update the text
         playerBetSprite.write("Bet: " + str(newBetValue))
 
+    # TODO: Method to confirm the player bet
+    # Needs to be passed the seat number of the player
+    # Should display the bet text moving to the pot
+    # Should also update the player chips and bet text
+    def confirmPlayerBet(self, seatNumber: Seat) -> None:
+        raise NotImplementedError("confirmPlayerBet not implemented")
+
     def updatePot(self, newPotValue: int) -> None:
         """
         Method to update the pot
@@ -516,10 +552,35 @@ class PokerGameView:
         # Update the text
         potSprite.write("Pot: " + str(newPotValue))
 
-    # TODO: Method to deal a card to the burn pile
-    # Needs to be passed the card to be dealt
-    # or alternatively get the card from the model when called
-    # Displays the card moving to the burn pile
+    def dealBurn(self, card: Card) -> None:
+        """
+        Method to deal a card to the burn pile.
+
+        Args:
+            card (Card): The card to deal
+        """
+        # Create the burn card sprite
+        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.BURN_POSITION, showCard=False, group=self.burnSprites)
+        newSprite = None
+
+    def fold(self, seatNumber: Seat) -> None:
+        """
+        Method to fold a player. Moves the player's cards to the burn pile.
+
+        Args:
+            seatNumber (Seat): The seat number of the player
+        """
+        # Get the player group
+        playerCardGroup = self.getPlayerCardGroup(seatNumber)
+
+        # Get the player card sprites
+        playerCardSprites = playerCardGroup.sprites()
+
+        # Move the card sprites to the burn pile
+        for cardSprite in playerCardSprites:
+            cardSprite.moveTo(self.BURN_POSITION)
+            cardSprite.add(self.burnSprites)
+            cardSprite.remove(playerCardGroup)
 
     def dealFlop(self) -> None:
         """
@@ -608,9 +669,24 @@ class PokerGameView:
     # Needs to be passed the player number
     # Displays the winner text for that player
 
-    # TODO: Method to indicate the player turn
-    # Needs to be passed the player number
-    # Displays the indicator for that player
+    def indicatePlayerTurn(self, seatNumber: Seat) -> None:
+        """
+        Method to indicate the player turn
+
+        Args:
+            seatNumber (Seat): The seat number of the player
+        """
+        # Get the sprite group for the player
+        playerGroup = self.getPlayerGroup(seatNumber)
+
+        if len(playerGroup) == 0:
+            logging.error("Trying to update the player chips for an empty player group")
+            return
+
+        # Get the player name text sprite - at index 0
+        playerNameSprite = playerGroup.sprites()[0]
+
+        playerNameSprite.growShrinkOnce()
 
     def findCardSprite(self, card: Card) -> CardSprite:
         """
@@ -702,7 +778,7 @@ class PokerGameView:
             text (str): The text to display in the popup
         """
         # Create the popup
-        popup = PopUpWindow(text, self.popupFont, self.popupFontColor, self.POPUP_POSITION, self.POPUP_SIZE, self.popupSprites)
+        popup = PopUpWindow(text, self.FONT_PATH, self.POPUP_FONT_HEIGHT, self.FONT_COLOR, self.POPUP_POSITION, self.POPUP_SIZE, self.popupSprites)
 
     def clearPopups(self) -> None:
         """
@@ -715,6 +791,7 @@ class PokerGameView:
         
         # Clear the sprites on screen
         self.backSprites.clear(self.screen, self.background)
+        self.burnSprites.clear(self.screen, self.background)
         self.player1Sprites.clear(self.screen, self.background)
         self.player2Sprites.clear(self.screen, self.background)
         self.player3Sprites.clear(self.screen, self.background)
@@ -732,6 +809,7 @@ class PokerGameView:
 
         # Update the sprites giving the time
         self.backSprites.update(seconds)
+        self.burnSprites.update(seconds)
         self.player1Sprites.update(seconds)
         self.player2Sprites.update(seconds)
         self.player3Sprites.update(seconds)
@@ -747,6 +825,7 @@ class PokerGameView:
 
         # Draw the sprites on screen
         dirtyRects = self.backSprites.draw(self.screen)
+        dirtyRects += self.burnSprites.draw(self.screen)
         dirtyRects += self.player1Sprites.draw(self.screen)
         dirtyRects += self.player2Sprites.draw(self.screen)
         dirtyRects += self.player3Sprites.draw(self.screen)
@@ -830,5 +909,11 @@ if __name__ == "__main__":
                 # z key calls the create popup method
                 if event.key == pygame.K_z:
                     view.createPopup("Place cards in shuffler")
+                # a key calls the fold method
+                if event.key == pygame.K_a:
+                    view.fold(Seat.ONE)
+                # k key tests the grow shrink method
+                if event.key == pygame.K_k:
+                    view.testGrowShrinkText()
 
         view.update()
