@@ -15,6 +15,7 @@ PCA9554 panel4(PANEL_4_ADDRESS);
  * @param buttonIndex the button index [0, 7]
  */
 void writeButtonInfo(uint8_t panelId, uint8_t buttonIndex) {
+  if (buttonIndex == -1) { return; }
   Serial.write(panelId);
   Serial.write(buttonIndex);
 }
@@ -37,6 +38,7 @@ uint8_t findButtonBit() {
       return i;
     }
   }
+  return -1; // No button was pressed
 }
 
 void panel1Interrupt(void) {
