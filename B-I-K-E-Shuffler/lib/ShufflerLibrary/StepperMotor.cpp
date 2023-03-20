@@ -22,8 +22,11 @@ void StepperMotor::init() {
 }
 
 void StepperMotor::calibrate() {
-    // TODO: Calibration should ensure motor starts at the correct position
-    // NOTE: Use a limit switch to check boundaries and then assign 0 there
+    setDirection(true); // TODO: Assign this to move towards home position
+    setSpeed(this->maxSpeed / 4); // Run at slower speed
+    while (!digitalRead(this->calibratePin)) { // TODO: Remove ! if Hall-Effect sensor is active low
+        stepMotor();
+    }
 }
 
 float StepperMotor::getTarget() { return this->target; }
@@ -46,7 +49,6 @@ void StepperMotor::setSpeed(float speed) {
  * @param CW True -> CW, False -> CCW
  */
 void StepperMotor::setDirection(bool CW) {
-    // TODO: Ensure directions are correct
     if (CW) {
         digitalWrite(this->dirPin, HIGH);
     } else { // CCW

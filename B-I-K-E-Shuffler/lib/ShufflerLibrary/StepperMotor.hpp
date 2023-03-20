@@ -3,7 +3,7 @@
 class StepperMotor {
 public:
     StepperMotor() = default;
-    StepperMotor(int stepPin, int dirPin, int maxSpeed);
+    StepperMotor(int stepPin, int dirPin, int calibratePin, int maxSpeed);
 
     // Initialize
     void init();
@@ -34,6 +34,7 @@ private:
     // Constructor Arguments
     int stepPin;
     int dirPin;
+    int calibratePin;
     // Control Variables
     bool currentDir; // True -> CW, False -> CCW
     int current;

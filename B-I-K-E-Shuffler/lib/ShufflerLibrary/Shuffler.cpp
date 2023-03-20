@@ -2,8 +2,10 @@
 #include "ShufflerConstants.hpp"
 
 Shuffler::Shuffler() {
-    this->dispenserMotor = StepperMotor(DISPENSER_STEP_PIN, DISPENSER_DIR_PIN, DISPENSER_MOTOR_MAX_STEPS_PER_SECOND);
-    this->beltMotor = StepperMotor(BELT_STEP_PIN, BELT_DIR_PIN, BELT_MOTOR_MAX_STEPS_PER_SECOND);
+    this->dispenserMotor =
+        StepperMotor(DISPENSER_STEP_PIN, DISPENSER_DIR_PIN, DISPENSER_LIMIT_SWITCH_PIN, DISPENSER_MOTOR_MAX_STEPS_PER_SECOND);
+    this->beltMotor =
+        StepperMotor(BELT_STEP_PIN, BELT_DIR_PIN, CONVEYER_HALL_EFFECT_PIN, BELT_MOTOR_MAX_STEPS_PER_SECOND);
 }
 
 void Shuffler::init() {
