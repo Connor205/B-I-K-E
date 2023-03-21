@@ -1,6 +1,4 @@
 #pragma once
 
-#include "StepperMotor.hpp"
-
-#include "Turret.hpp"
-#include "TurretConstants.hpp"
+#include "ShufflerConstants.hpp"
+#include "Shuffler.hpp"
