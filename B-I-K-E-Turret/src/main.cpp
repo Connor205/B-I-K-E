@@ -65,13 +65,13 @@ void serialReactions()
     String input = Serial.readStringUntil('\n');
     writeInfo("Received - " + input);
     // Check if string is equal to yAxis
-    if (input.equals("inOn")) {
+    if (input.equals("indexerOn")) {
         turret.powerIndexer(true);
-    } else if (input.equals("inOff")) {
+    } else if (input.equals("indexerOff")) {
         turret.powerIndexer(false);
-    } else if (input.equals("flyOn")) {
+    } else if (input.equals("flywheelOn")) {
         turret.powerFlywheel(true);
-    } else if (input.equals("flyOff")) {
+    } else if (input.equals("flywheelOff")) {
         turret.powerFlywheel(false);
     } else if (input.equals("on")) {
         turret.powerFlywheel(true);

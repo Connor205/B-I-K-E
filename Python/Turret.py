@@ -19,5 +19,17 @@ class Turret(Arduino):
     def shoot_card(self, distance: int):
         self.sendCommand("FIRE", [distance])
 
+    def activateFlywheel(self):
+        self.sendCommand("flywheelOn")
+
+    def deactivateFlywheel(self):
+        self.sendCommand("flywheelOff")
+
+    def activateIndexer(self):
+        self.sendCommand("indexerOn")
+
+    def deactivateIndexer(self):
+        self.sendCommand("indexerOff")
+
     def return_cards(self):
         raise NotImplementedError("return_cards is not implemented")
