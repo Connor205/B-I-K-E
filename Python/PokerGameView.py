@@ -265,10 +265,6 @@ class PokerGameView:
         pos = [self.MENU_CENTER_POSITION[0], self.MENU_CENTER_POSITION[1] + itemCount * 2 * self.FONT_HEIGHT]
         newSprite = TextSprite("White Chip Value: 1", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, pos, self.menuSprites)
         newSprite = None
-    
-    def testGrowShrinkText(self) -> None:
-        newSprite = TextSprite("Player 1", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, self.PLAYER_1_NAME_POSITION, self.player1Sprites)
-        newSprite.growShrinkOnce()
 
     def getPlayerPositions(self, seatNumber: Seat) -> dict[str, list[int]]:
         """
@@ -505,6 +501,9 @@ class PokerGameView:
         # Update the text
         playerChipsSprite.write("Chips: " + str(newChipValue))
 
+        # Grow and shrink the text
+        playerChipsSprite.growShrinkOnce()
+
     def updatePlayerBet(self, seatNumber: Seat, newBetValue: int) -> None:
         """
         Method to update the player bet
@@ -551,6 +550,9 @@ class PokerGameView:
 
         # Update the text
         potSprite.write("Pot: " + str(newPotValue))
+
+        # Grow and shrink the text
+        potSprite.growShrinkOnce()
 
     def dealBurn(self, card: Card) -> None:
         """
@@ -669,6 +671,19 @@ class PokerGameView:
     # Needs to be passed the player number
     # Displays the winner text for that player
 
+    def resetPlayerTurns(self) -> None:
+        """
+        Method to reset the player turn indicators
+        """
+        # Iterate through the player groups
+        for playerGroup in self.playerGroups:
+            if len(playerGroup) == 0:
+                continue
+            # Get the player name text sprite - at index 0
+            playerNameSprite = playerGroup.sprites()[0]
+            # Reset the player name text sprite
+            playerNameSprite.growShrinkReset()
+
     def indicatePlayerTurn(self, seatNumber: Seat) -> None:
         """
         Method to indicate the player turn
@@ -676,17 +691,21 @@ class PokerGameView:
         Args:
             seatNumber (Seat): The seat number of the player
         """
+        # First reset the player turns
+        self.resetPlayerTurns()
+
         # Get the sprite group for the player
         playerGroup = self.getPlayerGroup(seatNumber)
 
         if len(playerGroup) == 0:
-            logging.error("Trying to update the player chips for an empty player group")
+            logging.error("Trying to indicate player turn for a player who doesn't exist")
             return
 
         # Get the player name text sprite - at index 0
         playerNameSprite = playerGroup.sprites()[0]
 
-        playerNameSprite.growShrinkOnce()
+        # Indicate the player turn
+        playerNameSprite.growShrinkRepeat()
 
     def findCardSprite(self, card: Card) -> CardSprite:
         """
@@ -912,8 +931,5 @@ if __name__ == "__main__":
                 # a key calls the fold method
                 if event.key == pygame.K_a:
                     view.fold(Seat.ONE)
-                # k key tests the grow shrink method
-                if event.key == pygame.K_k:
-                    view.testGrowShrinkText()
 
         view.update()
