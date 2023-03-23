@@ -14,10 +14,10 @@ Members:
 Our goal is to build an automated robotic poker table that will handle most of the functions a human dealer would, such as shuffling, dealing, and facilitating the game.
 
 # Technology Stack
-## Main Compute Board
+## Raspberry Pi 4B
 The main compute for the B-I-K-E Poker Table is a Rasperry Pi 4B. The Pi is operating on native Ubuntu and will run our main program written in Python (3.11.1). The main program will facilitate the Poker logic and delegate low-level control to Arduino Unos and a Nucleo 32 via serial connection.
 ## Arduino Unos
-The Arduinos will control motors and sensors for both the Card-Turret and Auto-Shuffler. A custom communication layer lies between the Arduinos and the Pi to ensure correct command execution and completion.
+The Arduinos will control motors and sensors for both the Card-Turret and Auto-Shuffler. A custom communication layer lies between the Arduinos and the Pi to ensure correct command execution and completion. Each Arduino is running C++ utilizing our own custom-built Stepper-Motor Controller Library.
 ## Nucleo 32
-The Nucleo 32 handles I/O control for the 4 button panels which enable players to provide input when playing Poker. Each button panel offers an I/O chip equipped with $I^2C$ and an interrupt pin. Custom interfacing code translates the data over $I^2C$ into poker inputs for the Pi to operate upon.
+The Nucleo 32 handles I/O control for the 4 button panels which enable players to provide input when playing Poker. Each button panel offers an I/O chip equipped with $I^2C$ and an interrupt pin. Our custom interfacing code translates the data over $I^2C$ into poker inputs for the Pi to operate upon.
 
