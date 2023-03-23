@@ -19,5 +19,5 @@ The main compute for the B-I-K-E Poker Table is a Rasperry Pi 4B. The Pi is oper
 ## Arduino Unos
 The Arduinos will control motors and sensors for both the Card-Turret and Auto-Shuffler. A custom communication layer lies between the Arduinos and the Pi to ensure correct command execution and completion.
 ## Nucleo 32
-The Nucleo 32 handles I/O control for the 4 button panels which enable players to provide input when playing Poker. Each button panel offers an I/O chip equipped with I$^2$C and an interrupt pin. Custom interfacing code translates the data over I$^2$C into poker inputs for the Pi to operate upon.
+The Nucleo 32 handles I/O control for the 4 button panels which enable players to provide input when playing Poker. Each button panel offers an I/O chip equipped with $I^2C$ and an interrupt pin. Custom interfacing code translates the data over $I^2C$ into poker inputs for the Pi to operate upon.
 
