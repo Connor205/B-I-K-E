@@ -5,6 +5,7 @@ Shuffler shuffler = Shuffler();
 
 void testHallEffectSensor() {
   int sensorValue = digitalRead(CONVEYER_HALL_EFFECT_PIN);
+  Serial.println(sensorValue);
   digitalWrite(13, sensorValue);
 }
 

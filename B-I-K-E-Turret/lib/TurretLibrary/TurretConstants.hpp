@@ -15,6 +15,7 @@ constexpr int FLYWHEEL_MOTOR_PLUS_PIN = 9;
 constexpr int FLYWHEEL_MOTOR_MINUS_PIN = 8;
 
 // Sensor Constants
+constexpr uint8_t TURRET_HALL_EFFECT_PIN = 12;
 constexpr uint8_t INDEXER_ENCODER_A_PLUS_PIN = 4;
 constexpr uint8_t INDEXER_ENCODER_A_MINUS_PIN = 5;
 constexpr uint8_t INDEXER_ENCODER_B_PLUS_PIN = 6;

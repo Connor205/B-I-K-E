@@ -1,15 +1,11 @@
 #include <Arduino.h>
 #include <TurretLibrary.hpp>
 #include <Utils.h>
-#include <Vector.h>
 
 Turret turret = Turret();
 long now = millis();
 
-Vector<float> angles = Vector<float>();
-
-void testTurretRotate()
-{
+void testTurretRotate() {
     turret.turnToAngle(90);
     delay(2000);
     turret.turnToAngle(45);
@@ -18,8 +14,7 @@ void testTurretRotate()
     delay(2000);
 }
 
-void testTurretAccuracy()
-{
+void testTurretAccuracy() {
     for (int i = 0; i < 100; i++) {
         // turn to 90 degrees
         turret.turnToAngle(90);
@@ -34,8 +29,7 @@ void testTurretAccuracy()
     }
 }
 
-void testDCMotors()
-{
+void testDCMotors() {
     turret.powerFlywheel(true);
     turret.powerIndexer(true);
     delay(2000);
@@ -44,20 +38,19 @@ void testDCMotors()
     delay(2000);
 }
 
-void setup()
-{
+void testHallEffectSensor() {
+    int sensorValue = digitalRead(TURRET_HALL_EFFECT_PIN);
+    Serial.println(sensorValue);
+}
+
+void setup() {
     Serial.begin(9600);
     turret.init();
     turret.calibrate();
-
-    angles.push_back(90);
-    angles.push_back(180);
-    angles.push_back(270);
-    angles.push_back(0);
+    pinMode(TURRET_HALL_EFFECT_PIN, INPUT_PULLUP);
 }
 
-void serialReactions()
-{
+void serialReactions() {
     writeState("ready");
     // Wait for an input from the serial port
     waitForSerialInput();
@@ -105,4 +98,6 @@ void serialReactions()
     }
 }
 
-void loop() { serialReactions(); }
+void loop() {
+    serialReactions();
+}
