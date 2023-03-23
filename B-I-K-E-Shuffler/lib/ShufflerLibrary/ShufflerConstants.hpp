@@ -27,6 +27,7 @@ constexpr uint16_t DROPPER_MOTOR_STEPS_PER_REVOLUTION = 3200; // Set on the digi
 constexpr uint8_t DISPENSER_RAIL_LIMIT_SWITCH_PIN = 10;
 constexpr uint8_t CONVEYER_HALL_EFFECT_PIN = 11;
 constexpr uint8_t ELEVATOR_LIMIT_SWITCH_PIN = 12;
+constexpr uint8_t CONFIRMATION_BUTTON_PIN = 13;
 
 // Shuffler Constants
 constexpr uint8_t DROPPER_DIAMETER = 11; // [mm] TUNE THIS VALUE

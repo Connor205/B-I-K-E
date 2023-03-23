@@ -22,3 +22,4 @@ constexpr uint8_t INDEXER_ENCODER_B_MINUS_PIN = 7;
 constexpr uint8_t MAGAZINE_SENSOR_PIN = A1; // Photoresistor
 constexpr uint8_t FLYWHEEL_BARREL_SENSOR_PIN = A0; // Photoresistor
 constexpr uint8_t FLYWHEEL_BARREL_SENSOR_THRESHOLD = 3;
+constexpr uint8_t CONFIRMATION_BUTTON_PIN = 12;
