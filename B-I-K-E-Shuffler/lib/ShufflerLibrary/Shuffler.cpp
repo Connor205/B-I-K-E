@@ -3,24 +3,29 @@
 
 Shuffler::Shuffler() {
     this->dispenserMotor =
-        StepperMotor(DISPENSER_STEP_PIN, DISPENSER_DIR_PIN, DISPENSER_LIMIT_SWITCH_PIN, DISPENSER_MOTOR_MAX_STEPS_PER_SECOND);
+        StepperMotor(DISPENSER_RAIL_STEP_PIN, DISPENSER_RAIL_DIR_PIN, DISPENSER_RAIL_LIMIT_SWITCH_PIN, DISPENSER_RAIL_MAX_STEPS_PER_SECOND);
     this->beltMotor =
         StepperMotor(BELT_STEP_PIN, BELT_DIR_PIN, CONVEYER_HALL_EFFECT_PIN, BELT_MOTOR_MAX_STEPS_PER_SECOND);
+    this->dropperMotor =
+        StepperMotor(DROPPER_MOTOR_STEP_PIN, DROPPER_MOTOR_DIR_PIN, -1, DROPPER_MOTOR_MAX_STEPS_PER_SECOND);
+    this->elevatorMotor =
+        StepperMotor(ELEVATOR_STEP_PIN, ELEVATOR_DIR_PIN, ELEVATOR_LIMIT_SWITCH_PIN, ELEVATOR_MOTOR_MAX_STEPS_PER_SECOND);
 }
 
 void Shuffler::init() {
     this->dispenserMotor.init();
     this->beltMotor.init();
+    this->dropperMotor.init();
+    this->elevatorMotor.init();
     this->calibrate();
     this->dispenserMotor.moveToTarget(DISPENSER_STEPS_TO_FIRST_LINK);
-
-    pinMode(DISPENSER_MOTOR_PLUS_PIN, OUTPUT);
-    pinMode(DISPENSER_MOTOR_MINUS_PIN, OUTPUT);
 }
 
 void Shuffler::calibrate() {
     this->dispenserMotor.calibrate();
     this->beltMotor.calibrate();
+    this->dropperMotor.calibrate();
+    this->elevatorMotor.calibrate();
 }
 
 void Shuffler::moveDispenserToSlot(int slotNumber) {
@@ -44,19 +49,7 @@ void Shuffler::ejectCards() { this->beltMotor.moveToTarget(BELT_LENGTH_STEPS); }
 
 void Shuffler::resetBelt() { this->beltMotor.moveToTarget(DISPENSER_STEPS_TO_FIRST_LINK); }
 
-void Shuffler::powerDispenser(bool on) {
-    if (on) {
-        digitalWrite(DISPENSER_MOTOR_PLUS_PIN, HIGH);
-        digitalWrite(DISPENSER_MOTOR_MINUS_PIN, LOW);
-    } else {
-        digitalWrite(DISPENSER_MOTOR_PLUS_PIN, LOW);
-        digitalWrite(DISPENSER_MOTOR_MINUS_PIN, LOW);
-    }
-}
-
 // TODO:: This is not the way we are going to do this, but it works for now
 void Shuffler::dropCard() {
-    this->powerDispenser(true);
-    delay(1000);
-    this->powerDispenser(false);
+
 }

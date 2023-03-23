@@ -25,6 +25,10 @@ void StepperMotor::init() {
 }
 
 void StepperMotor::calibrate() {
+    if (this->calibratePin == -1) {
+        // No Calibration Pin
+        return;
+    }
     setDirection(true);
     setSpeed(this->maxSpeed / 4); // Run at slower speed
     while (!digitalRead(this->calibratePin)) {
