@@ -12,7 +12,6 @@ public:
 
     // Motor Control
     void turnToAngle(float targetDegrees);
-    void indexOneCard();
     void powerFlywheel(bool on);
     void powerIndexer(bool on);
 
@@ -22,6 +21,7 @@ public:
     bool cardInMagazine();
     bool cardInFlywheelBarrel();
 
+    // Turret Actions
     void dealSingleCard();
 
 private:
