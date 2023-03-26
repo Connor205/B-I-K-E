@@ -1,5 +1,6 @@
 import pygame as pg
 from Turret import Turret
+from Shuffler import Shuffler
 
 BUTTON_HEIGHT = 100
 BUTTON_WIDTH = 300
@@ -20,33 +21,25 @@ class GUITester:
 
         self.buttons = []
         self.turretButtons = []
-        self.buttons.append({
-            "x": 100,
-            "y": 100,
-            "width": 300,
-            "height": 100,
-            "text": "Test Button",
-            "function": lambda: print("Hello World"),
-            "is_pressed": False,
-        })
+        self.shufflerButtons = []
 
         self.serial_port_str_turret = input(
             "Provide the Serial Port For the Turret:").strip()
-        if self.serial_port_str_turret == "" and not debug:
-            self.serial_port_str_turret = None
-        else:
-            self.turret = None
+        self.serial_port_str_shuffler = input(
+            "Provide the Serial Port For the Shuffler:").strip()
 
-            self.connect()
+        self.shuffler = None
+        self.turret = None
+        self.connect()
 
     def draw(self):
         # First we want to fill the background
         self.screen.fill((105, 105, 105))
 
         # Lets draw the turret buttons
-        for i, button in enumerate(self.turretButtons):
-            x = 250
-            y = i * (BUTTON_HEIGHT + BUTTON_SPACING) + BUTTON_SPACING
+        for button in self.turretButtons + self.shufflerButtons:
+            x = button["x"]
+            y = button["y"]
             pg.draw.rect(self.screen, button["color"],
                          (x, y, BUTTON_WIDTH, BUTTON_HEIGHT))
             pg.draw.rect(self.screen, (255, 255, 255),
@@ -60,6 +53,10 @@ class GUITester:
         # We can draw the fps in the bottom right
         pg.display.set_caption(f"FPS: {self.clock.get_fps():.2f}")
         pg.display.flip()
+
+    def connect(self):
+        self.connectTurret()
+        self.connectShuffler()
 
     # Lets write a function to connect to the serial port of the arduinos
     def connectTurret(self):
@@ -115,13 +112,61 @@ class GUITester:
         })
 
         for i, button in enumerate(self.turretButtons):
-            button["x"] = 250
+            button["x"] = 50
             button["y"] = i * (BUTTON_HEIGHT + BUTTON_SPACING) + BUTTON_SPACING
             button["width"] = BUTTON_WIDTH
             button["height"] = BUTTON_HEIGHT
 
     def connectShuffler(self):
-        
+        if self.shuffler:
+            print("Shuffler already connected, attempting to reconnect... ")
+        if not self.debug:
+            self.shuffler = Shuffler(self.serial_port_str_turret)
+
+        # We want to add more buttons if we are connected to the arduino
+        self.shufflerButtons.append({
+            "text": "Reset Conveyor",
+            "function": lambda: self.shuffler.resetConveyor,
+            "color": (98, 93, 93)
+        })
+        self.shufflerButtons.append({
+            "text": "Export Cards",
+            "function": lambda: self.shuffler.exportCards,
+            "color": (98, 93, 93)
+        })
+        self.shufflerButtons.append({
+            "text": "Dispsense",
+            "function": lambda: self.shuffler.dispense,
+            "color": (96, 130, 182)
+        })
+        self.shufflerButtons.append({
+            "text":
+            "Move to 1",
+            "function":
+            lambda: self.shuffler.moveToSlot(1),
+            "color": (74, 100, 108)
+        })
+        self.shufflerButtons.append({
+            "text":
+            "Move to 30",
+            "function":
+            lambda: self.shuffler.moveToSlot(30),
+            "color": (74, 100, 108)
+        })
+        self.shufflerButtons.append({
+            "text":
+            "Move to 52",
+            "function":
+            lambda: self.shuffler.moveToSlot(52),
+            "color": (74, 100, 108)
+        })
+
+        for i, button in enumerate(self.shufflerButtons):
+            button["x"] = 400
+            button["y"] = i * (BUTTON_HEIGHT + BUTTON_SPACING) + BUTTON_SPACING
+            button["width"] = BUTTON_WIDTH
+            button["height"] = BUTTON_HEIGHT
+
     def events(self):
         # We dont have any user input so we just need to make sure we can exit the simulation
         for event in pg.event.get():
@@ -133,7 +178,7 @@ class GUITester:
     def update(self):
         mouse = pg.mouse.get_pos()
         click = pg.mouse.get_pressed()
-        for button in self.turretButtons:
+        for button in self.turretButtons + self.shufflerButtons:
             if button["x"] < mouse[
                     0] < button["x"] + button["width"] and button["y"] < mouse[
                         1] < button["y"] + button["height"]:
