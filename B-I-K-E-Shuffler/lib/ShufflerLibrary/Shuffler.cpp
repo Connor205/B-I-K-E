@@ -51,5 +51,5 @@ void Shuffler::resetBelt() { this->beltMotor.moveToTarget(DISPENSER_STEPS_TO_FIR
 
 // TODO:: This is not the way we are going to do this, but it works for now
 void Shuffler::dropCard() {
-
+    // NOTE: Dropper motor is a Pancake NEMA 17
 }
