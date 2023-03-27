@@ -22,12 +22,10 @@
 #include <Wire.h>
 #include "Pca9554.h"
 
-#define PCA9554_ADDRESS                 0x37
-
 #define PCA9554_REG_INP                 0
-#define PCA9554_REG_OUT                 0
-#define PCA9554_REG_POL                 0
-#define PCA9554_REG_CTRL                0
+#define PCA9554_REG_OUT                	1
+#define PCA9554_REG_POL                 2
+#define PCA9554_REG_CTRL                3
 
 uint8_t pinNum2bitNum[] = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 };
 
@@ -61,7 +59,9 @@ static uint16_t readRegister(uint8_t i2cAddress, uint8_t reg) {
  * Constructor for the Pca9554Class class, not much here yet
  *
  **************************************************************************/
-Pca9554Class::Pca9554Class(void) {}
+Pca9554Class::Pca9554Class(uint8_t i2cAddress) {
+	m_i2cAddress = i2cAddress;
+}
 
 /***************************************************************************
  *
@@ -73,10 +73,10 @@ Pca9554Class::Pca9554Class(void) {}
  **************************************************************************/
 void Pca9554Class::begin(void) {
 	// Read out default values from the registers to the shadow variables.
-	m_inp = readRegister(PCA9554_ADDRESS, PCA9554_REG_INP);
-	m_out = readRegister(PCA9554_ADDRESS, PCA9554_REG_OUT);
-	m_pol = readRegister(PCA9554_ADDRESS, PCA9554_REG_POL);
-	m_ctrl = readRegister(PCA9554_ADDRESS, PCA9554_REG_CTRL);
+	m_inp = readRegister(m_i2cAddress, PCA9554_REG_INP);
+	m_out = readRegister(m_i2cAddress, PCA9554_REG_OUT);
+	m_pol = readRegister(m_i2cAddress, PCA9554_REG_POL);
+	m_ctrl = readRegister(m_i2cAddress, PCA9554_REG_CTRL);
 }
 
 #if defined(ARDUINO_ARCH_ESP8266)
@@ -111,7 +111,7 @@ boolean Pca9554Class::pinMode(uint8_t pin, uint8_t mode) {
 		return false;
 	}
 
-	writeRegister(PCA9554_ADDRESS, PCA9554_REG_CTRL, m_ctrl);
+	writeRegister(m_i2cAddress, PCA9554_REG_CTRL, m_ctrl);
 
 	return true;
 }
@@ -137,7 +137,7 @@ boolean Pca9554Class::pinPolarity(uint8_t pin, uint8_t polarity) {
 		return false;
 	}
 
-	writeRegister(PCA9554_ADDRESS, PCA9554_REG_POL, m_pol);
+	writeRegister(m_i2cAddress, PCA9554_REG_POL, m_pol);
 
 	return true;
 }
@@ -159,7 +159,7 @@ boolean Pca9554Class::digitalWrite(uint8_t pin, boolean val) {
 		m_out &= ~pinNum2bitNum[pin];
 	}
 
-	writeRegister(PCA9554_ADDRESS, PCA9554_REG_OUT, m_out);
+	writeRegister(m_i2cAddress, PCA9554_REG_OUT, m_out);
 }
 
 /***************************************************************************
@@ -170,7 +170,7 @@ boolean Pca9554Class::digitalWrite(uint8_t pin, boolean val) {
  *
  **************************************************************************/
 boolean Pca9554Class::digitalRead(uint8_t pin) {
-	return (readRegister(PCA9554_ADDRESS, PCA9554_REG_INP) & pinNum2bitNum[pin] != 0);
+	return (readRegister(m_i2cAddress, PCA9554_REG_INP) & pinNum2bitNum[pin] != 0);
 }
 
 Pca9554Class Pca9554;

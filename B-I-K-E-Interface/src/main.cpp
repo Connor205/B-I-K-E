@@ -7,7 +7,10 @@
 // PCA9554 panel3(PANEL_3_ADDRESS);
 // PCA9554 panel4(PANEL_4_ADDRESS);
 
-Pca9554Class panel4;
+Pca9554Class panel1(PANEL_1_ADDRESS);
+Pca9554Class panel2(PANEL_2_ADDRESS);
+Pca9554Class panel3(PANEL_3_ADDRESS);
+Pca9554Class panel4(PANEL_4_ADDRESS);
 
 /**
  * @brief Writes the given panel ID and button index to the serial port
@@ -20,35 +23,6 @@ void writeButtonInfo(uint8_t panelId, uint8_t buttonIndex) {
   if (buttonIndex == -1) { return; }
   //Serial.write(panelId);
   //Serial.write(buttonIndex);
-}
-
-/**
- * @brief Reads the data over I2C, expecting 8 bytes, and returns the index of the button that was pressed
- *
- * @return uint8_t The index of the button that was pressed
- */
-uint8_t findButtonBit() {
-  int length = 64;
-  byte data[length];
-  int i = 0;
-  while (Wire.available() > 0) {
-    data[i++] = Wire.read();
-  }
-  Serial.println("Received data: ");
-  for (int i = 0; i < length; i++) {
-    Serial.print(data[i]);
-    Serial.print(" ");
-  }
-  // Find the index of the button that was pressed by finding the 1
-  // This only supports 1 button press at a time
-  for (int i = 0; i < length; i++) {
-    if (data[i] == 1) {
-      Serial.println("Found button: " + String(i));
-      return i;
-    }
-  }
-  Serial.println("No button was pressed");
-  return -1; // No button was pressed
 }
 
 int readI2CRegister(uint8_t i2cAddress, uint8_t reg) {
@@ -69,56 +43,50 @@ int readI2CRegister(uint8_t i2cAddress, uint8_t reg) {
 
 void panel1Interrupt(void) {
   Serial.println("Panel 1 Interrupt");
-  // Wire.requestFrom(PANEL_1_ADDRESS, 8);
-  uint8_t button = findButtonBit();
-  writeButtonInfo(1, button);
 }
 
 void panel2Interrupt(void) {
   Serial.println("Panel 2 Interrupt");
-  // Wire.requestFrom(PANEL_2_ADDRESS, 8);
-  uint8_t button = findButtonBit();
-  writeButtonInfo(2, button);
 }
 
 void panel3Interrupt(void) {
   Serial.println("Panel 3 Interrupt");
-  // Wire.requestFrom(PANEL_3_ADDRESS, 8);
-  uint8_t button = findButtonBit();
-  writeButtonInfo(3, button);
 }
 
 void panel4Interrupt(void) {
   Serial.println("Panel 4 Interrupt");
   int readData = readI2CRegister(0x37, 0);
   Serial.println("Read data: " + String(readData));
-  //Wire.requestFrom(PANEL_4_ADDRESS, 8);
-  //uint8_t button = findButtonBit();
-  //writeButtonInfo(4, button);
 }
 
 void setup() {
   // Start Serial and I2C
   Serial.begin(115200);
+  panel1.begin();
+  panel2.begin();
+  panel3.begin();
   panel4.begin();
-  Wire.begin(A4, A5);
   // Set all the panels to input mode
-  // panel1.portMode(ALLINPUT);
-  // panel2.portMode(ALLINPUT);
-  // panel3.portMode(ALLINPUT);
-  // panel4.portMode(ALLINPUT);
+  for (int i = 0; i < 8; i++) {
+    panel1.pinMode(i, INPUT);
+    panel2.pinMode(i, INPUT);
+    panel3.pinMode(i, INPUT);
+    panel4.pinMode(i, INPUT);
+  }
+  // Start I2C
+  Wire.begin();
   // Set the interrupt pins to input mode
   pinMode(PANEL_1_INTERRUPT_PIN, INPUT);
   pinMode(PANEL_2_INTERRUPT_PIN, INPUT);
   pinMode(PANEL_3_INTERRUPT_PIN, INPUT);
   pinMode(PANEL_4_INTERRUPT_PIN, INPUT);
   // Attach the interrupt handlers
-  //attachInterrupt(digitalPinToInterrupt(PANEL_1_INTERRUPT_PIN), panel1Interrupt, RISING);
-  // attachInterrupt(digitalPinToInterrupt(PANEL_2_INTERRUPT_PIN), panel2Interrupt, RISING);
-  // attachInterrupt(digitalPinToInterrupt(PANEL_3_INTERRUPT_PIN), panel3Interrupt, RISING);
+  attachInterrupt(digitalPinToInterrupt(PANEL_1_INTERRUPT_PIN), panel1Interrupt, RISING);
+  attachInterrupt(digitalPinToInterrupt(PANEL_2_INTERRUPT_PIN), panel2Interrupt, RISING);
+  attachInterrupt(digitalPinToInterrupt(PANEL_3_INTERRUPT_PIN), panel3Interrupt, RISING);
   attachInterrupt(digitalPinToInterrupt(PANEL_4_INTERRUPT_PIN), panel4Interrupt, RISING);
 }
 
 void loop() {
-  delay(15);
+  delay(20);
 }

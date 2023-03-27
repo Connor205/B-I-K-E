@@ -31,7 +31,7 @@ class Pca9554Class
 {
 protected:
 public:
-	Pca9554Class();
+	Pca9554Class(uint8_t i2cAddress);
 	void    begin(void);
 #if defined(ARDUINO_ARCH_ESP8266)
 	void    init(uint8_t sda, uint8_t scl);
@@ -42,6 +42,7 @@ public:
 	boolean digitalRead(uint8_t pin);
 
 private:
+	uint8_t m_i2cAddress;
 	uint8_t m_inp;
 	uint8_t m_out;
 	uint8_t m_pol;
