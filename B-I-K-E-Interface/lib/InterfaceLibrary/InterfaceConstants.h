@@ -19,7 +19,7 @@ Address     A2  A1  A0
 constexpr uint8_t PANEL_1_ADDRESS = 0x21; // L L H
 constexpr uint8_t PANEL_2_ADDRESS = 0x20; // L L L 
 constexpr uint8_t PANEL_3_ADDRESS = 0x27; // H H H 
-constexpr uint8_t PANEL_4_ADDRESS = 0x25; // H L H
+constexpr uint8_t PANEL_4_ADDRESS = 0x37; // H L H
 
 constexpr uint8_t PANEL_1_INTERRUPT_PIN = PA_0;
 constexpr uint8_t PANEL_2_INTERRUPT_PIN = PA_1;
