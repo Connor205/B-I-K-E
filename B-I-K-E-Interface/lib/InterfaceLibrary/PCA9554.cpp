@@ -59,7 +59,7 @@ static uint16_t readRegister(uint8_t i2cAddress, uint8_t reg) {
  * Constructor for the Pca9554Class class, not much here yet
  *
  **************************************************************************/
-Pca9554Class::Pca9554Class(uint8_t i2cAddress) {
+Pca9554::Pca9554(uint8_t i2cAddress) {
 	m_i2cAddress = i2cAddress;
 }
 
@@ -71,7 +71,7 @@ Pca9554Class::Pca9554Class(uint8_t i2cAddress) {
  * function will call this one.
  *
  **************************************************************************/
-void Pca9554Class::begin(void) {
+void Pca9554::begin(void) {
 	// Read out default values from the registers to the shadow variables.
 	m_inp = readRegister(m_i2cAddress, PCA9554_REG_INP);
 	m_out = readRegister(m_i2cAddress, PCA9554_REG_OUT);
@@ -85,7 +85,7 @@ void Pca9554Class::begin(void) {
  * Convenience method for ESP8266 systems such as the ESP210.
  *
  **************************************************************************/
-void Pca9554Class::init(uint8_t sda, uint8_t scl) {
+void Pca9554::init(uint8_t sda, uint8_t scl) {
 	Wire.begin(sda, scl);
 	begin();
 }
@@ -96,7 +96,7 @@ void Pca9554Class::init(uint8_t sda, uint8_t scl) {
  * Sets the desired pin mode
  *
  **************************************************************************/
-boolean Pca9554Class::pinMode(uint8_t pin, uint8_t mode) {
+bool Pca9554::pinMode(uint8_t pin, uint8_t mode) {
 	// Make sure the pin number is OK
 	if (pin >= sizeof pinNum2bitNum) {
 		return false;
@@ -123,7 +123,7 @@ boolean Pca9554Class::pinMode(uint8_t pin, uint8_t mode) {
  * hardware logic.
  *
  **************************************************************************/
-boolean Pca9554Class::pinPolarity(uint8_t pin, uint8_t polarity) {
+bool Pca9554::pinPolarity(uint8_t pin, uint8_t polarity) {
 	// Make sure pin number is OK
 	if (pin >= sizeof pinNum2bitNum) {
 		return false;
@@ -147,7 +147,7 @@ boolean Pca9554Class::pinPolarity(uint8_t pin, uint8_t polarity) {
  * Write digital value to pin
  *
  **************************************************************************/
-boolean Pca9554Class::digitalWrite(uint8_t pin, boolean val) {
+bool Pca9554::digitalWrite(uint8_t pin, bool val) {
 	// Make sure pin number is OK
 	if (pin >= sizeof pinNum2bitNum) {
 		return false;
@@ -160,6 +160,7 @@ boolean Pca9554Class::digitalWrite(uint8_t pin, boolean val) {
 	}
 
 	writeRegister(m_i2cAddress, PCA9554_REG_OUT, m_out);
+	return true;
 }
 
 /***************************************************************************
@@ -169,8 +170,6 @@ boolean Pca9554Class::digitalWrite(uint8_t pin, boolean val) {
  * incorrectly specified.
  *
  **************************************************************************/
-boolean Pca9554Class::digitalRead(uint8_t pin) {
+boolean Pca9554::digitalRead(uint8_t pin) {
 	return (readRegister(m_i2cAddress, PCA9554_REG_INP) & pinNum2bitNum[pin] != 0);
 }
-
-Pca9554Class Pca9554;

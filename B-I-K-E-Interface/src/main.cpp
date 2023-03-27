@@ -7,10 +7,10 @@
 // PCA9554 panel3(PANEL_3_ADDRESS);
 // PCA9554 panel4(PANEL_4_ADDRESS);
 
-Pca9554Class panel1(PANEL_1_ADDRESS);
-Pca9554Class panel2(PANEL_2_ADDRESS);
-Pca9554Class panel3(PANEL_3_ADDRESS);
-Pca9554Class panel4(PANEL_4_ADDRESS);
+Pca9554 panel1(PANEL_1_ADDRESS);
+Pca9554 panel2(PANEL_2_ADDRESS);
+Pca9554 panel3(PANEL_3_ADDRESS);
+Pca9554 panel4(PANEL_4_ADDRESS);
 
 /**
  * @brief Writes the given panel ID and button index to the serial port
@@ -31,7 +31,7 @@ int readI2CRegister(uint8_t i2cAddress, uint8_t reg) {
   Wire.write(reg);
   uint8_t error = Wire.endTransmission();
   if (error == 0) {
-    Wire.requestFrom(i2cAddress, 1, true);
+    Wire.requestFrom(i2cAddress, (uint8_t)1);
     while (Wire.available() < 1);
     value = Wire.read();
   } else {

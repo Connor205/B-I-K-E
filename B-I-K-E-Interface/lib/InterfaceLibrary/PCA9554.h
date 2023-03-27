@@ -27,19 +27,19 @@
 #define NORMAL                          0
 #define INVERTED                        1
 
-class Pca9554Class
+class Pca9554
 {
 protected:
 public:
-	Pca9554Class(uint8_t i2cAddress);
+	Pca9554(uint8_t i2cAddress);
 	void    begin(void);
 #if defined(ARDUINO_ARCH_ESP8266)
 	void    init(uint8_t sda, uint8_t scl);
 #endif
-	boolean pinMode(uint8_t pin, uint8_t mode);
-	boolean pinPolarity(uint8_t pin, uint8_t polarity);
-	boolean digitalWrite(uint8_t pin, boolean val);
-	boolean digitalRead(uint8_t pin);
+	bool pinMode(uint8_t pin, uint8_t mode);
+	bool pinPolarity(uint8_t pin, uint8_t polarity);
+	bool digitalWrite(uint8_t pin, bool val);
+	bool digitalRead(uint8_t pin);
 
 private:
 	uint8_t m_i2cAddress;
@@ -48,8 +48,6 @@ private:
 	uint8_t m_pol;
 	uint8_t m_ctrl;
 };
-
-extern Pca9554Class Pca9554;
 
 #endif //ifndef __GUARD_PCA9554_H__
 
