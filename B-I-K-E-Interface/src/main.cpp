@@ -43,6 +43,8 @@ int readI2CRegister(uint8_t i2cAddress, uint8_t reg) {
 
 void panel1Interrupt(void) {
   Serial.println("Panel 1 Interrupt");
+  int readData = readI2CRegister(PANEL_1_ADDRESS, 0);
+  Serial.println("Read data: " + String(readData));
 }
 
 void panel2Interrupt(void) {
@@ -55,8 +57,39 @@ void panel3Interrupt(void) {
 
 void panel4Interrupt(void) {
   Serial.println("Panel 4 Interrupt");
-  int readData = readI2CRegister(0x37, 0);
+  int readData = readI2CRegister(PANEL_4_ADDRESS, 0);
   Serial.println("Read data: " + String(readData));
+}
+
+void i2cScanner() {
+  // Scan I2C bus for devices
+  Serial.println("Scanning I2C bus...");
+  byte error, address;
+  int nDevices = 0;
+  for (address = 1; address < 127; address++) {
+    Wire.beginTransmission(address);
+    error = Wire.endTransmission();
+    if (error == 0) {
+      Serial.print("I2C device found at address 0x");
+      if (address < 16) {
+        Serial.print("0");
+      }
+      Serial.println(address, HEX);
+      nDevices++;
+    } else if (error == 4) {
+      Serial.print("Unknown error at address 0x");
+      if (address < 16) {
+        Serial.print("0");
+      }
+      Serial.println(address, HEX);
+    }
+  }
+  if (nDevices == 0) {
+    Serial.println("No I2C devices found");
+  } else {
+    Serial.println("done");
+  }
+  delay(5000);
 }
 
 void setup() {
@@ -74,7 +107,8 @@ void setup() {
     panel4.pinMode(i, INPUT);
   }
   // Start I2C
-  Wire.begin();
+  Wire.begin((uint32_t)PA_5, (uint32_t)PA_6);
+  // Wire.begin(A4, A5);
   // Set the interrupt pins to input mode
   pinMode(PANEL_1_INTERRUPT_PIN, INPUT);
   pinMode(PANEL_2_INTERRUPT_PIN, INPUT);
@@ -88,5 +122,5 @@ void setup() {
 }
 
 void loop() {
-  delay(20);
+  i2cScanner();
 }
