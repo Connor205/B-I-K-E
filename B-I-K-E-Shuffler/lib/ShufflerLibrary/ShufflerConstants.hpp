@@ -16,7 +16,7 @@ constexpr uint16_t DISPENSER_RAIL_STEPS_PER_REVOLUTION = 6400; // Set on the dig
 constexpr uint8_t BELT_STEP_PIN = 6;
 constexpr uint8_t BELT_DIR_PIN = 7;
 constexpr uint16_t BELT_MOTOR_MAX_STEPS_PER_SECOND = 1000;
-constexpr uint16_t BELT_STEPS_PER_REVOLUTION = 3200; // Set on the digital driver
+constexpr uint16_t BELT_STEPS_PER_REVOLUTION = 6400; // Set on the digital driver
 
 constexpr uint8_t DROPPER_MOTOR_STEP_PIN = 8;
 constexpr uint8_t DROPPER_MOTOR_DIR_PIN = 9;
