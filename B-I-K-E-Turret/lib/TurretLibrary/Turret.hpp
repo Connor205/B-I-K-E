@@ -14,6 +14,7 @@ public:
     void turnToAngle(float targetDegrees);
     void powerFlywheel(bool on);
     void powerIndexer(bool on);
+    void reverseIndexer();
 
     // Sensor Control
     float getTurretAngle();

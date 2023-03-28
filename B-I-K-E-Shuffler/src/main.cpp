@@ -11,7 +11,7 @@ void testHallEffectSensor() {
 
 void setup() {
   Serial.begin(9600);
-  pinMode(13, OUTPUT);
+  pinMode(13, OUTPUT); // LED
   pinMode(CONVEYER_HALL_EFFECT_PIN, INPUT);
 }
 

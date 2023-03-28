@@ -58,7 +58,7 @@ void Turret::turnToAngle(float targetDegrees) {
  * @param on true -> on, false -> off
  */
 void Turret::powerFlywheel(bool on) {
-    if (on) { // TODO: Check direction
+    if (on) {
         digitalWrite(FLYWHEEL_MOTOR_PLUS_PIN, LOW);
         digitalWrite(FLYWHEEL_MOTOR_MINUS_PIN, HIGH);
     } else {
@@ -73,13 +73,23 @@ void Turret::powerFlywheel(bool on) {
  * @param on true -> on, false -> off
  */
 void Turret::powerIndexer(bool on) {
-    if (on) { // TODO: Check direction
+    if (on) {
         digitalWrite(INDEXER_MOTOR_PLUS_PIN, LOW);
         digitalWrite(INDEXER_MOTOR_MINUS_PIN, HIGH);
     } else {
         digitalWrite(INDEXER_MOTOR_PLUS_PIN, LOW);
         digitalWrite(INDEXER_MOTOR_MINUS_PIN, LOW);
     }
+}
+
+/**
+ * @brief Powers the indexer motor in reverse
+ *        To pull cards back into the magazine
+ *
+ */
+void Turret::reverseIndexer() {
+    digitalWrite(INDEXER_MOTOR_PLUS_PIN, HIGH);
+    digitalWrite(INDEXER_MOTOR_MINUS_PIN, LOW);
 }
 
 float Turret::getTurretAngle() { return this->turretMotor.getCurrentAngle(); }
