@@ -51,5 +51,13 @@ void Shuffler::resetBelt() { this->beltMotor.moveToTarget(DISPENSER_STEPS_TO_FIR
 
 // TODO:: This is not the way we are going to do this, but it works for now
 void Shuffler::dropCard() {
-    // NOTE: Dropper motor is a Pancake NEMA 17
+    this->dropperMotor.setDirection(true); // Drop card direction
+    for (int i = 0; i < DROPPER_STEPS_PER_CARD; i++) {
+        this->dropperMotor.stepMotor();
+    }
+    this->dropperMotor.setDirection(false); // Pull cards up after drop
+    int resetSteps = DROPPER_STEPS_PER_CARD / 2;
+    for (int i = 0; i < resetSteps; i++) {
+        this->dropperMotor.stepMotor();
+    }
 }
