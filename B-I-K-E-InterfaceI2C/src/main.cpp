@@ -107,7 +107,7 @@ void setup() {
     panel4.pinMode(i, INPUT);
   }
   // Start I2C
-  Wire.begin((uint32_t)PB_7, (uint32_t)PB_6);
+  Wire.begin();
   // Set the interrupt pins to input mode
   pinMode(PANEL_1_INTERRUPT_PIN, INPUT);
   pinMode(PANEL_2_INTERRUPT_PIN, INPUT);
@@ -121,6 +121,8 @@ void setup() {
 }
 
 void loop() {
-  Serial.println("Looping");
-  i2cScanner();
+  // i2cScanner();
+  int readData = readI2CRegister(PANEL_1_ADDRESS, 0);
+  Serial.println("Read data: " + String(readData));
+  delay(500);
 }
