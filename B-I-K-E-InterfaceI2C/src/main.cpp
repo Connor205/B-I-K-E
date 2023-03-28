@@ -42,21 +42,21 @@ int readI2CRegister(uint8_t i2cAddress, uint8_t reg) {
 }
 
 void panel1Interrupt(void) {
-  Serial.println("Panel 1 Interrupt");
+  Serial.println("1Panel 1 Interrupt");
   int readData = readI2CRegister(PANEL_1_ADDRESS, 0);
   Serial.println("Read data: " + String(readData));
 }
 
 void panel2Interrupt(void) {
-  Serial.println("Panel 2 Interrupt");
+  Serial.println("2Panel 2 Interrupt");
 }
 
 void panel3Interrupt(void) {
-  Serial.println("Panel 3 Interrupt");
+  Serial.println("3Panel 3 Interrupt");
 }
 
 void panel4Interrupt(void) {
-  Serial.println("Panel 4 Interrupt");
+  Serial.println("4Panel 4 Interrupt");
   int readData = readI2CRegister(PANEL_4_ADDRESS, 0);
   Serial.println("Read data: " + String(readData));
 }
@@ -122,7 +122,7 @@ void setup() {
 
 void loop() {
   // i2cScanner();
-  int readData = readI2CRegister(PANEL_1_ADDRESS, 0);
-  Serial.println("Read data: " + String(readData));
-  delay(500);
+  // int readData = readI2CRegister(PANEL_1_ADDRESS, 0);
+  // Serial.println("Read data: " + String(readData));
+  delay(25);
 }

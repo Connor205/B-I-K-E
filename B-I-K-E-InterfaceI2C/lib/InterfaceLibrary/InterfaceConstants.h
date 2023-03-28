@@ -21,7 +21,7 @@ constexpr uint8_t PANEL_2_ADDRESS = 0x20; // L L L
 constexpr uint8_t PANEL_3_ADDRESS = 0x27; // H H H 
 constexpr uint8_t PANEL_4_ADDRESS = 0x37; // H L H
 
-constexpr uint8_t PANEL_1_INTERRUPT_PIN = 12;
+constexpr uint8_t PANEL_1_INTERRUPT_PIN = 2;
 constexpr uint8_t PANEL_2_INTERRUPT_PIN = 11;
 constexpr uint8_t PANEL_3_INTERRUPT_PIN = 10;
 constexpr uint8_t PANEL_4_INTERRUPT_PIN = 9;
