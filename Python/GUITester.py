@@ -68,16 +68,16 @@ class GUITester:
         # We want to add more buttons if we are connected to the arduino
         self.turretButtons.append({
             "text":
-            "90 degrees",
+            "45 degrees",
             "function":
-            lambda: self.turret.turn_to_angle(90),
+            lambda: self.turret.turn_to_angle(45),
             "color": (152, 175, 199)
         })
         self.turretButtons.append({
             "text":
-            "120 degrees",
+            "-45 degrees",
             "function":
-            lambda: self.turret.turn_to_angle(120),
+            lambda: self.turret.turn_to_angle(-45),
             "color": (152, 175, 199)
         })
 
@@ -197,5 +197,5 @@ class GUITester:
 
 
 if __name__ == "__main__":
-    gui = GUITester(debug=True)
+    gui = GUITester(debug=False)
     gui.run()

@@ -2,7 +2,6 @@
 
 #include "StepperMotor.hpp"
 
-
 // We need to control 4 different stepper motors
 // 1. The motor that move the dispenser
 // 2. The motor that moves the belt that the cards are already on
@@ -26,7 +25,6 @@ public:
     void resetBelt();
     void dropCard();
 
-private:
     StepperMotor dispenserMotor; // Dispenser Rail
     StepperMotor beltMotor; // Conveyor Belt
     StepperMotor dropperMotor; // Card Dropper

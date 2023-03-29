@@ -1,39 +1,57 @@
 #include "StepperMotor.hpp"
 #include <Arduino.h>
 
-StepperMotor::StepperMotor(int stepPin, int dirPin, int calibratePin, int maxSpeed) {
+StepperMotor::StepperMotor(int stepPin, int dirPin, int calibratePin, int maxSpeed)
+{
     this->stepPin = stepPin;
     this->dirPin = dirPin;
     this->calibratePin = calibratePin;
     this->maxSpeed = maxSpeed;
 }
 
-void StepperMotor::init() {
+void StepperMotor::init()
+{
     // Setup pins
     pinMode(stepPin, OUTPUT);
     pinMode(dirPin, OUTPUT);
     // TODO: Remove pullup if Hall-Effect sensor is active low (and remove ! in calibrate() method)
     pinMode(calibratePin, INPUT_PULLUP);
 
+    digitalWrite(stepPin, LOW);
+    digitalWrite(dirPin, HIGH);
+
     // Setup default values
     this->current = 0;
     this->target = 0;
-    this->currentSpeed = 0;
+    this->currentSpeed = this->maxSpeed;
     this->currentDelay = getDelayFromSpeed(this->currentSpeed);
     this->previousChangeTime = micros();
     this->currentlyRunning = false;
 }
 
-void StepperMotor::calibrate() {
-    if (this->calibratePin == -1) {
-        // No Calibration Pin
-        return;
-    }
-    setDirection(true);
-    setSpeed(this->maxSpeed / 4); // Run at slower speed
-    while (!digitalRead(this->calibratePin)) {
+void StepperMotor::calibrate(bool CW)
+{
+    Serial.println("Calibrating Motor: " + String(CW ? "CW" : "CCW"));
+    int steps = 0;
+    // Step until limit switch is hit
+    setDirection(CW);
+    int startingLimit = digitalRead(this->calibratePin);
+    setSpeed(this->maxSpeed);
+    while (true) {
+        int limitSwitch = digitalRead(this->calibratePin);
+        if (limitSwitch != startingLimit) {
+            break;
+        }
         stepMotor();
+
+        // Serial.println("Step: " + String(steps) + " Limit: " + String(limitSwitch));
+        steps++;
     }
+    // Output Step number
+    Serial.println("Calibrated " + String(steps) + " steps");
+    // Set current to 0
+    this->current = 0;
+    this->currentAngle = 0.0f;
 }
 
 float StepperMotor::getTarget() { return this->target; }
@@ -45,7 +63,8 @@ long StepperMotor::getDelay() { return this->currentDelay; }
  *
  * @param speed speed in steps per second
  */
-void StepperMotor::setSpeed(float speed) {
+void StepperMotor::setSpeed(float speed)
+{
     this->currentSpeed = speed;
     this->currentDelay = getDelayFromSpeed(this->currentSpeed);
 }
@@ -55,7 +74,9 @@ void StepperMotor::setSpeed(float speed) {
  *
  * @param CW True -> CW, False -> CCW
  */
-void StepperMotor::setDirection(bool CW) {
+void StepperMotor::setDirection(bool CW)
+{
+    Serial.println("Setting Direction: " + String(CW ? "CW" : "CCW"));
     if (CW) {
         digitalWrite(this->dirPin, HIGH);
     } else { // CCW
@@ -72,7 +93,8 @@ void StepperMotor::setDirection(bool CW) {
  *
  * @param targetStep the absolute target step
  */
-void StepperMotor::setTarget(int targetStep) {
+void StepperMotor::setTarget(int targetStep)
+{
     if (isMoving()) {
         return; // Motor is currently moving
     }
@@ -87,7 +109,8 @@ bool StepperMotor::isMoving() { return this->current != this->target; }
  * @brief Provides a pulse to the motor using the current delay calculated from the current speed
  *
  */
-void StepperMotor::stepMotor() {
+void StepperMotor::stepMotor()
+{
     digitalWrite(this->stepPin, HIGH);
     delayMicroseconds(this->currentDelay);
     digitalWrite(this->stepPin, LOW);
@@ -102,7 +125,8 @@ void StepperMotor::stepMotor() {
  * as motion occurs.
  *
  */
-void StepperMotor::update() {
+void StepperMotor::update()
+{
     // If the motor has reached its target, do nothing
     if (this->current == this->target) {
         return;
@@ -140,7 +164,8 @@ void StepperMotor::update() {
  *
  * @param targetStep the target step to acheive. Represents an absolute position
  */
-void StepperMotor::moveToTarget(int targetStep) {
+void StepperMotor::moveToTarget(int targetStep)
+{
     setDirection(targetStep > this->current); // True -> CW, False -> CCW
     int stepsToMove = abs(targetStep - this->current);
     for (int i = 0; i < stepsToMove; i++) {
@@ -149,7 +174,8 @@ void StepperMotor::moveToTarget(int targetStep) {
     this->current = targetStep;
 }
 
-void StepperMotor::moveToTargetAccel(int targetStep) {
+void StepperMotor::moveToTargetAccel(int targetStep)
+{
     // So this shit is mad basic. We are going to do a trapazoidal velocity profile
     // We will start at 0 and accelerate to a max speed, then decelerate to 0
     setDirection(targetStep > this->current); // True -> CW, False -> CCW
@@ -181,7 +207,8 @@ void StepperMotor::moveToTargetAccel(int targetStep) {
  *
  * @return true on function termination
  */
-bool StepperMotor::updateToTarget() {
+bool StepperMotor::updateToTarget()
+{
     if (this->current == this->target) {
         return true;
     }

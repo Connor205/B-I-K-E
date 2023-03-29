@@ -7,7 +7,7 @@ public:
 
     // Initialize
     void init();
-    void calibrate();
+    void calibrate(bool CW);
 
     // Getters
     float getTarget();
