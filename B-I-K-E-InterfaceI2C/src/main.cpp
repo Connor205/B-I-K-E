@@ -45,6 +45,7 @@ void panel1Interrupt(void) {
   Serial.println("1Panel 1 Interrupt");
   int readData = readI2CRegister(PANEL_1_ADDRESS, 0);
   Serial.println("Read data: " + String(readData));
+
 }
 
 void panel2Interrupt(void) {
