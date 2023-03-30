@@ -25,9 +25,6 @@ void StepperMotor::init() {
 }
 
 void StepperMotor::calibrate() {
-    // TODO: Calibration should ensure motor starts at the correct angle
-    // NOTE: Could use a limit switch to check boundaries and then assign 0 there
-
     // Step until limit switch is hit
     Serial.println("Calibrating...");
     setDirection(true);
