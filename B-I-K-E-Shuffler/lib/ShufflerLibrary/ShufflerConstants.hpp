@@ -52,7 +52,7 @@ constexpr int STEPS_PER_TWO_WIDE_SLOT = DISPENSER_STEPS_PER_MM * 3.5;
 constexpr float BELT_MM_PER_REVOLUTION = 88.0f; // Find this value by testing, the length of the belt travelled in 1 stepper motor revolution
 constexpr int BELT_STEPS_PER_MM = BELT_STEPS_PER_REVOLUTION / BELT_MM_PER_REVOLUTION; // This number should be pretty large
 
-constexpr int BELT_LENGTH_MM = 1000; // Find this value by testing, the length of the belt in mm
+constexpr float BELT_LENGTH_MM = (20 * 11) + (22); // Find this value by testing, the length of the belt in mm
 constexpr long BELT_LENGTH_STEPS = BELT_LENGTH_MM * BELT_STEPS_PER_MM;
 
 constexpr int BELT_DEFAULT_POSITION = 0; // TODO:: Find this value using calibration method
