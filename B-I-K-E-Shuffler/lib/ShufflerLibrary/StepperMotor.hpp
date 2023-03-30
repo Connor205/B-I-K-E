@@ -38,7 +38,6 @@ private:
     // Control Variables
     bool currentDir; // True -> CW, False -> CCW
     int current;
-    float currentAngle;
     int target;
     int previous;
     long previousChangeTime;
