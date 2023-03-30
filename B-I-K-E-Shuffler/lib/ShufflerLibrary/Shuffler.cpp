@@ -9,7 +9,6 @@ Shuffler::Shuffler() {
 
 void Shuffler::init() {
     this->dispenserMotor.init();
-    this->elevatorMotor.init();
     this->beltMotor.init();
     this->dropperMotor.init();
 }
@@ -47,7 +46,7 @@ void Shuffler::resetBelt() { this->beltMotor.moveToTarget(BELT_DEFAULT_POSITION)
 // TODO:: This is not the way we are going to do this, but it works for now
 void Shuffler::dropCard() {
     this->dropperMotor.setDirection(true); // Drop card direction
-    for (int i = 0; i < DROPPER_STEPS_PER_CARD; i++) {
+    for (uint16_t i = 0; i < DROPPER_STEPS_PER_CARD; i++) {
         this->dropperMotor.stepMotor();
     }
     this->dropperMotor.setDirection(false); // Pull cards up after drop
