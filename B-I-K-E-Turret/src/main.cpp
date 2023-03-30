@@ -24,7 +24,6 @@ void setup() {
     Serial.begin(9600);
     turret.init();
     turret.calibrate();
-    pinMode(TURRET_HALL_EFFECT_PIN, INPUT_PULLUP);
 }
 
 void serialReactions() {

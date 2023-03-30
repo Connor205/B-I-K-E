@@ -12,7 +12,7 @@ void StepperMotor::init() {
     // Setup pins
     pinMode(stepPin, OUTPUT);
     pinMode(dirPin, OUTPUT);
-    pinMode(calibrationPin, INPUT_PULLUP);
+    pinMode(calibrationPin, INPUT_PULLUP); // Hall effect sensor
 
     // Setup default values
     this->current = 0;
