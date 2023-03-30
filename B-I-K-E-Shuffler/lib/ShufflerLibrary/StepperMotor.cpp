@@ -32,7 +32,7 @@ void StepperMotor::calibrate(bool CW) {
     // Step until limit switch is hit
     setDirection(CW);
     int startingLimit = digitalRead(this->calibratePin);
-    setSpeed(this->maxSpeed);
+    setSpeed(this->maxSpeed / 2.0f);
     while (true) {
         int limitSwitch = digitalRead(this->calibratePin);
         if (limitSwitch != startingLimit) {
@@ -47,7 +47,6 @@ void StepperMotor::calibrate(bool CW) {
     Serial.println("Calibrated " + String(steps) + " steps");
     // Set current to 0
     this->current = 0;
-    this->currentAngle = 0.0f;
 }
 
 float StepperMotor::getTarget() { return this->target; }

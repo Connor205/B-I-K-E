@@ -14,8 +14,10 @@ Shuffler::Shuffler()
 void Shuffler::init()
 {
     this->dispenserMotor.init();
+    this->elevatorMotor.init();
     this->beltMotor.init();
     this->dropperMotor.init();
+    this->calibrate();
     this->dispenserMotor.moveToTarget(DISPENSER_STEPS_TO_FIRST_LINK);
 }
 
