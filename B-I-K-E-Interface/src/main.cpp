@@ -123,6 +123,7 @@ void setup() {
   Serial.println(F("\nI2C PINS"));
   Serial.print(F("\tSDA = ")); Serial.println(SDA);
   Serial.print(F("\tSCL = ")); Serial.println(SCL);
+  Serial.println();
   panel1.begin();
   panel2.begin();
   panel3.begin();
