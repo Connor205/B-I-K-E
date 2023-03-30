@@ -5,8 +5,7 @@
 
 Turret::Turret() { this->turretMotor = StepperMotor(TURRET_STEP_PIN, TURRET_DIR_PIN, TURRET_HALL_EFFECT_PIN); }
 
-void Turret::init()
-{
+void Turret::init() {
     // Init Turret StepperMotor
     this->turretMotor.init();
 
@@ -15,14 +14,12 @@ void Turret::init()
     pinMode(INDEXER_MOTOR_MINUS_PIN, OUTPUT);
     pinMode(FLYWHEEL_MOTOR_PLUS_PIN, OUTPUT);
     pinMode(FLYWHEEL_MOTOR_MINUS_PIN, OUTPUT);
-    pinMode(HALL_EFFECT_INPUT_PIN, OUTPUT);
 
     // // Intialize Sensor Pins
     // pinMode(INDEXER_ENCODER_A_PLUS_PIN, INPUT);
     // pinMode(INDEXER_ENCODER_A_MINUS_PIN, INPUT);
     // pinMode(INDEXER_ENCODER_B_PLUS_PIN, INPUT);
     // pinMode(INDEXER_ENCODER_B_MINUS_PIN, INPUT);
-    pinMode(MAGAZINE_SENSOR_PIN, INPUT);
     pinMode(FLYWHEEL_BARREL_SENSOR_PIN, INPUT);
 
     // Turn off motors
@@ -31,8 +28,7 @@ void Turret::init()
 
 void Turret::calibrate() { this->turretMotor.calibrate(); }
 
-void Turret::killAllPower()
-{
+void Turret::killAllPower() {
     digitalWrite(INDEXER_MOTOR_PLUS_PIN, LOW);
     digitalWrite(INDEXER_MOTOR_MINUS_PIN, LOW);
     digitalWrite(FLYWHEEL_MOTOR_PLUS_PIN, LOW);
@@ -44,8 +40,7 @@ void Turret::killAllPower()
  *
  * @param targetDegrees the target angle in degrees [90, -90])
  */
-void Turret::turnToAngle(float targetDegrees)
-{
+void Turret::turnToAngle(float targetDegrees) {
     if (targetDegrees > 90.0f) {
         writeError("Target angle too large, clamping to 90 degrees");
         targetDegrees = 90.0f;
@@ -61,8 +56,7 @@ void Turret::turnToAngle(float targetDegrees)
  *
  * @param on true -> on, false -> off
  */
-void Turret::powerFlywheel(bool on)
-{
+void Turret::powerFlywheel(bool on) {
     if (on) {
         digitalWrite(FLYWHEEL_MOTOR_PLUS_PIN, LOW);
         digitalWrite(FLYWHEEL_MOTOR_MINUS_PIN, HIGH);
@@ -76,44 +70,32 @@ void Turret::powerFlywheel(bool on)
  * @brief Powers the indexer motor on or off
  *
  * @param on true -> on, false -> off
+ * @param reverse true -> reversed, false -> forward, false by default
  */
-void Turret::powerIndexer(bool on)
-{
-    if (on) {
+void Turret::powerIndexer(bool on, bool reverse) {
+    if (on && !reverse) {
         digitalWrite(INDEXER_MOTOR_PLUS_PIN, LOW);
         digitalWrite(INDEXER_MOTOR_MINUS_PIN, HIGH);
+    } else if (on && reverse) {
+        digitalWrite(INDEXER_MOTOR_PLUS_PIN, HIGH);
+        digitalWrite(INDEXER_MOTOR_MINUS_PIN, LOW);
     } else {
         digitalWrite(INDEXER_MOTOR_PLUS_PIN, LOW);
         digitalWrite(INDEXER_MOTOR_MINUS_PIN, LOW);
     }
 }
 
-/**
- * @brief Powers the indexer motor in reverse
- *        To pull cards back into the magazine
- *
- */
-void Turret::reverseIndexer()
-{
-    digitalWrite(INDEXER_MOTOR_PLUS_PIN, HIGH);
-    digitalWrite(INDEXER_MOTOR_MINUS_PIN, LOW);
-}
-
 float Turret::getTurretAngle() { return this->turretMotor.getCurrentAngle(); }
-
-bool Turret::cardInMagazine() { return digitalRead(MAGAZINE_SENSOR_PIN); }
 
 bool Turret::cardInFlywheelBarrel() { return this->getBarrelReading() > FLYWHEEL_BARREL_SENSOR_THRESHOLD; }
 
 /*Generates a value between 0 and 1023 for the barrel sensor */
-int Turret::getBarrelReading()
-{
+int Turret::getBarrelReading() {
     int sensorValue = analogRead(FLYWHEEL_BARREL_SENSOR_PIN);
     return map(sensorValue, 0, 1023, 0, 255);
 }
 
-void Turret::dealSingleCard()
-{
+void Turret::dealSingleCard() {
     this->powerFlywheel(true);
     this->powerIndexer(true);
     while (this->getBarrelReading() > FLYWHEEL_BARREL_SENSOR_THRESHOLD) {
