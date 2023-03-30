@@ -13,13 +13,12 @@ public:
     // Motor Control
     void turnToAngle(float targetDegrees);
     void powerFlywheel(bool on);
-    void powerIndexer(bool on);
+    void powerIndexer(bool on, bool reverse = false);
     void reverseIndexer();
 
     // Sensor Control
     float getTurretAngle();
     int getBarrelReading();
-    bool cardInMagazine();
     bool cardInFlywheelBarrel();
 
     // Turret Actions

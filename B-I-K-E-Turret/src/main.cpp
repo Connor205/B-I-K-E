@@ -3,45 +3,6 @@
 #include <Utils.h>
 
 Turret turret = Turret();
-long now = millis();
-
-void testTurretRotate() {
-    turret.turnToAngle(90);
-    delay(2000);
-    turret.turnToAngle(45);
-    delay(2000);
-    turret.turnToAngle(0);
-    delay(2000);
-}
-
-void testTurretAccuracy() {
-    for (int i = 0; i < 100; i++) {
-        // turn to 90 degrees
-        turret.turnToAngle(90);
-        delay(1000);
-        // turn to -90 degrees
-        turret.turnToAngle(-90);
-        delay(1000);
-
-        // Turn to 0
-        turret.turnToAngle(0);
-        delay(1000);
-    }
-}
-
-void testDCMotors() {
-    turret.powerFlywheel(true);
-    turret.powerIndexer(true);
-    delay(2000);
-    turret.powerFlywheel(false);
-    turret.powerIndexer(false);
-    delay(2000);
-}
-
-void testHallEffectSensor() {
-    int sensorValue = digitalRead(TURRET_HALL_EFFECT_PIN);
-    Serial.println(sensorValue);
-}
 
 void stopForever() {
     while (true) {
@@ -115,7 +76,5 @@ void serialReactions() {
 }
 
 void loop() {
-    // serialReactions();
-    sprayCards();
-    stopForever();
+    serialReactions();
 }
