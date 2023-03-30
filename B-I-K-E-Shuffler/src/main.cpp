@@ -7,12 +7,6 @@ Shuffler shuffler = Shuffler();
 // Lets move the elevator out of the shuffler so we can drive it here in main
 StepperMotor elevator = StepperMotor(ELEVATOR_STEP_PIN, ELEVATOR_DIR_PIN, ELEVATOR_LIMIT_SWITCH_PIN, ELEVATOR_MOTOR_MAX_STEPS_PER_SECOND);
 
-void stopForever() {
-    while (true) {
-        delay(100);
-    }
-}
-
 void serialReactions() {
     writeState("ready");
     // Wait for an input from the serial port
