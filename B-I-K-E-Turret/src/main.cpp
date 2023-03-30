@@ -43,6 +43,22 @@ void testHallEffectSensor() {
     Serial.println(sensorValue);
 }
 
+void stopForever() {
+    while (true) {
+        delay(1000);
+    }
+}
+
+void sprayCards() {
+    turret.powerFlywheel(true);
+    turret.turnToAngle(45);
+    turret.powerIndexer(true);
+    turret.turnToAngle(-45);
+    turret.powerIndexer(false);
+    turret.powerFlywheel(false);
+    turret.turnToAngle(0);
+}
+
 void setup() {
     Serial.begin(9600);
     turret.init();
@@ -99,5 +115,7 @@ void serialReactions() {
 }
 
 void loop() {
-    serialReactions();
+    // serialReactions();
+    sprayCards();
+    stopForever();
 }
