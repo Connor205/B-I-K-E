@@ -18,7 +18,7 @@ void StepperMotor::init() {
     this->current = 0;
     this->currentAngle = 0.0f;
     this->target = 0;
-    this->currentSpeed = (STEPS_PER_REV * MAX_RPM * (1.0f / 60.0f)) / 10.0;
+    this->currentSpeed = (STEPS_PER_REV * TURRET_BASE_RPM * (1.0f / 60.0f)); // steps/rev * rev/min * (1 min/60 sec) = steps/sec
     this->currentDelay = getDelayFromSpeed(this->currentSpeed);
     this->previousChangeTime = micros();
     this->currentlyRunning = false;
