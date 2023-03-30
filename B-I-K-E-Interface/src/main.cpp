@@ -1,11 +1,30 @@
 #include <Arduino.h>
 #include <Wire.h>
-#include <InterfaceLibrary.h>
+#include <Pca9554.h>
 
-// PCA9554 panel1(PANEL_1_ADDRESS);
-// PCA9554 panel2(PANEL_2_ADDRESS);
-// PCA9554 panel3(PANEL_3_ADDRESS);
-// PCA9554 panel4(PANEL_4_ADDRESS);
+/*
+PCA9554 Addressing (These may be incorrect)
+Address     A2  A1  A0
+0x20        L   L   L
+0x21        L   L   H
+0x22        L   H   L
+0x23        L   H   H
+0x24        H   L   L
+0x25        H   L   H
+0x26        H   H   L
+0x27        H   H   H
+*/
+
+// Panel 1 is the leftmost panel when looking at the front of the table
+constexpr uint8_t PANEL_1_ADDRESS = 0x26; // L L H
+constexpr uint8_t PANEL_2_ADDRESS = 0x20; // L L L 
+constexpr uint8_t PANEL_3_ADDRESS = 0x27; // H H H 
+constexpr uint8_t PANEL_4_ADDRESS = 0x37; // H L H
+
+constexpr uint8_t PANEL_1_INTERRUPT_PIN = 2;
+constexpr uint8_t PANEL_2_INTERRUPT_PIN = 3;
+constexpr uint8_t PANEL_3_INTERRUPT_PIN = 4;
+constexpr uint8_t PANEL_4_INTERRUPT_PIN = 5;
 
 Pca9554 panel1(PANEL_1_ADDRESS);
 Pca9554 panel2(PANEL_2_ADDRESS);
@@ -49,10 +68,14 @@ void panel1Interrupt(void) {
 
 void panel2Interrupt(void) {
   Serial.println("Panel 2 Interrupt");
+  int readData = readI2CRegister(PANEL_2_ADDRESS, 0);
+  Serial.println("Read data: " + String(readData));
 }
 
 void panel3Interrupt(void) {
   Serial.println("Panel 3 Interrupt");
+  int readData = readI2CRegister(PANEL_3_ADDRESS, 0);
+  Serial.println("Read data: " + String(readData));
 }
 
 void panel4Interrupt(void) {
@@ -107,7 +130,7 @@ void setup() {
     panel4.pinMode(i, INPUT);
   }
   // Start I2C
-  Wire.begin((uint32_t)PB_7, (uint32_t)PB_6);
+  Wire.begin();
   // Set the interrupt pins to input mode
   pinMode(PANEL_1_INTERRUPT_PIN, INPUT);
   pinMode(PANEL_2_INTERRUPT_PIN, INPUT);
@@ -121,6 +144,5 @@ void setup() {
 }
 
 void loop() {
-  Serial.println("Looping");
   i2cScanner();
 }

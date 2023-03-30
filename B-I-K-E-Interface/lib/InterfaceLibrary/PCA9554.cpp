@@ -22,11 +22,6 @@
 #include <Wire.h>
 #include "Pca9554.h"
 
-#define PCA9554_REG_INP                 0
-#define PCA9554_REG_OUT                	1
-#define PCA9554_REG_POL                 2
-#define PCA9554_REG_CTRL                3
-
 uint8_t pinNum2bitNum[] = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 };
 
 /***************************************************************************
@@ -171,5 +166,5 @@ bool Pca9554::digitalWrite(uint8_t pin, bool val) {
  *
  **************************************************************************/
 boolean Pca9554::digitalRead(uint8_t pin) {
-	return (readRegister(m_i2cAddress, PCA9554_REG_INP) & pinNum2bitNum[pin] != 0);
+	return (readRegister(m_i2cAddress, PCA9554_REG_INP) & (pinNum2bitNum[pin] != 0));
 }

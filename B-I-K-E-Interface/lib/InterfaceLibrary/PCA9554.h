@@ -24,8 +24,13 @@
 #include <Arduino.h>
 #include <Wire.h>
 
-#define NORMAL                          0
-#define INVERTED                        1
+#define PCA9554_REG_INP 0
+#define PCA9554_REG_OUT 1
+#define PCA9554_REG_POL 2
+#define PCA9554_REG_CTRL 3
+
+#define NORMAL 0
+#define INVERTED 1
 
 class Pca9554
 {
