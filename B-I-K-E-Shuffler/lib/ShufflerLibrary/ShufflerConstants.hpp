@@ -13,8 +13,8 @@ constexpr uint8_t DISPENSER_RAIL_DIR_PIN = 5;
 constexpr uint16_t DISPENSER_RAIL_MAX_STEPS_PER_SECOND = 1000;
 constexpr uint16_t DISPENSER_RAIL_STEPS_PER_REVOLUTION = 6400; // Set on the digital driver
 
-constexpr uint8_t BELT_STEP_PIN = 10;
-constexpr uint8_t BELT_DIR_PIN = 11;
+constexpr uint8_t BELT_STEP_PIN = 6;
+constexpr uint8_t BELT_DIR_PIN = 7;
 constexpr uint16_t BELT_MOTOR_MAX_STEPS_PER_SECOND = 1000;
 constexpr uint16_t BELT_STEPS_PER_REVOLUTION = 6400; // Set on the digital driver
 
@@ -33,11 +33,10 @@ constexpr uint8_t ELEVATOR_LIMIT_SWITCH_PIN = 13;
 constexpr uint8_t DROPPER_DIAMETER = 11; // [mm] TUNE THIS VALUE
 constexpr float DROPPER_MM_PER_REV = PI * DROPPER_DIAMETER; // [mm]
 constexpr uint8_t DROPPER_MM_PER_CARD = 63; // [mm] TUNE THIS VALUE
-constexpr uint16_t DROPPER_STEPS_PER_CARD
-= (DROPPER_MM_PER_CARD / DROPPER_MM_PER_REV) * DROPPER_MOTOR_STEPS_PER_REVOLUTION; // [steps]
+constexpr uint16_t DROPPER_STEPS_PER_CARD = (DROPPER_MM_PER_CARD / DROPPER_MM_PER_REV) * DROPPER_MOTOR_STEPS_PER_REVOLUTION; // [steps]
 
-constexpr uint8_t NUM_THREE_WIDE_LINKS = 10;
-constexpr uint8_t NUM_TWO_WIDE_LINKS = (52 - NUM_THREE_WIDE_LINKS * 3) / 2;
+constexpr uint8_t NUM_THREE_WIDE_LINKS = 8;
+constexpr uint8_t NUM_TWO_WIDE_LINKS = (52 - NUM_THREE_WIDE_LINKS * 3) / 2; // 12
 
 // Fuck it lets measure everything in steps
 
@@ -50,10 +49,8 @@ constexpr int STEPS_PER_WALL = DISPENSER_STEPS_PER_MM;
 constexpr int STEPS_PER_THREE_WIDE_SLOT = DISPENSER_STEPS_PER_MM * 2;
 constexpr int STEPS_PER_TWO_WIDE_SLOT = DISPENSER_STEPS_PER_MM * 3.5;
 
-constexpr float BELT_MM_PER_REVOLUTION
-= 88.0f; // Find this value by testing, the length of the belt travelled in 1 stepper motor revolution
-constexpr int BELT_STEPS_PER_MM
-= BELT_STEPS_PER_REVOLUTION / BELT_MM_PER_REVOLUTION; // This number should be pretty large
+constexpr float BELT_MM_PER_REVOLUTION = 88.0f; // Find this value by testing, the length of the belt travelled in 1 stepper motor revolution
+constexpr int BELT_STEPS_PER_MM = BELT_STEPS_PER_REVOLUTION / BELT_MM_PER_REVOLUTION; // This number should be pretty large
 
 constexpr int BELT_LENGTH_MM = 1000; // Find this value by testing, the length of the belt in mm
 constexpr int BELT_LENGTH_STEPS = BELT_LENGTH_MM * BELT_STEPS_PER_MM;
