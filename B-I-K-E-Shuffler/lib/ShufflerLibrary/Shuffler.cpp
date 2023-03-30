@@ -1,33 +1,33 @@
 #include "Shuffler.hpp"
 #include "ShufflerConstants.hpp"
 
-Shuffler::Shuffler() {
+Shuffler::Shuffler()
+{
     this->dispenserMotor = StepperMotor(DISPENSER_RAIL_STEP_PIN, DISPENSER_RAIL_DIR_PIN,
         DISPENSER_RAIL_LIMIT_SWITCH_PIN, DISPENSER_RAIL_MAX_STEPS_PER_SECOND);
     this->beltMotor
         = StepperMotor(BELT_STEP_PIN, BELT_DIR_PIN, CONVEYER_HALL_EFFECT_PIN, BELT_MOTOR_MAX_STEPS_PER_SECOND);
     this->dropperMotor
         = StepperMotor(DROPPER_MOTOR_STEP_PIN, DROPPER_MOTOR_DIR_PIN, -1, DROPPER_MOTOR_MAX_STEPS_PER_SECOND);
-    this->elevatorMotor = StepperMotor(
-        ELEVATOR_STEP_PIN, ELEVATOR_DIR_PIN, ELEVATOR_LIMIT_SWITCH_PIN, ELEVATOR_MOTOR_MAX_STEPS_PER_SECOND);
 }
 
-void Shuffler::init() {
+void Shuffler::init()
+{
     this->dispenserMotor.init();
-    this->elevatorMotor.init();
-    // this->beltMotor.init();
-    // this->dropperMotor.init();
-    // this->dispenserMotor.moveToTarget(DISPENSER_STEPS_TO_FIRST_LINK);
+    this->beltMotor.init();
+    this->dropperMotor.init();
+    this->dispenserMotor.moveToTarget(DISPENSER_STEPS_TO_FIRST_LINK);
 }
 
-void Shuffler::calibrate() {
+void Shuffler::calibrate()
+{
     Serial.println("Calibrating Shuffler");
     this->dispenserMotor.calibrate(false);
-    // this->beltMotor.calibrate(true);
-    this->elevatorMotor.calibrate(true);
+    // this->beltMotor.calibrate(true); TODO:: This currently does not have a hall effect sensor
 }
 
-void Shuffler::moveDispenserToSlot(int slotNumber) {
+void Shuffler::moveDispenserToSlot(int slotNumber)
+{
     int steps = DISPENSER_STEPS_TO_FIRST_LINK;
     if (slotNumber < NUM_THREE_WIDE_LINKS) {
         steps += (slotNumber / 3) * STEPS_PER_LINK;
@@ -40,7 +40,8 @@ void Shuffler::moveDispenserToSlot(int slotNumber) {
     this->dispenserMotor.moveToTarget(steps);
 }
 
-void Shuffler::moveDispenserToMM(float targetMM) {
+void Shuffler::moveDispenserToMM(float targetMM)
+{
     this->dispenserMotor.moveToTarget(targetMM * DISPENSER_STEPS_PER_MM);
 }
 
@@ -48,10 +49,11 @@ void Shuffler::moveBeltToMM(float targetMM) { this->beltMotor.moveToTarget(targe
 
 void Shuffler::ejectCards() { this->beltMotor.moveToTarget(BELT_LENGTH_STEPS); }
 
-void Shuffler::resetBelt() { this->beltMotor.moveToTarget(DISPENSER_STEPS_TO_FIRST_LINK); }
+void Shuffler::resetBelt() { this->beltMotor.moveToTarget(BELT_DEFAULT_POSITION); }
 
 // TODO:: This is not the way we are going to do this, but it works for now
-void Shuffler::dropCard() {
+void Shuffler::dropCard()
+{
     this->dropperMotor.setDirection(true); // Drop card direction
     for (int i = 0; i < DROPPER_STEPS_PER_CARD; i++) {
         this->dropperMotor.stepMotor();
