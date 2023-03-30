@@ -40,6 +40,8 @@ Pca9554 panel4(PANEL_4_ADDRESS);
  */
 void writeButtonInfo(uint8_t panelId, uint8_t buttonIndex) {
   if (buttonIndex == -1) { return; }
+  // TODO: Write to python using serial and
+  // define how the data is formatted on the python side
   //Serial.write(panelId);
   //Serial.write(buttonIndex);
 }
@@ -62,25 +64,25 @@ int readI2CRegister(uint8_t i2cAddress, uint8_t reg) {
 
 void panel1Interrupt(void) {
   Serial.println("Panel 1 Interrupt");
-  int readData = readI2CRegister(PANEL_1_ADDRESS, 0);
+  int readData = readI2CRegister(PANEL_1_ADDRESS, PCA9554_REG_INP);
   Serial.println("Read data: " + String(readData));
 }
 
 void panel2Interrupt(void) {
   Serial.println("Panel 2 Interrupt");
-  int readData = readI2CRegister(PANEL_2_ADDRESS, 0);
+  int readData = readI2CRegister(PANEL_2_ADDRESS, PCA9554_REG_INP);
   Serial.println("Read data: " + String(readData));
 }
 
 void panel3Interrupt(void) {
   Serial.println("Panel 3 Interrupt");
-  int readData = readI2CRegister(PANEL_3_ADDRESS, 0);
+  int readData = readI2CRegister(PANEL_3_ADDRESS, PCA9554_REG_INP);
   Serial.println("Read data: " + String(readData));
 }
 
 void panel4Interrupt(void) {
   Serial.println("Panel 4 Interrupt");
-  int readData = readI2CRegister(PANEL_4_ADDRESS, 0);
+  int readData = readI2CRegister(PANEL_4_ADDRESS, PCA9554_REG_INP);
   Serial.println("Read data: " + String(readData));
 }
 
@@ -118,6 +120,9 @@ void i2cScanner() {
 void setup() {
   // Start Serial and I2C
   Serial.begin(115200);
+  Serial.println(F("\nI2C PINS"));
+  Serial.print(F("\tSDA = ")); Serial.println(SDA);
+  Serial.print(F("\tSCL = ")); Serial.println(SCL);
   panel1.begin();
   panel2.begin();
   panel3.begin();
