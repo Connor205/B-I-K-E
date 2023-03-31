@@ -120,6 +120,7 @@ void i2cScanner() {
 void setup() {
   // Start Serial and I2C
   Serial.begin(115200);
+  while (!Serial) { delay(10); } // Wait for serial to be ready
   Serial.println(F("\nI2C PINS"));
   Serial.print(F("\tSDA = ")); Serial.println(SDA);
   Serial.print(F("\tSCL = ")); Serial.println(SCL);
