@@ -19,7 +19,7 @@ class Card():
         Returns:
             bool: True if they are the same suit, false if not.
         """
-        return self.suit.compare(other.suit) == 0
+        return self.suit == other.suit
 
     def compareValue(self, other: 'Card') -> int:
         """Given another Card, compares the value of the Cards.
@@ -43,7 +43,22 @@ class Card():
         Returns:
             bool: True if they are the same card, false if not.
         """
-        return self.value.compare(other.value) == 0 and self.suit.compare(other.suit) == 0
+        return self.value == other.value and self.suit == other.suit
     
     def __str__(self) -> str:
-        return f"{self.value} of {self.suit}"
+        return f"{str(self.value)} of {str(self.suit)}"
+    
+
+if __name__ == "__main__":
+    card1 = Card(Value.ACE, Suit.HEART)
+    card2 = Card(Value.ACE, Suit.HEART)
+    card3 = Card(Value.FIVE, Suit.SPADE)
+    assert card1.isSameCard(card2)
+    assert card1.isSameSuit(card2)
+    assert card1.compareValue(card2) == 0
+    assert not card1.isSameCard(card3)
+    assert not card1.isSameSuit(card3)
+    assert card1.compareValue(card3) > 0
+    print(card1)
+    print(card2)
+    print(card3)
