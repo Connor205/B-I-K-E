@@ -8,7 +8,7 @@ class PlayerHand():
     bestHand: list[Card]
     ranking: HandRanking
 
-    def __init__(self, holeCards: list[Card]) -> None:
+    def __init__(self, holeCards: list[Card] = []) -> None:
         self.holeCards = holeCards
         self.bestHand = []
         self.ranking = None
