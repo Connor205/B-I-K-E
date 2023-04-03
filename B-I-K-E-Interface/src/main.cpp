@@ -188,19 +188,20 @@ void getAllPanelValues(bool print = false) {
     panelIndex = 3;
     buttonIndex = getButtonIndex(panel4Value);
   }
+  // Write the button info to the serial port connected to the main program
   writeButtonInfo(panelIndex, buttonIndex);
 }
 
 void setup() {
   // Start Serial
   Serial.begin(115200);
-  Serial.println("Initializing I2C bus...");
-  Serial.println(F("\nI2C PINS"));
-  Serial.print(F("\tSDA = ")); Serial.println(SDA);
-  Serial.print(F("\tSCL = ")); Serial.println(SCL);
-  Serial.println();
-  // Start I2C
   Wire.begin();
+  // Serial.println("Initializing I2C bus...");
+  // Serial.println(F("\nI2C PINS"));
+  // Serial.print(F("\tSDA = ")); Serial.println(SDA);
+  // Serial.print(F("\tSCL = ")); Serial.println(SCL);
+  // Serial.println();
+  // Start I2C
   // setupInterrupts();
 }
 
