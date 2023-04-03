@@ -41,7 +41,7 @@ public:
 #if defined(ARDUINO_ARCH_ESP8266)
 	void    init(uint8_t sda, uint8_t scl);
 #endif
-	bool pinMode(uint8_t pin, uint8_t mode);
+	bool setPinMode(uint8_t pin, uint8_t mode);
 	bool pinPolarity(uint8_t pin, uint8_t polarity);
 	bool digitalWrite(uint8_t pin, bool val);
 	bool digitalRead(uint8_t pin);

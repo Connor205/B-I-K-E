@@ -17,9 +17,9 @@ Address     A2  A1  A0
 
 // Panel 1 is the leftmost panel when looking at the front of the table
 constexpr uint8_t PANEL_1_ADDRESS = 0x26; // L L H
-constexpr uint8_t PANEL_2_ADDRESS = 0x20; // L L L 
-constexpr uint8_t PANEL_3_ADDRESS = 0x27; // H H H 
-constexpr uint8_t PANEL_4_ADDRESS = 0x37; // H L H
+constexpr uint8_t PANEL_2_ADDRESS = 0x27; // L L L 
+constexpr uint8_t PANEL_3_ADDRESS = 0x20; // H H H 
+constexpr uint8_t PANEL_4_ADDRESS = 0x25; // H L H
 
 constexpr uint8_t PANEL_1_INTERRUPT_PIN = 2;
 constexpr uint8_t PANEL_2_INTERRUPT_PIN = 3;
@@ -56,32 +56,32 @@ int readI2CRegister(uint8_t i2cAddress, uint8_t reg) {
     while (Wire.available() < 1);
     value = Wire.read();
   } else {
-    Serial.println("Error reading register");
+    Serial.print("Error reading register at address 0x" + String(i2cAddress, HEX) + ": ");
     Serial.println(error);
   }
   return value;
 }
 
 void panel1Interrupt(void) {
-  Serial.println("Panel 1 Interrupt");
+  Serial.println("1");
   int readData = readI2CRegister(PANEL_1_ADDRESS, PCA9554_REG_INP);
   Serial.println("Read data: " + String(readData));
 }
 
 void panel2Interrupt(void) {
-  Serial.println("Panel 2 Interrupt");
+  Serial.println("2");
   int readData = readI2CRegister(PANEL_2_ADDRESS, PCA9554_REG_INP);
   Serial.println("Read data: " + String(readData));
 }
 
 void panel3Interrupt(void) {
-  Serial.println("Panel 3 Interrupt");
+  Serial.println("3");
   int readData = readI2CRegister(PANEL_3_ADDRESS, PCA9554_REG_INP);
   Serial.println("Read data: " + String(readData));
 }
 
 void panel4Interrupt(void) {
-  Serial.println("Panel 4 Interrupt");
+  Serial.println("4");
   int readData = readI2CRegister(PANEL_4_ADDRESS, PCA9554_REG_INP);
   Serial.println("Read data: " + String(readData));
 }
@@ -117,39 +117,49 @@ void i2cScanner() {
   delay(5000);
 }
 
-void setup() {
-  // Start Serial and I2C
-  Serial.begin(115200);
-  while (!Serial) { delay(10); } // Wait for serial to be ready
-  Serial.println(F("\nI2C PINS"));
-  Serial.print(F("\tSDA = ")); Serial.println(SDA);
-  Serial.print(F("\tSCL = ")); Serial.println(SCL);
-  Serial.println();
-  panel1.begin();
-  panel2.begin();
-  panel3.begin();
-  panel4.begin();
-  // Set all the panels to input mode
-  for (int i = 0; i < 8; i++) {
-    panel1.pinMode(i, INPUT);
-    panel2.pinMode(i, INPUT);
-    panel3.pinMode(i, INPUT);
-    panel4.pinMode(i, INPUT);
-  }
-  // Start I2C
-  Wire.begin();
+void setupInterrupts() {
   // Set the interrupt pins to input mode
   pinMode(PANEL_1_INTERRUPT_PIN, INPUT);
   pinMode(PANEL_2_INTERRUPT_PIN, INPUT);
   pinMode(PANEL_3_INTERRUPT_PIN, INPUT);
   pinMode(PANEL_4_INTERRUPT_PIN, INPUT);
   // Attach the interrupt handlers
-  attachInterrupt(digitalPinToInterrupt(PANEL_1_INTERRUPT_PIN), panel1Interrupt, RISING);
-  attachInterrupt(digitalPinToInterrupt(PANEL_2_INTERRUPT_PIN), panel2Interrupt, RISING);
-  attachInterrupt(digitalPinToInterrupt(PANEL_3_INTERRUPT_PIN), panel3Interrupt, RISING);
-  attachInterrupt(digitalPinToInterrupt(PANEL_4_INTERRUPT_PIN), panel4Interrupt, RISING);
+  // attachInterrupt(digitalPinToInterrupt(PANEL_1_INTERRUPT_PIN), panel1Interrupt, FALLING);
+  // attachInterrupt(digitalPinToInterrupt(PANEL_2_INTERRUPT_PIN), panel2Interrupt, FALLING);
+  // attachInterrupt(digitalPinToInterrupt(PANEL_3_INTERRUPT_PIN), panel3Interrupt, FALLING);
+  // attachInterrupt(digitalPinToInterrupt(PANEL_4_INTERRUPT_PIN), panel4Interrupt, FALLING);
+}
+
+void getAllPanelValues() {
+  // Read the input register of each panel
+  int panel1Value = readI2CRegister(PANEL_1_ADDRESS, PCA9554_REG_INP);
+  int panel2Value = readI2CRegister(PANEL_2_ADDRESS, PCA9554_REG_INP);
+  int panel3Value = readI2CRegister(PANEL_3_ADDRESS, PCA9554_REG_INP);
+  int panel4Value = readI2CRegister(PANEL_4_ADDRESS, PCA9554_REG_INP);
+  // Print the values to the serial port on one line
+  Serial.println("Panel 1: " + String(panel1Value) + " | " +
+    "Panel 2: " + String(panel2Value) + " | " +
+    "Panel 3: " + String(panel3Value) + " | " +
+    "Panel 4: " + String(panel4Value));
+}
+
+void setup() {
+  // Start Serial and I2C
+  Serial.begin(115200);
+  Serial.println("Initializing I2C bus...");
+  Serial.println(F("\nI2C PINS"));
+  Serial.print(F("\tSDA = ")); Serial.println(SDA);
+  Serial.print(F("\tSCL = ")); Serial.println(SCL);
+  Serial.println();
+  // Start I2C
+  Wire.begin();
+  Serial.println("Attaching interrupt handlers...");
+  setupInterrupts();
+  Serial.println("Setup complete");
 }
 
 void loop() {
-  i2cScanner();
+  getAllPanelValues();
+  delay(50);
+  // i2cScanner();
 }

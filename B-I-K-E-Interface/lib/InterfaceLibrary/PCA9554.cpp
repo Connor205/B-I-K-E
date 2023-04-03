@@ -91,7 +91,7 @@ void Pca9554::init(uint8_t sda, uint8_t scl) {
  * Sets the desired pin mode
  *
  **************************************************************************/
-bool Pca9554::pinMode(uint8_t pin, uint8_t mode) {
+bool Pca9554::setPinMode(uint8_t pin, uint8_t mode) {
 	// Make sure the pin number is OK
 	if (pin >= sizeof pinNum2bitNum) {
 		return false;
