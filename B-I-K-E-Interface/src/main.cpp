@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <Wire.h>
-#include <Pca9554.h>
+// #include <Pca9554.h>
 
 /*
 PCA9554 Addressing (These may be incorrect)
@@ -26,64 +26,33 @@ constexpr uint8_t PANEL_2_INTERRUPT_PIN = 3;
 constexpr uint8_t PANEL_3_INTERRUPT_PIN = 4;
 constexpr uint8_t PANEL_4_INTERRUPT_PIN = 5;
 
-Pca9554 panel1(PANEL_1_ADDRESS);
-Pca9554 panel2(PANEL_2_ADDRESS);
-Pca9554 panel3(PANEL_3_ADDRESS);
-Pca9554 panel4(PANEL_4_ADDRESS);
-
-/**
- * @brief Writes the given panel ID and button index to the serial port
- *        to be obtained by the main program in Python
- *
- * @param panelId the panel ID [1, 4]
- * @param buttonIndex the button index [0, 7]
- */
-void writeButtonInfo(uint8_t panelId, uint8_t buttonIndex) {
-  if (buttonIndex == -1) { return; }
-  // TODO: Write to python using serial and
-  // define how the data is formatted on the python side
-  //Serial.write(panelId);
-  //Serial.write(buttonIndex);
-}
-
-int readI2CRegister(uint8_t i2cAddress, uint8_t reg) {
-  int value = 0;
-  Wire.beginTransmission(i2cAddress);
-  Wire.write(reg);
-  uint8_t error = Wire.endTransmission();
-  if (error == 0) {
-    Wire.requestFrom(i2cAddress, (uint8_t)1);
-    while (Wire.available() < 1);
-    value = Wire.read();
-  } else {
-    Serial.print("Error reading register at address 0x" + String(i2cAddress, HEX) + ": ");
-    Serial.println(error);
-  }
-  return value;
-}
+constexpr uint8_t PCA9554_REG_INP = 0;
+constexpr uint8_t PCA9554_REG_OUT = 1;
+constexpr uint8_t PCA9554_REG_POL = 2;
+constexpr uint8_t PCA9554_REG_CTRL = 3;
 
 void panel1Interrupt(void) {
   Serial.println("1");
-  int readData = readI2CRegister(PANEL_1_ADDRESS, PCA9554_REG_INP);
-  Serial.println("Read data: " + String(readData));
+  // int readData = readI2CRegister(PANEL_1_ADDRESS, PCA9554_REG_INP);
+  // Serial.println("Read data: " + String(readData));
 }
 
 void panel2Interrupt(void) {
   Serial.println("2");
-  int readData = readI2CRegister(PANEL_2_ADDRESS, PCA9554_REG_INP);
-  Serial.println("Read data: " + String(readData));
+  // int readData = readI2CRegister(PANEL_2_ADDRESS, PCA9554_REG_INP);
+  // Serial.println("Read data: " + String(readData));
 }
 
 void panel3Interrupt(void) {
   Serial.println("3");
-  int readData = readI2CRegister(PANEL_3_ADDRESS, PCA9554_REG_INP);
-  Serial.println("Read data: " + String(readData));
+  // int readData = readI2CRegister(PANEL_3_ADDRESS, PCA9554_REG_INP);
+  // Serial.println("Read data: " + String(readData));
 }
 
 void panel4Interrupt(void) {
   Serial.println("4");
-  int readData = readI2CRegister(PANEL_4_ADDRESS, PCA9554_REG_INP);
-  Serial.println("Read data: " + String(readData));
+  // int readData = readI2CRegister(PANEL_4_ADDRESS, PCA9554_REG_INP);
+  // Serial.println("Read data: " + String(readData));
 }
 
 void i2cScanner() {
@@ -123,28 +92,98 @@ void setupInterrupts() {
   pinMode(PANEL_2_INTERRUPT_PIN, INPUT);
   pinMode(PANEL_3_INTERRUPT_PIN, INPUT);
   pinMode(PANEL_4_INTERRUPT_PIN, INPUT);
+  Serial.println("Attaching interrupt handlers...");
   // Attach the interrupt handlers
-  // attachInterrupt(digitalPinToInterrupt(PANEL_1_INTERRUPT_PIN), panel1Interrupt, FALLING);
-  // attachInterrupt(digitalPinToInterrupt(PANEL_2_INTERRUPT_PIN), panel2Interrupt, FALLING);
-  // attachInterrupt(digitalPinToInterrupt(PANEL_3_INTERRUPT_PIN), panel3Interrupt, FALLING);
-  // attachInterrupt(digitalPinToInterrupt(PANEL_4_INTERRUPT_PIN), panel4Interrupt, FALLING);
+  attachInterrupt(digitalPinToInterrupt(PANEL_1_INTERRUPT_PIN), panel1Interrupt, FALLING);
+  attachInterrupt(digitalPinToInterrupt(PANEL_2_INTERRUPT_PIN), panel2Interrupt, FALLING);
+  attachInterrupt(digitalPinToInterrupt(PANEL_3_INTERRUPT_PIN), panel3Interrupt, FALLING);
+  attachInterrupt(digitalPinToInterrupt(PANEL_4_INTERRUPT_PIN), panel4Interrupt, FALLING);
 }
 
-void getAllPanelValues() {
+/**
+ * @brief Writes the given panel ID and button index to the serial port
+ *        to be obtained by the main program in Python
+ *
+ * @param panelId the panel ID [1, 4]
+ * @param buttonIndex the button index [0, 7]
+ * @param print whether or not to print the data to the serial monitor
+ */
+void writeButtonInfo(uint8_t panelId, uint8_t buttonIndex, bool print = true) {
+  // TODO: Write to python using serial and
+  // define how the data is formatted on the python side
+  if (print) {
+    Serial.println("[" + String(panelId) + ", " + String(buttonIndex) + "]");
+  }
+  // Serial.write(panelId);
+  // Serial.write(buttonIndex);
+}
+
+/**
+ * @brief Reads the given register from the given I2C address
+ *
+ * @param i2cAddress the I2C address of the device
+ * @param reg the address of the register to read
+ * @return int the value of the register
+ */
+int readI2CRegister(uint8_t i2cAddress, uint8_t reg) {
+  int value = 0;
+  Wire.beginTransmission(i2cAddress);
+  Wire.write(reg);
+  uint8_t error = Wire.endTransmission();
+  if (error == 0) {
+    Wire.requestFrom(i2cAddress, (uint8_t)1);
+    while (Wire.available() < 1);
+    value = Wire.read();
+  } else {
+    Serial.print("Error reading register at address 0x" + String(i2cAddress, HEX) + ": ");
+    Serial.println(error);
+  }
+  return value;
+}
+
+void getAllPanelValues(bool print = false) {
   // Read the input register of each panel
   int panel1Value = readI2CRegister(PANEL_1_ADDRESS, PCA9554_REG_INP);
   int panel2Value = readI2CRegister(PANEL_2_ADDRESS, PCA9554_REG_INP);
   int panel3Value = readI2CRegister(PANEL_3_ADDRESS, PCA9554_REG_INP);
   int panel4Value = readI2CRegister(PANEL_4_ADDRESS, PCA9554_REG_INP);
-  // Print the values to the serial port on one line
-  Serial.println("Panel 1: " + String(panel1Value) + " | " +
-    "Panel 2: " + String(panel2Value) + " | " +
-    "Panel 3: " + String(panel3Value) + " | " +
-    "Panel 4: " + String(panel4Value));
+  if (print) {
+    Serial.println("Panel 1: " + String(panel1Value) + " | " +
+      "Panel 2: " + String(panel2Value) + " | " +
+      "Panel 3: " + String(panel3Value) + " | " +
+      "Panel 4: " + String(panel4Value));
+  }
+  // Check if any buttons have been pressed, default value is 255
+  int panel1Button = 255;
+  int panel2Button = 255;
+  int panel3Button = 255;
+  int panel4Button = 255;
+  // Check if any buttons have been pressed
+  if (panel1Value != 255) {
+    // Get the button index
+    panel1Button = 7 - log(panel1Value);
+    // Write the button info to the serial port
+    writeButtonInfo(1, panel1Button);
+  } else if (panel2Value != 255) {
+    // Get the button index
+    panel2Button = 7 - log(panel2Value);
+    // Write the button info to the serial port
+    writeButtonInfo(2, panel2Button);
+  } else if (panel3Value != 255) {
+    // Get the button index
+    panel3Button = 7 - log(panel3Value);
+    // Write the button info to the serial port
+    writeButtonInfo(3, panel3Button);
+  } else if (panel4Value != 255) {
+    // Get the button index
+    panel4Button = 7 - log(panel4Value);
+    // Write the button info to the serial port
+    writeButtonInfo(4, panel4Button);
+  }
 }
 
 void setup() {
-  // Start Serial and I2C
+  // Start Serial
   Serial.begin(115200);
   Serial.println("Initializing I2C bus...");
   Serial.println(F("\nI2C PINS"));
@@ -153,13 +192,11 @@ void setup() {
   Serial.println();
   // Start I2C
   Wire.begin();
-  Serial.println("Attaching interrupt handlers...");
-  setupInterrupts();
-  Serial.println("Setup complete");
+  // setupInterrupts();
 }
 
 void loop() {
-  getAllPanelValues();
-  delay(50);
+  getAllPanelValues(true);
+  delay(10);
   // i2cScanner();
 }
