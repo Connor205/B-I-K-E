@@ -15,7 +15,7 @@ Address     A2  A1  A0
 0x27        H   H   H
 */
 
-// Panel 1 is the leftmost panel when looking at the front of the table
+// Panel 1 is the leftmost panel (near the shuffler)
 constexpr uint8_t PANEL_1_ADDRESS = 0x26; // L L H
 constexpr uint8_t PANEL_2_ADDRESS = 0x27; // L L L 
 constexpr uint8_t PANEL_3_ADDRESS = 0x20; // H H H 
@@ -104,7 +104,7 @@ void setupInterrupts() {
  * @brief Writes the given panel ID and button index to the serial port
  *        to be obtained by the main program in Python
  *
- * @param panelId the panel ID [1, 4]
+ * @param panelId the panel ID [0, 3]
  * @param buttonIndex the button index [0, 7]
  * @param print whether or not to print the data to the serial monitor
  */
@@ -114,6 +114,7 @@ void writeButtonInfo(uint8_t panelId, uint8_t buttonIndex, bool print = true) {
   if (print) {
     Serial.println("[" + String(panelId) + ", " + String(buttonIndex) + "]");
   }
+  if (panelId == -1 || buttonIndex == -1) { return; }
   // Serial.write(panelId);
   // Serial.write(buttonIndex);
 }
@@ -126,7 +127,7 @@ void writeButtonInfo(uint8_t panelId, uint8_t buttonIndex, bool print = true) {
  * @return int the value of the register
  */
 int readI2CRegister(uint8_t i2cAddress, uint8_t reg) {
-  int value = 0;
+  int value = 255; // Default to 255 so we default to no buttons pressed
   Wire.beginTransmission(i2cAddress);
   Wire.write(reg);
   uint8_t error = Wire.endTransmission();
@@ -134,11 +135,28 @@ int readI2CRegister(uint8_t i2cAddress, uint8_t reg) {
     Wire.requestFrom(i2cAddress, (uint8_t)1);
     while (Wire.available() < 1);
     value = Wire.read();
-  } else {
-    Serial.print("Error reading register at address 0x" + String(i2cAddress, HEX) + ": ");
-    Serial.println(error);
   }
+  // else {
+  //   Serial.print("Error reading register at address 0x" + String(i2cAddress, HEX) + ": ");
+  //   Serial.println(error);
+  // }
   return value;
+}
+
+/**
+ * @brief Given a panelValue, return the index of the button that was pressed
+ * @note The buttons are indexed from [0, 7] where each one represents a bit in the full 8-bit representation
+ *      of the panel value. For example, if the panel value is 1111 1110, then the button at index 0 was pressed.
+ *
+ * @param panelValue the value of the panel as an integer
+ * @return uint8_t the index of the button that was pressed
+ */
+uint8_t getButtonIndex(uint8_t panelValue) {
+  // We do this by finding the first 0 in the binary representation of the panel value
+  for (uint8_t i = 7; i >= 0; i--) {
+    if (panelValue % 2 == 0) { return i; } else { panelValue = panelValue >> 1; }
+  }
+  return -1;
 }
 
 void getAllPanelValues(bool print = false) {
@@ -154,32 +172,23 @@ void getAllPanelValues(bool print = false) {
       "Panel 4: " + String(panel4Value));
   }
   // Check if any buttons have been pressed, default value is 255
-  int panel1Button = 255;
-  int panel2Button = 255;
-  int panel3Button = 255;
-  int panel4Button = 255;
-  // Check if any buttons have been pressed
+  int panelIndex = -1;
+  int buttonIndex = -1;
+  // Check if any buttons have been pressed (only one button can be pressed at a time)
   if (panel1Value != 255) {
-    // Get the button index
-    panel1Button = 7 - log(panel1Value);
-    // Write the button info to the serial port
-    writeButtonInfo(1, panel1Button);
+    panelIndex = 0;
+    buttonIndex = getButtonIndex(panel1Value);
   } else if (panel2Value != 255) {
-    // Get the button index
-    panel2Button = 7 - log(panel2Value);
-    // Write the button info to the serial port
-    writeButtonInfo(2, panel2Button);
+    panelIndex = 1;
+    buttonIndex = getButtonIndex(panel2Value);
   } else if (panel3Value != 255) {
-    // Get the button index
-    panel3Button = 7 - log(panel3Value);
-    // Write the button info to the serial port
-    writeButtonInfo(3, panel3Button);
+    panelIndex = 2;
+    buttonIndex = getButtonIndex(panel3Value);
   } else if (panel4Value != 255) {
-    // Get the button index
-    panel4Button = 7 - log(panel4Value);
-    // Write the button info to the serial port
-    writeButtonInfo(4, panel4Button);
+    panelIndex = 3;
+    buttonIndex = getButtonIndex(panel4Value);
   }
+  writeButtonInfo(panelIndex, buttonIndex);
 }
 
 void setup() {
