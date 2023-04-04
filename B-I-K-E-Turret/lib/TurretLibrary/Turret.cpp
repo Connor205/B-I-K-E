@@ -98,7 +98,7 @@ int Turret::getBarrelReading() {
 void Turret::dealSingleCard() {
     this->powerFlywheel(true);
     this->powerIndexer(true);
-    while (this->getBarrelReading() > FLYWHEEL_BARREL_SENSOR_THRESHOLD) {
+    while (this->cardInFlywheelBarrel()) {
         delay(5);
     }
     this->powerIndexer(false);

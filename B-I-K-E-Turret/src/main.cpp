@@ -10,6 +10,23 @@ void stopForever() {
     }
 }
 
+void testTurretAccuracy() {
+
+}
+
+void photoTest() {
+    while (true) {
+        int reading = turret.getBarrelReading();
+        writeInfo("Photoresistor reading: " + String(reading));
+        // if (reading < FLYWHEEL_BARREL_SENSOR_THRESHOLD) {
+        //     writeInfo("Card Firing");
+        //     turret.powerFlywheel(false);
+        //     turret.powerIndexer(false);
+        //     break;
+        // }
+    }
+}
+
 void sprayCards() {
     turret.powerFlywheel(true);
     turret.turnToAngle(45);
@@ -18,12 +35,6 @@ void sprayCards() {
     turret.powerIndexer(false);
     turret.powerFlywheel(false);
     turret.turnToAngle(0);
-}
-
-void setup() {
-    Serial.begin(9600);
-    turret.init();
-    turret.calibrate();
 }
 
 void serialReactions() {
@@ -57,16 +68,7 @@ void serialReactions() {
         writeInfo("Moving to " + String(x));
         turret.turnToAngle(x);
     } else if (input.equals("photoTest")) {
-        while (true) {
-            int reading = turret.getBarrelReading();
-            writeInfo("Photoresistor reading: " + String(reading));
-            // if (reading < FLYWHEEL_BARREL_SENSOR_THRESHOLD) {
-            //     writeInfo("Card Firing");
-            //     turret.powerFlywheel(false);
-            //     turret.powerIndexer(false);
-            //     break;
-            // }
-        }
+        photoTest();
     } else if (input.equals("deal")) {
         turret.dealSingleCard();
     } else {
@@ -74,6 +76,16 @@ void serialReactions() {
     }
 }
 
+void setup() {
+    Serial.begin(9600);
+    turret.init();
+    turret.calibrate();
+}
+
 void loop() {
-    serialReactions();
+    // serialReactions();
+    // turret.dealSingleCard();
+    turret.powerFlywheel(true);
+    turret.powerIndexer(true);
+    stopForever();
 }
