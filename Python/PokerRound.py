@@ -124,7 +124,7 @@ class PokerRound():
         """Returns the community cards"""
         return self.communityCards
     
-    def startRound(self) -> tuple(bool, list[Card]):
+    def startRound(self) -> tuple[bool, list[Card]]:
         """
         Starts the round. This will deal the cards to the players and set the state to PREFLOP. 
         The dealing of cards will be done 1 to each player at a time.
@@ -180,7 +180,7 @@ class PokerRound():
             return True
         return False
     
-    def dealCommunityCards(self, numCards: int) -> tuple(bool, list[Card]):
+    def dealCommunityCards(self, numCards: int) -> tuple[bool, list[Card]]:
         """
         Deals the specified number of community cards. 
         The first card dealt will be burnt (i.e. discarded) and the next ones will be dealt to the community cards.
