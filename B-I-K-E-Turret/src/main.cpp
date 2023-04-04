@@ -4,17 +4,17 @@
 
 Turret turret = Turret();
 
-void stopForever() {
+void stopForever()
+{
     while (true) {
         delay(1000);
     }
 }
 
-void testTurretAccuracy() {
+void testTurretAccuracy() { }
 
-}
-
-void photoTest() {
+void photoTest()
+{
     while (true) {
         int reading = turret.getBarrelReading();
         writeInfo("Photoresistor reading: " + String(reading));
@@ -27,7 +27,8 @@ void photoTest() {
     }
 }
 
-void sprayCards() {
+void sprayCards()
+{
     turret.powerFlywheel(true);
     turret.turnToAngle(45);
     turret.powerIndexer(true);
@@ -37,7 +38,8 @@ void sprayCards() {
     turret.turnToAngle(0);
 }
 
-void serialReactions() {
+void serialReactions()
+{
     writeState("ready");
     // Wait for an input from the serial port
     waitForSerialInput();
@@ -76,16 +78,18 @@ void serialReactions() {
     }
 }
 
-void setup() {
+void setup()
+{
     Serial.begin(9600);
     turret.init();
     turret.calibrate();
 }
 
-void loop() {
-    // serialReactions();
+void loop()
+{
+    serialReactions();
     // turret.dealSingleCard();
-    turret.powerFlywheel(true);
-    turret.powerIndexer(true);
-    stopForever();
+    // turret.powerFlywheel(true);
+    // turret.powerIndexer(true);
+    // stopForever();
 }

@@ -5,9 +5,11 @@
 Shuffler shuffler = Shuffler();
 
 // Lets move the elevator out of the shuffler so we can drive it here in main
-StepperMotor elevator = StepperMotor(ELEVATOR_STEP_PIN, ELEVATOR_DIR_PIN, ELEVATOR_LIMIT_SWITCH_PIN, ELEVATOR_MOTOR_MAX_STEPS_PER_SECOND);
+StepperMotor elevator
+    = StepperMotor(ELEVATOR_STEP_PIN, ELEVATOR_DIR_PIN, ELEVATOR_LIMIT_SWITCH_PIN, ELEVATOR_MOTOR_MAX_STEPS_PER_SECOND);
 
-void serialReactions() {
+void serialReactions()
+{
     writeState("ready");
     // Wait for an input from the serial port
     waitForSerialInput();
@@ -36,15 +38,23 @@ void serialReactions() {
     }
 }
 
-void setup() {
+void setup()
+{
     Serial.begin(9600);
     shuffler.init();
     shuffler.calibrate();
     elevator.init();
     elevator.calibrate(true);
+    elevator.moveToTargetAccel(-1000);
+    digitalWrite(DROPPER_MOTOR_DIR_PIN, HIGH);
 }
 
-void loop() {
-    //serialReactions();
-    delay(100);
+void loop()
+{
+    // digitalWrite(DROPPER_MOTOR_STEP_PIN, HIGH);
+    // delayMicroseconds(1000);
+    // digitalWrite(DROPPER_MOTOR_STEP_PIN, LOW);
+    // delayMicroseconds(1000);
+    shuffler.dropCard();
+    delay(5000);
 }

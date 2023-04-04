@@ -5,7 +5,8 @@
 
 Turret::Turret() { this->turretMotor = StepperMotor(TURRET_STEP_PIN, TURRET_DIR_PIN, TURRET_HALL_EFFECT_PIN); }
 
-void Turret::init() {
+void Turret::init()
+{
     // Init Turret StepperMotor
     this->turretMotor.init();
 
@@ -28,7 +29,8 @@ void Turret::init() {
 
 void Turret::calibrate() { this->turretMotor.calibrate(); }
 
-void Turret::killAllPower() {
+void Turret::killAllPower()
+{
     digitalWrite(INDEXER_MOTOR_PLUS_PIN, LOW);
     digitalWrite(INDEXER_MOTOR_MINUS_PIN, LOW);
     digitalWrite(FLYWHEEL_MOTOR_PLUS_PIN, LOW);
@@ -40,7 +42,8 @@ void Turret::killAllPower() {
  *
  * @param targetDegrees the target angle in degrees [90, -90])
  */
-void Turret::turnToAngle(float targetDegrees) {
+void Turret::turnToAngle(float targetDegrees)
+{
     if (targetDegrees > 90.0f) {
         writeError("Target angle too large, clamping to 90 degrees");
         targetDegrees = 90.0f;
@@ -56,7 +59,8 @@ void Turret::turnToAngle(float targetDegrees) {
  *
  * @param on true -> on, false -> off
  */
-void Turret::powerFlywheel(bool on) {
+void Turret::powerFlywheel(bool on)
+{
     if (on) {
         digitalWrite(FLYWHEEL_MOTOR_PLUS_PIN, LOW);
         digitalWrite(FLYWHEEL_MOTOR_MINUS_PIN, HIGH);
@@ -72,7 +76,8 @@ void Turret::powerFlywheel(bool on) {
  * @param on true -> on, false -> off
  * @param reverse true -> reversed, false -> forward, false by default
  */
-void Turret::powerIndexer(bool on, bool reverse) {
+void Turret::powerIndexer(bool on, bool reverse)
+{
     if (on && !reverse) {
         digitalWrite(INDEXER_MOTOR_PLUS_PIN, LOW);
         digitalWrite(INDEXER_MOTOR_MINUS_PIN, HIGH);
@@ -90,16 +95,21 @@ float Turret::getTurretAngle() { return this->turretMotor.getCurrentAngle(); }
 bool Turret::cardInFlywheelBarrel() { return this->getBarrelReading() > FLYWHEEL_BARREL_SENSOR_THRESHOLD; }
 
 /*Generates a value between 0 and 1023 for the barrel sensor */
-int Turret::getBarrelReading() {
+int Turret::getBarrelReading()
+{
     int sensorValue = analogRead(FLYWHEEL_BARREL_SENSOR_PIN);
     return map(sensorValue, 0, 1023, 0, 255);
 }
 
-void Turret::dealSingleCard() {
+void Turret::dealSingleCard()
+{
     this->powerFlywheel(true);
+    delay(250);
     this->powerIndexer(true);
     while (this->cardInFlywheelBarrel()) {
+        writeInfo("Waiting for card to leave barrel" + String(this->getBarrelReading()));
         delay(5);
     }
     this->powerIndexer(false);
+    this->powerFlywheel(false);
 }
