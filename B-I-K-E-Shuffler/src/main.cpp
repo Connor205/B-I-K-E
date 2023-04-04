@@ -41,7 +41,10 @@ void setup() {
     shuffler.init();
     shuffler.calibrate();
     elevator.init();
-    elevator.calibrate(true); // TODO:: Make sure this is the correct direction
+    elevator.calibrate(true);
 }
 
-void loop() { serialReactions(); }
+void loop() {
+    //serialReactions();
+    delay(100);
+}

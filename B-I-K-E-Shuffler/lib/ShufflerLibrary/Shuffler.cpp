@@ -14,10 +14,9 @@ void Shuffler::init() {
 }
 
 void Shuffler::calibrate() {
-    Serial.println("Calibrating Shuffler");
     this->dispenserMotor.calibrate(false);
-    this->dispenserMotor.moveToTarget(DISPENSER_STEPS_TO_FIRST_LINK);
-    // this->beltMotor.calibrate(true); TODO:: This currently does not have a hall effect sensor
+    this->dispenserMotor.moveToTargetAccel(DISPENSER_STEPS_TO_FIRST_LINK);
+    this->beltMotor.calibrate(true);
 }
 
 void Shuffler::moveDispenserToSlot(int slotNumber) {

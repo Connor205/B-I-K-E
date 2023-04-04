@@ -27,7 +27,7 @@ void StepperMotor::init() {
 }
 
 void StepperMotor::calibrate(bool CW) {
-    Serial.println("Calibrating Motor: " + String(CW ? "CW" : "CCW"));
+    // Serial.println("Calibrating Motor: " + String(CW ? "CW" : "CCW"));
     int steps = 0;
     // Step until limit switch is hit
     setDirection(CW);
@@ -40,7 +40,6 @@ void StepperMotor::calibrate(bool CW) {
         }
         stepMotor();
 
-        // Serial.println("Step: " + String(steps) + " Limit: " + String(limitSwitch));
         steps++;
     }
     // Output Step number
