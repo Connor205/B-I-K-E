@@ -23,6 +23,7 @@ class PokerRound():
     smallBlind: int # the size of the small blind
     bigBlind: int # the size of the big blind
     logger: logging.Logger
+    cardsDealt: int # the number of cards dealt so far
 
     def __init__(self) -> None:
         # init the logger
@@ -42,6 +43,7 @@ class PokerRound():
         self.currentPlayer = self.players[0]
         self.smallBlind = SMALL_BLIND
         self.bigBlind = BIG_BLIND
+        self.cardsDealt = 0
 
     def initFourPlayers(self) -> None:
         self.players = [Player("Player 1", Seat.ONE), Player("Player 2", Seat.TWO), Player("Player 3", Seat.THREE), Player("Player 4", Seat.FOUR)]
@@ -109,6 +111,7 @@ class PokerRound():
                 for _ in range(2):
                     for player in self.players:
                         card = self.deck.drawCard()
+                        self.cardsDealt += 1
                         player.addCard(card)
 
                 return True
@@ -121,6 +124,7 @@ class PokerRound():
                 self.communityCards.append(self.deck.drawCard())
                 self.communityCards.append(self.deck.drawCard())
                 self.communityCards.append(self.deck.drawCard())
+                self.cardsDealt += 4
                 return True
             case GameState.TURN:
                 self.logger.debug("Advancing state to TURN")
@@ -129,6 +133,7 @@ class PokerRound():
                 burned = self.deck.drawCard()
                 # Deal community card
                 self.communityCards.append(self.deck.drawCard())
+                self.cardsDealt += 2
                 return True
             case GameState.RIVER:
                 self.logger.debug("Advancing state to RIVER")
@@ -137,6 +142,7 @@ class PokerRound():
                 burned = self.deck.drawCard()
                 # Deal community card
                 self.communityCards.append(self.deck.drawCard())
+                self.cardsDealt += 2
                 return True
             case GameState.SHOWDOWN:
                 self.logger.debug("Advancing state to SHOWDOWN")

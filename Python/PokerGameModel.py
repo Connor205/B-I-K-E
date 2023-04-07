@@ -157,4 +157,12 @@ class PokerGameModel():
         if player == None:
             return False
         return self.currentRound.resetBet(player)
+    
+    def getPlayersInHand(self) -> list[Player]:
+        # Gets the players that are currently in the round
+        return self.currentRound.players
+    
+    def getRemainingCards(self) -> int:
+        # returns the number of cards left in the deck
+        return 52 - self.currentRound.cardsDealt
         

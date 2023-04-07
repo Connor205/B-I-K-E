@@ -93,8 +93,10 @@ class PokerGameController():
         button = self.numToButton(buttonStatus[0])
         seat = self.numToSeat(buttonStatus[1])
 
+        origState = self.model.getCurrentRoundState()
+
         # If the gamestate is preparing, any button press will ready the player
-        if self.model.getCurrentRoundState() == GameState.PREPARING:
+        if origState == GameState.PREPARING:
             player = self.model.getPlayerFromSeat(seat)
             if player is not None:
                 player.toggleReady()
@@ -142,6 +144,11 @@ class PokerGameController():
                     self.deal()
             case _:
                 raise NotImplementedError("Unrecognized button")
+            
+        newState = self.model.getCurrentRoundState()
+
+        if newState != origState:
+            self.deal(newState)
 
     def updatePlayers(self, seat: Seat) -> None:
         # Based on input from the Arduino-side,
@@ -203,16 +210,29 @@ class PokerGameController():
         # Update the view to reflect the ready
         self.model.ready(seat)
 
-    def deal(self) -> None:
-        self.model.dealWait = False
-        self.model.startRound()
-        raise NotImplementedError("deal is not implemented")
+    def deal(self, state: GameState) -> None:
+        players = self.model.getPlayersInHand()
+        match state:
+            case GameState.PREFLOP:
+                for _ in range(2):
+                    for player in players:
+                        self.turret.dealToSeat(player.seatNumber)
+            case GameState.FLOP:
+                self.turret.dealDiscard(1)
+                self.turret.dealCommunity(3)
+            case GameState.TURN:
+                self.turret.dealDiscard(1)
+                self.turret.dealCommunity(1)
+            case GameState.RIVER:
+                self.turret.dealDiscard(1)
+                self.turret.dealCommunity(1)
+            case GameState.SHOWDOWN:
+                # TODO: Have view display winner, wait for button confirmation from winner to end hand
+            case GameState.POSTHAND:
+                remainingCards = self.model.getRemainingCards()
+                self.turret.dealDiscard(remainingCards)
+            
 
-    def shuffle(self) -> None:
-        self.runShuffler()
-        self.model.shuffleWait = False
-        self.model.dealWait = True
-        raise NotImplementedError("shuffle is not implemented")
     
     def settings(self) -> None:
         # Toggle the settings menu
