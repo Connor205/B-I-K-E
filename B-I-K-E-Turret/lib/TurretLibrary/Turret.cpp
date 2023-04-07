@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include <Utils.h>
 
-Turret::Turret() { this->turretMotor = StepperMotor(TURRET_STEP_PIN, TURRET_DIR_PIN, TURRET_OUTPUT_GEAR_RATIO); }
+Turret::Turret() { this->turretMotor = StepperMotor(TURRET_STEP_PIN, TURRET_DIR_PIN, TURRET_HALL_EFFECT_PIN); }
 
 void Turret::init()
 {
@@ -16,12 +16,11 @@ void Turret::init()
     pinMode(FLYWHEEL_MOTOR_PLUS_PIN, OUTPUT);
     pinMode(FLYWHEEL_MOTOR_MINUS_PIN, OUTPUT);
 
-    // Intialize Sensor Pins
-    pinMode(INDEXER_ENCODER_A_PLUS_PIN, INPUT);
-    pinMode(INDEXER_ENCODER_A_MINUS_PIN, INPUT);
-    pinMode(INDEXER_ENCODER_B_PLUS_PIN, INPUT);
-    pinMode(INDEXER_ENCODER_B_MINUS_PIN, INPUT);
-    pinMode(MAGAZINE_SENSOR_PIN, INPUT);
+    // // Intialize Sensor Pins
+    // pinMode(INDEXER_ENCODER_A_PLUS_PIN, INPUT);
+    // pinMode(INDEXER_ENCODER_A_MINUS_PIN, INPUT);
+    // pinMode(INDEXER_ENCODER_B_PLUS_PIN, INPUT);
+    // pinMode(INDEXER_ENCODER_B_MINUS_PIN, INPUT);
     pinMode(FLYWHEEL_BARREL_SENSOR_PIN, INPUT);
 
     // Turn off motors
@@ -56,29 +55,13 @@ void Turret::turnToAngle(float targetDegrees)
 }
 
 /**
- * @brief Indexes one card into the flywheel barrel by
- * 				powering the indexer motor for a certain amount of time
- *
- */
-void Turret::indexOneCard()
-{
-    if (this->cardInMagazine()) {
-        this->powerIndexer(true);
-        delay(INDEXER_ONE_CARD_DELAY_MS);
-        this->powerIndexer(false);
-    } else {
-        Serial.println("No card in magazine, cannot index a card");
-    }
-}
-
-/**
  * @brief Powers the flywheel motor on or off
  *
  * @param on true -> on, false -> off
  */
 void Turret::powerFlywheel(bool on)
 {
-    if (on) { // TODO: Check direction
+    if (on) {
         digitalWrite(FLYWHEEL_MOTOR_PLUS_PIN, LOW);
         digitalWrite(FLYWHEEL_MOTOR_MINUS_PIN, HIGH);
     } else {
@@ -91,12 +74,16 @@ void Turret::powerFlywheel(bool on)
  * @brief Powers the indexer motor on or off
  *
  * @param on true -> on, false -> off
+ * @param reverse true -> reversed, false -> forward, false by default
  */
-void Turret::powerIndexer(bool on)
+void Turret::powerIndexer(bool on, bool reverse)
 {
-    if (on) { // TODO: Check direction
+    if (on && !reverse) {
         digitalWrite(INDEXER_MOTOR_PLUS_PIN, LOW);
         digitalWrite(INDEXER_MOTOR_MINUS_PIN, HIGH);
+    } else if (on && reverse) {
+        digitalWrite(INDEXER_MOTOR_PLUS_PIN, HIGH);
+        digitalWrite(INDEXER_MOTOR_MINUS_PIN, LOW);
     } else {
         digitalWrite(INDEXER_MOTOR_PLUS_PIN, LOW);
         digitalWrite(INDEXER_MOTOR_MINUS_PIN, LOW);
@@ -104,8 +91,6 @@ void Turret::powerIndexer(bool on)
 }
 
 float Turret::getTurretAngle() { return this->turretMotor.getCurrentAngle(); }
-
-bool Turret::cardInMagazine() { return digitalRead(MAGAZINE_SENSOR_PIN); }
 
 bool Turret::cardInFlywheelBarrel() { return this->getBarrelReading() > FLYWHEEL_BARREL_SENSOR_THRESHOLD; }
 
@@ -119,9 +104,12 @@ int Turret::getBarrelReading()
 void Turret::dealSingleCard()
 {
     this->powerFlywheel(true);
+    delay(250);
     this->powerIndexer(true);
-    while (this->getBarrelReading() > FLYWHEEL_BARREL_SENSOR_THRESHOLD) {
+    while (this->cardInFlywheelBarrel()) {
+        writeInfo("Waiting for card to leave barrel" + String(this->getBarrelReading()));
         delay(5);
     }
     this->powerIndexer(false);
+    this->powerFlywheel(false);
 }

@@ -1,59 +1,41 @@
 #include <Arduino.h>
 #include <TurretLibrary.hpp>
 #include <Utils.h>
-#include <Vector.h>
 
 Turret turret = Turret();
-long now = millis();
 
-Vector<float> angles = Vector<float>();
-
-void testTurretRotate()
+void stopForever()
 {
-    turret.turnToAngle(90);
-    delay(2000);
-    turret.turnToAngle(45);
-    delay(2000);
-    turret.turnToAngle(0);
-    delay(2000);
-}
-
-void testTurretAccuracy()
-{
-    for (int i = 0; i < 100; i++) {
-        // turn to 90 degrees
-        turret.turnToAngle(90);
-        delay(1000);
-        // turn to -90 degrees
-        turret.turnToAngle(-90);
-        delay(1000);
-
-        // Turn to 0
-        turret.turnToAngle(0);
+    while (true) {
         delay(1000);
     }
 }
 
-void testDCMotors()
+void testTurretAccuracy() { }
+
+void photoTest()
 {
-    turret.powerFlywheel(true);
-    turret.powerIndexer(true);
-    delay(2000);
-    turret.powerFlywheel(false);
-    turret.powerIndexer(false);
-    delay(2000);
+    while (true) {
+        int reading = turret.getBarrelReading();
+        writeInfo("Photoresistor reading: " + String(reading));
+        // if (reading < FLYWHEEL_BARREL_SENSOR_THRESHOLD) {
+        //     writeInfo("Card Firing");
+        //     turret.powerFlywheel(false);
+        //     turret.powerIndexer(false);
+        //     break;
+        // }
+    }
 }
 
-void setup()
+void sprayCards()
 {
-    Serial.begin(9600);
-    turret.init();
-    turret.calibrate();
-
-    angles.push_back(90);
-    angles.push_back(180);
-    angles.push_back(270);
-    angles.push_back(0);
+    turret.powerFlywheel(true);
+    turret.turnToAngle(45);
+    turret.powerIndexer(true);
+    turret.turnToAngle(-45);
+    turret.powerIndexer(false);
+    turret.powerFlywheel(false);
+    turret.turnToAngle(0);
 }
 
 void serialReactions()
@@ -65,13 +47,13 @@ void serialReactions()
     String input = Serial.readStringUntil('\n');
     writeInfo("Received - " + input);
     // Check if string is equal to yAxis
-    if (input.equals("inOn")) {
+    if (input.equals("indexerOn")) {
         turret.powerIndexer(true);
-    } else if (input.equals("inOff")) {
+    } else if (input.equals("indexerOff")) {
         turret.powerIndexer(false);
-    } else if (input.equals("flyOn")) {
+    } else if (input.equals("flywheelOn")) {
         turret.powerFlywheel(true);
-    } else if (input.equals("flyOff")) {
+    } else if (input.equals("flywheelOff")) {
         turret.powerFlywheel(false);
     } else if (input.equals("on")) {
         turret.powerFlywheel(true);
@@ -88,16 +70,7 @@ void serialReactions()
         writeInfo("Moving to " + String(x));
         turret.turnToAngle(x);
     } else if (input.equals("photoTest")) {
-        while (true) {
-            int reading = turret.getBarrelReading();
-            writeInfo("Photoresistor reading: " + String(reading));
-            if (reading < FLYWHEEL_BARREL_SENSOR_THRESHOLD) {
-                writeInfo("Card Firing");
-                turret.powerFlywheel(false);
-                turret.powerIndexer(false);
-                break;
-            }
-        }
+        photoTest();
     } else if (input.equals("deal")) {
         turret.dealSingleCard();
     } else {
@@ -105,4 +78,18 @@ void serialReactions()
     }
 }
 
-void loop() { serialReactions(); }
+void setup()
+{
+    Serial.begin(9600);
+    turret.init();
+    turret.calibrate();
+}
+
+void loop()
+{
+    serialReactions();
+    // turret.dealSingleCard();
+    // turret.powerFlywheel(true);
+    // turret.powerIndexer(true);
+    // stopForever();
+}

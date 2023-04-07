@@ -7,21 +7,22 @@ class Seat(Enum):
     TWO = 2
     THREE = 3
     FOUR = 4
-
-    def compare(self, other: 'Seat') -> int:
-        """Compares another Seat with this Seat.
-
-        Args:
-            other (Seat): Other Seat to compare
-
-        Returns:
-            int: Negative value if this Seat is of lesser value.
-            Positive value if this Seat is of greater value.
-            0 if the same Seat value.
-        """
-        return self.value - other.value
     
-    # TODO def toString(self) -> string:
+    def __eq__(self, __value: object) -> bool:
+        if isinstance(__value, Seat):
+            return self.value == __value.value
+        return False
+    
+    def __hash__(self) -> int:
+        return hash(self.value)
+    
+    def __lt__(self, other):
+        if isinstance(other, Seat):
+            return self.value < other.value
+        return NotImplemented
+    
+    def __str__(self) -> str:
+        return f"Seat {self.value}"
 
 
 class Suit(Enum):
@@ -31,18 +32,16 @@ class Suit(Enum):
     CLUB = 3
     DIAMOND = 4
 
-    def compare(self, other: 'Suit') -> int:
-        """Compares another Suit with this Suit.
-
-        Args:
-            other (Suit): Other Suit to compare
-
-        Returns:
-            int: Negative value if this Suit is of lesser value.
-            Positive value if this Suit is of greater value.
-            0 if the same Suit value.
-        """
-        return self.value - other.value
+    def __eq__(self, __value: object) -> bool:
+        if isinstance(__value, Suit):
+            return self.value == __value.value
+        return False
+    
+    def __hash__(self) -> int:
+        return hash(self.value)
+    
+    def __str__(self) -> str:
+        return f"{self.name}"
 
 
 class Value(Enum):
@@ -74,6 +73,27 @@ class Value(Enum):
         """
         return self.value - other.value
 
+    def __lt__(self, other):
+        if isinstance(other, Value):
+            return self.value < other.value
+        return NotImplemented
+    
+    def __eq__(self, __value: object) -> bool:
+        if isinstance(__value, Value):
+            return self.value == __value.value
+        return False
+    
+    def __hash__(self) -> int:
+        return hash(self.value)
+    
+    def __sub__(self, other):
+        if isinstance(other, Value):
+            return self.value - other.value
+        return NotImplemented
+    
+    def __str__(self) -> str:
+        return f"{self.name}"
+
 class HandRanking(Enum):
     """An Enum representing poker hand rankings."""
     HIGH_CARD = 1
@@ -99,6 +119,22 @@ class HandRanking(Enum):
             0 if the same HandRanking value.
         """
         return self.value - other.value
+    
+    def __lt__(self, other):
+        if isinstance(other, HandRanking):
+            return self.value < other.value
+        return NotImplemented
+    
+    def __eq__(self, __value: object) -> bool:
+        if isinstance(__value, HandRanking):
+            return self.value == __value.value
+        return NotImplemented
+    
+    def __hash__(self) -> int:
+        return hash(self.value)
+    
+    def __str__(self) -> str:
+        return f"{self.name}"
 
 
 class GameState(Enum):
