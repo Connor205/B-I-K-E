@@ -145,6 +145,7 @@ class GameState(Enum):
     TURN = 4
     RIVER = 5
     SHOWDOWN = 6
+    POSTHAND = 7
 
 class Button(Enum):
     """An Enum representing the buttons the players have access to."""
@@ -156,6 +157,8 @@ class Button(Enum):
     BLUE_CHIP = 6
     RED_CHIP = 7
     SETTINGS = 8
+    SHUFFLECONFIRM = 9
+    DEALCONFIRM = 10
 
 class Blind(Enum):
     """An Enum representing the blinds."""

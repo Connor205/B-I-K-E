@@ -11,29 +11,35 @@ class PokerRound():
     deck: Deck
     players: list[Player]
     turnIndex: int # keeps track of who's turn it is to bet
-    startIndex: int # keeps track of who's starts betting each round
+    startBettingRoundIndex: int # keeps track of who's starts betting each round
+    smallBlindIndex: int # keeps track of who has the blinds each round
     currentPlayer: Player # keeps track of who's turn it is to bet
     turnIndex: int # keeps track of who's turn it is to bet
     betToMatch: int # the current bet to match
     overallPlayers: list[Player] # Tracking the players between hands
+    smallBlind: int # the size of the small blind
+    bigBlind: int # the size of the big blind
 
-    def __init__(self, players) -> None:
+    def __init__(self) -> None:
         self.players = []
         self.potSize = 0
         self.state = GameState.PREPARING
         self.deck = Deck()
         self.communityCards = []
         self.turnIndex = 0
-        self.startIndex = 0
+        self.startBettingRoundIndex = 0
+        self.smallBlindIndex = 0
         self.betToMatch = 0
         self.currentPlayer = None
 
     def playerFolds(self) -> bool:
         origSize = len(self.players)
         self.players.remove(self.currentPlayer)
-        self.currentPlayer = self.players[(self.turnIndex + 1) % len(self.players)]
-        if self.startIndex > self.turnIndex:
-            self.startIndex -= 1
+        self.currentPlayer = self.players[self.turnIndex % len(self.players)]
+        if len(self.players) == 1:
+            self.playerWins(self.players(0))
+        if self.startBettingRoundIndex > self.turnIndex:
+            self.startBettingRoundIndex -= 1
         if self.checkAllMatched():
             self.advanceRound()
         return len(self.players) == origSize - 1
@@ -69,10 +75,16 @@ class PokerRound():
         self.state = GameState(self.state.value + 1)
         match self.state:
             case GameState.SHOWDOWN:
-                # TODO Determine Winner
+                self.playerWins(self.determineWinner())
                 return True
             case GameState.PREFLOP:
                 self.resetForBettingRound()
+                smallBlindPlayer = self.players[self.smallBlindIndex]
+                bigBlindPlayer = self.players[(self.smallBlindIndex + 1) % len(self.players)]
+                smallBlindPlayer.setBet(self.smallBlind)
+                self.makeBet(smallBlindPlayer)
+                bigBlindPlayer.setBet(self.bigBlind)
+                self.makeBet(bigBlindPlayer)
                 return True
             case GameState.FLOP:
                 # TODO Deal 1 burn card and 3 community cards
@@ -95,8 +107,8 @@ class PokerRound():
                 return False
     
     def resetForBettingRound(self) -> bool:
-        self.currentPlayer = self.players[self.startIndex]
-        self.turnIndex = self.startIndex
+        self.currentPlayer = self.players[self.startBettingRoundIndex]
+        self.turnIndex = self.startBettingRoundIndex
         self.betToMatch = 0
         for player in self.players:
             player.resetCommitment()
@@ -205,7 +217,8 @@ class PokerRound():
     
     def playerWins(self, player) -> bool:
         player.stackSize += self.potSize
-        self.resetRound()
+        self.state = GameState.POSTHAND
+        #self.resetRound()
         return True
     
     def resetRound(self) -> bool:
@@ -217,9 +230,10 @@ class PokerRound():
         self.deck = Deck()
         self.communityCards = []
         self.turnIndex = 0
-        self.startIndex = 0
+        self.startBettingRoundIndex = 0
+        self.smallBlindIndex += 1 % len(self.players)
         self.betToMatch = 0
-        self.currentPlayer = None
+        self.currentPlayer = self.players[self.smallBlindIndex]
 
 
     def startRound(self) -> tuple[bool, list[Card]]:
