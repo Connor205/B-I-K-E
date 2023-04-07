@@ -10,6 +10,7 @@ class Player():
     hand: PlayerHand
     potentialBet: int
     isReady: bool
+    commmitment: int # How much has the player bet during this round of betting
 
     def __init__(self, name: str, playerID: int) -> None:
         self.name = name
@@ -20,6 +21,7 @@ class Player():
         self.hand = None
         self.potentialBet = 0
         self.isReady = False
+        self.commmitment = 0
 
     def addToGame(self, seatNumber: Seat) -> None:
         """Adds a player to a game at the given seat"""
@@ -31,10 +33,15 @@ class Player():
         self.seatNumber = None
         self.inGame = False
 
-    def makeBet(self) -> None:
+    def makeBet(self) -> bool:
         """Changing stack size based off of this player's bet"""
-        self.stackSize -= self.potentialBet
-        self.potentialBet = 0
+        if self.stackSize >= self.potentialBet:
+            self.stackSize -= self.potentialBet
+            self.commmitment += self.potentialBet
+            self.potentialBet = 0
+            return True
+        else:
+            return False
 
     def winPot(self, potSize:int) -> None:
         """Changing stack size based off of the player's win"""
@@ -51,3 +58,6 @@ class Player():
     def toggleReady(self) -> None:
         """Player is ready to play"""
         self.isReady = not self.isReady
+
+    def resetCommitment(self) -> None:
+        self.commmitment = 0

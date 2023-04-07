@@ -29,6 +29,7 @@ class PokerGameModel():
         # ends the current round and moves it to the previous rounds
         # returns true if successful, false if not
         self.previousRounds.append(self.currentRound)
+        self.currentRound = None
 
     def getPlayerFromSeat(self, seat) -> Player | None:
         # Returns the player object from the seat number
@@ -101,7 +102,7 @@ class PokerGameModel():
         # return true if successful, false if not
         player = self.getPlayerFromSeat(seat)
         if (self.isPlayerTurn(player)):
-            self.currentRound.makeBet()
+            self.currentRound.makeBet(player)
             return True
         else:
             return False
