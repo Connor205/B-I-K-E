@@ -339,7 +339,7 @@ class PokerRound():
     def call(self, player: Player) -> Tuple[bool, int]:
         if player != self.currentPlayer:
             return False
-        player.setBet(self.betToMatch)
+        player.setBet(self.betToMatch - self.player.commitment)
         return self.makeBet(player)
     
     def resetRound(self) -> bool:
