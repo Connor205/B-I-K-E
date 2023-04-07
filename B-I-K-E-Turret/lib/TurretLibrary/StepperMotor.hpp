@@ -3,7 +3,7 @@
 class StepperMotor {
 public:
     StepperMotor() = default;
-    StepperMotor(int stepPin, int dirPin, int calibrationPin);
+    StepperMotor(int stepPin, int dirPin, int calibrationPin, int maxSpeed);
 
     // Initialize
     void init();
@@ -28,11 +28,10 @@ public:
     void stepMotor();
     void update();
     void moveToTarget(int targetStep);
+    void moveToTargetAccel(int targetStep);
     void moveToAngle(float targetAngleDegrees);
 
     bool updateToTarget();
-
-private:
     // Constructor Arguments
     int stepPin;
     int dirPin;

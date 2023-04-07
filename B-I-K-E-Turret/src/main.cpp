@@ -73,6 +73,8 @@ void serialReactions()
         photoTest();
     } else if (input.equals("deal")) {
         turret.dealSingleCard();
+    } else if (input.equals("players")) {
+        turret.dealToAllPlayers();
     } else {
         writeError("Invalid Command");
     }
