@@ -2,13 +2,16 @@
 #include "TurretConstants.hpp"
 #include <Arduino.h>
 
-StepperMotor::StepperMotor(int stepPin, int dirPin, int calibrationPin) {
+StepperMotor::StepperMotor(int stepPin, int dirPin, int calibrationPin, int maxSpeed)
+{
     this->stepPin = stepPin;
     this->dirPin = dirPin;
     this->calibrationPin = calibrationPin;
+    this->maxSpeed = maxSpeed;
 }
 
-void StepperMotor::init() {
+void StepperMotor::init()
+{
     // Setup pins
     pinMode(stepPin, OUTPUT);
     pinMode(dirPin, OUTPUT);
@@ -18,13 +21,15 @@ void StepperMotor::init() {
     this->current = 0;
     this->currentAngle = 0.0f;
     this->target = 0;
-    this->currentSpeed = (STEPS_PER_REV * TURRET_BASE_RPM * (1.0f / 60.0f)); // steps/rev * rev/min * (1 min/60 sec) = steps/sec
+    this->currentSpeed
+        = (STEPS_PER_REV * TURRET_BASE_RPM * (1.0f / 60.0f)); // steps/rev * rev/min * (1 min/60 sec) = steps/sec
     this->currentDelay = getDelayFromSpeed(this->currentSpeed);
     this->previousChangeTime = micros();
     this->currentlyRunning = false;
 }
 
-void StepperMotor::calibrate() {
+void StepperMotor::calibrate()
+{
     // Step until limit switch is hit
     Serial.println("Calibrating...");
     setDirection(true);
@@ -55,7 +60,8 @@ float StepperMotor::getCurrentAngle() { return this->currentAngle; }
  *
  * @param speed speed in steps per second
  */
-void StepperMotor::setSpeed(float speed) {
+void StepperMotor::setSpeed(float speed)
+{
     this->currentSpeed = speed;
     this->currentDelay = getDelayFromSpeed(this->currentSpeed);
 }
@@ -65,7 +71,8 @@ void StepperMotor::setSpeed(float speed) {
  *
  * @param CW True -> CW, False -> CCW
  */
-void StepperMotor::setDirection(bool CW) {
+void StepperMotor::setDirection(bool CW)
+{
     // TODO: Ensure directions are correct
     if (CW) {
         digitalWrite(this->dirPin, HIGH);
@@ -83,7 +90,8 @@ void StepperMotor::setDirection(bool CW) {
  *
  * @param targetStep the absolute target step
  */
-void StepperMotor::setTarget(int targetStep) {
+void StepperMotor::setTarget(int targetStep)
+{
     if (isMoving()) {
         return; // Motor is currently moving
     }
@@ -101,7 +109,8 @@ void StepperMotor::setTarget(int targetStep) {
  *
  * @param targetAngleDegrees the absolute target angle
  */
-void StepperMotor::setTargetAngle(float targetAngleDegrees) {
+void StepperMotor::setTargetAngle(float targetAngleDegrees)
+{
     int steps = degreeToSteps(targetAngleDegrees);
     setTarget(steps);
 }
@@ -110,7 +119,8 @@ void StepperMotor::setTargetAngle(float targetAngleDegrees) {
  * @brief Sets the current angle of the motor based on the current step
  *
  */
-void StepperMotor::setAngle() {
+void StepperMotor::setAngle()
+{
     // TODO: Verify this math
     this->currentAngle = (this->current / STEPS_PER_REV) * 360.0f;
 }
@@ -121,7 +131,8 @@ bool StepperMotor::isMoving() { return this->current != this->target; }
  * @brief Provides a pulse to the motor using the current delay calculated from the current speed
  *
  */
-void StepperMotor::stepMotor() {
+void StepperMotor::stepMotor()
+{
     digitalWrite(this->stepPin, HIGH);
     delayMicroseconds(this->currentDelay);
     digitalWrite(this->stepPin, LOW);
@@ -136,7 +147,8 @@ void StepperMotor::stepMotor() {
  * as motion occurs.
  *
  */
-void StepperMotor::update() {
+void StepperMotor::update()
+{
     // If the motor has reached its target, do nothing
     if (this->current == this->target) {
         return;
@@ -175,7 +187,8 @@ void StepperMotor::update() {
  *
  * @param targetStep the target step to acheive. Represents an absolute position
  */
-void StepperMotor::moveToTarget(int targetStep) {
+void StepperMotor::moveToTarget(int targetStep)
+{
     setDirection(targetStep > this->current); // True -> CW, False -> CCW
     int stepsToMove = abs(targetStep - this->current);
     for (int i = 0; i < stepsToMove; i++) {
@@ -191,9 +204,10 @@ void StepperMotor::moveToTarget(int targetStep) {
  *
  * @param targetAngle the target angle in degrees
  */
-void StepperMotor::moveToAngle(float targetAngleDegrees) {
+void StepperMotor::moveToAngle(float targetAngleDegrees)
+{
     int targetSteps = degreeToSteps(targetAngleDegrees);
-    moveToTarget(targetSteps);
+    moveToTargetAccel(targetSteps);
 }
 
 /**
@@ -204,7 +218,8 @@ void StepperMotor::moveToAngle(float targetAngleDegrees) {
  *
  * @return true on function termination
  */
-bool StepperMotor::updateToTarget() {
+bool StepperMotor::updateToTarget()
+{
     if (this->current == this->target) {
         return true;
     }
@@ -229,7 +244,33 @@ long StepperMotor::getDelayFromSpeed(float speed) { return (long)(1000000.0f / s
  * @param targetAngleDegrees angle to convert to steps to accomplish that angle [0,360)
  * @return long representing the number of steps to accomplish that angle
  */
-int StepperMotor::degreeToSteps(float targetAngleDegrees) {
+int StepperMotor::degreeToSteps(float targetAngleDegrees)
+{
     // SPR * 1 / 360 = steps per degree * degree
     return round(((STEPS_PER_REV / 360.0f) * targetAngleDegrees));
+}
+
+void StepperMotor::moveToTargetAccel(int targetStep)
+{
+    // So this shit is mad basic. We are going to do a trapazoidal velocity profile
+    // We will start at 0 and accelerate to a max speed, then decelerate to 0
+    setDirection(targetStep > this->current); // True -> CW, False -> CCW
+    int stepsToMove = abs(targetStep - this->current);
+    int quarterSteps = stepsToMove / 4;
+    for (int i = 0; i < stepsToMove / 4; i++) {
+        setSpeed(maxSpeed * (float(i) / quarterSteps));
+        stepMotor();
+    }
+
+    for (int i = 0; i < stepsToMove / 2 + stepsToMove % 4; i++) {
+        setSpeed(maxSpeed);
+        stepMotor();
+    }
+
+    for (int i = 0; i < stepsToMove / 4; i++) {
+        setSpeed(maxSpeed * (1.0 - (float(i) / quarterSteps)));
+        stepMotor();
+    }
+
+    this->current = targetStep;
 }

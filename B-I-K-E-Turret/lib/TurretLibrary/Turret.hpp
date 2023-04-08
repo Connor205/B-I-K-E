@@ -23,6 +23,9 @@ public:
     // Turret Actions
     void dealSingleCard();
 
+    void dealToPlayer(int playerNumber);
+    void dealToAllPlayers();
+
 private:
     StepperMotor turretMotor;
 };

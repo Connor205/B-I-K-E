@@ -3,7 +3,10 @@
 #include <Arduino.h>
 #include <Utils.h>
 
-Turret::Turret() { this->turretMotor = StepperMotor(TURRET_STEP_PIN, TURRET_DIR_PIN, TURRET_HALL_EFFECT_PIN); }
+Turret::Turret()
+{
+    this->turretMotor = StepperMotor(TURRET_STEP_PIN, TURRET_DIR_PIN, TURRET_HALL_EFFECT_PIN, TURRET_MAX_SPEED);
+}
 
 void Turret::init()
 {
@@ -15,6 +18,7 @@ void Turret::init()
     pinMode(INDEXER_MOTOR_MINUS_PIN, OUTPUT);
     pinMode(FLYWHEEL_MOTOR_PLUS_PIN, OUTPUT);
     pinMode(FLYWHEEL_MOTOR_MINUS_PIN, OUTPUT);
+    pinMode(INDEXER_SPEED_PIN, OUTPUT);
 
     // // Intialize Sensor Pins
     // pinMode(INDEXER_ENCODER_A_PLUS_PIN, INPUT);
@@ -22,12 +26,17 @@ void Turret::init()
     // pinMode(INDEXER_ENCODER_B_PLUS_PIN, INPUT);
     // pinMode(INDEXER_ENCODER_B_MINUS_PIN, INPUT);
     pinMode(FLYWHEEL_BARREL_SENSOR_PIN, INPUT);
+    analogWrite(INDEXER_SPEED_PIN, 255);
 
     // Turn off motors
     killAllPower();
 }
 
-void Turret::calibrate() { this->turretMotor.calibrate(); }
+void Turret::calibrate()
+{
+    this->turretMotor.calibrate();
+    this->turretMotor.current = this->turretMotor.degreeToSteps(90);
+}
 
 void Turret::killAllPower()
 {
@@ -44,12 +53,12 @@ void Turret::killAllPower()
  */
 void Turret::turnToAngle(float targetDegrees)
 {
-    if (targetDegrees > 90.0f) {
-        writeError("Target angle too large, clamping to 90 degrees");
-        targetDegrees = 90.0f;
-    } else if (targetDegrees < -90.0f) {
-        writeError("Target angle too small, clamping to -90 degrees");
-        targetDegrees = -90.0f;
+    if (targetDegrees > 180.0f) {
+        writeError("Target angle too large, clamping to 180 degrees:" + String(targetDegrees));
+        targetDegrees = 180.0f;
+    } else if (targetDegrees < 0.0f) {
+        writeError("Target angle too small, clamping to 0 degrees:" + String(targetDegrees));
+        targetDegrees = 0.0f;
     }
     this->turretMotor.moveToAngle(targetDegrees);
 }
@@ -110,6 +119,27 @@ void Turret::dealSingleCard()
         writeInfo("Waiting for card to leave barrel" + String(this->getBarrelReading()));
         delay(5);
     }
+    analogWrite(INDEXER_SPEED_PIN, 255);
+    this->powerIndexer(true, true);
+    delay(500);
     this->powerIndexer(false);
-    this->powerFlywheel(false);
+    // this->powerFlywheel(false);
+}
+
+void Turret::dealToPlayer(int playerNumber)
+{
+    if (playerNumber < 0 || playerNumber > 3) {
+        writeError("Invalid player number, must be between 0 and 3");
+        return;
+    }
+    this->turnToAngle(PLAYER_ANGLES[playerNumber]);
+    delay(250);
+    this->dealSingleCard();
+}
+
+void Turret::dealToAllPlayers()
+{
+    for (int i = 0; i < 4; i++) {
+        this->dealToPlayer(i);
+    }
 }
