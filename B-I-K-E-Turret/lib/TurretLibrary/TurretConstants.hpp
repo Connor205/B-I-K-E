@@ -21,4 +21,4 @@ constexpr uint8_t TURRET_HALL_EFFECT_PIN = 4;
 // constexpr uint8_t INDEXER_ENCODER_B_MINUS_PIN = 7;
 constexpr uint8_t FLYWHEEL_BARREL_SENSOR_PIN = A0; // Photoresistor
 constexpr uint8_t FLYWHEEL_BARREL_SENSOR_THRESHOLD = 10; // Below this value is considered a card
-constexpr uint8_t CONFIRMATION_BUTTON_PIN = 7;
+constexpr uint8_t CONFIRMATION_BUTTON_PIN = 12;

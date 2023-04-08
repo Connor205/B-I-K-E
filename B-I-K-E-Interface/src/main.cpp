@@ -221,5 +221,6 @@ void setup() {
 
 void loop() {
   getAllPanelValues(false);
+  // i2cScanner();
   delay(50);
 }
