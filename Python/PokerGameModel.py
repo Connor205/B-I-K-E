@@ -1,27 +1,26 @@
+import logging
+import sys
 from PokerRound import PokerRound
 from Player import Player
+from Enums import GameState, Seat
 
 class PokerGameModel():
     previousRounds: list[PokerRound]
-    players: list[Player]
-    smallBlind: int
-    bigBlind: int
     currentRound: PokerRound
     startIndex: int # tracks what player will start betting of each hand
     inSettings: bool # is the settings menu active
-    shuffleWait: bool
-    dealWait: bool
+    logger: logging.Logger
 
     def __init__(self) -> None:
+        # init the logger
+        self.logger = logging.getLogger(__name__)
+        self.logger.addHandler(logging.StreamHandler(sys.stdout))
+        self.logger.setLevel(logging.DEBUG)
+        
         self.previousRounds = []
-        self.players = []
-        self.smallBlind = 0
-        self.bigBlind = 0
         self.currentRound = None
         self.startIndex = 0
         self.inSettings = False
-        self.shuffleWait = True
-        self.dealWait = False
 
     def createRound(self) -> bool:
         # creates a new round (calls PokerRound constructor) and makes it the current round
@@ -36,23 +35,10 @@ class PokerGameModel():
         self.currentRound = None
         return True
 
-    def startRound(self) -> bool:
-        # Starts the current round
-        # returns true if successful, false if not
-        self.currentRound.startRound()
-        return True
-
-    def getPlayerFromSeat(self, seat) -> Player | None:
+    def getPlayerFromSeat(self, seat: Seat) -> Player | None:
         # Returns the player object from the seat number
         # or none if no player is at that seat
-        # for each player in self.players
-        # if player.seatNumber == seat
-        # return player
-        # return None
-        for player in self.players:
-            if seat == player.seat:
-                return player
-        return None
+        return self.currentRound.getPlayerFromSeat(seat)
 
     def addPlayer(self, seat) -> bool:
         # Updates to reflect what players are active in the game
@@ -112,11 +98,9 @@ class PokerGameModel():
         # check that bet they're making is >= bet they need to make (check in round)
         # return true if successful, false if not
         player = self.getPlayerFromSeat(seat)
-        if (self.isPlayerTurn(player)):
-            self.currentRound.makeBet(player)
-            return True
-        else:
+        if player == None:
             return False
+        return self.currentRound.makeBet(player)
 
     def fold(self, seat) -> bool:
         # Based on the seat mapping, fold that player if they have no potential bet
@@ -135,16 +119,12 @@ class PokerGameModel():
         else:
             return False
 
-    def call(self, seat) -> bool:
+    def call(self, seat: Seat) -> bool:
         # Based on the seat mapping, call that player
         # call makeBet with betSize = pokerRound.betToMatch
         # return true if successful, false if not
         player = self.getPlayerFromSeat(seat)
-        if (self.isPlayerTurn(player)):
-            self.currentRound.call()
-            return True
-        else:
-            return False
+        return self.currentRound.call(player)
 
     def ready(self, seat) -> bool:
         # Updates the player status to ready (call toggleReady)
@@ -156,4 +136,25 @@ class PokerGameModel():
         # Toggles the settings menu
         # return true if successful, false if not
         self.inSettings = not self.inSettings
+
+    def getCurrentRoundState(self) -> GameState:
+        # Returns the current state of the round
+        return self.currentRound.state
+    
+    def allReadyStatus(self) -> bool:
+        return self.currentRound.allReadyStatus()
+
+    def advanceRound(self) -> bool:
+        self.logger.debug("Advancing round")
+        # Advances the round to the next state
+        # return true if successful, false if not
+        return self.currentRound.advanceRound()
+    
+    def resetBet(self, seat: Seat) -> bool:
+        # Resets the bet amount for the player
+        # return true if successful, false if not
+        player = self.getPlayerFromSeat(seat)
+        if player == None:
+            return False
+        return self.currentRound.resetBet(player)
         

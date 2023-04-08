@@ -33,3 +33,7 @@ class Turret(Arduino):
 
     def return_cards(self):
         raise NotImplementedError("return_cards is not implemented")
+    
+    def waitForConfirmation(self):
+        # TODO: Blocking call to wait 
+        self.logger.debug("Waiting for confirmation")

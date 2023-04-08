@@ -99,10 +99,11 @@ class PokerGameView:
     menuSprites: pygame.sprite.RenderUpdates # Sprite group for the menu-related sprites
     popupSprites: pygame.sprite.RenderUpdates # Sprite group for the popup-related sprites
 
-    def __init__(self, model) -> None:
+    def __init__(self, model: PokerGameModel) -> None:
         # init the logger
         self.logger = logging.getLogger(__name__)
         self.logger.addHandler(logging.StreamHandler(sys.stdout))
+        self.logger.setLevel(logging.DEBUG)
 
         # init pygame
         pygame.init()
