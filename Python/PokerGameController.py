@@ -55,7 +55,6 @@ class PokerGameController():
     def buttonListener(self, buttonStatus) -> None:
         match buttonStatus[0]:
             case Button.FOLD:
-                # TODO logic for resetting potential bet if it's > 0
                 if self.model.inSettings:
                     self.removePlayer(buttonStatus[1])
                 else:
@@ -84,6 +83,12 @@ class PokerGameController():
                     self.updateBet(buttonStatus[1], self.blueChipValue)
             case Button.SETTINGS:
                 self.settings()
+            case Button.SHUFFLECONFIRM:
+                if self.model.shuffleWait:
+                    self.shuffle()
+            case Button.DEALCONFIRM:
+                if self.model.dealWait:
+                    self.deal()
             case _:
                 raise NotImplementedError("Unrecognized button")
 
@@ -141,12 +146,14 @@ class PokerGameController():
         self.model.ready(seat)
 
     def deal(self) -> None:
-        # Get the game state and the list of seats
-        # Give the command to the shuffler to deal to the seats
+        self.model.dealWait = False
+        self.model.startRound()
         raise NotImplementedError("deal is not implemented")
 
     def shuffle(self) -> None:
-        # Command the shuffler to shuffle deck
+        self.runShuffler()
+        self.model.shuffleWait = False
+        self.model.dealWait = True
         raise NotImplementedError("shuffle is not implemented")
     
     def settings(self) -> None:

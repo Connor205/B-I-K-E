@@ -9,6 +9,8 @@ class PokerGameModel():
     currentRound: PokerRound
     startIndex: int # tracks what player will start betting of each hand
     inSettings: bool # is the settings menu active
+    shuffleWait: bool
+    dealWait: bool
 
     def __init__(self) -> None:
         self.previousRounds = []
@@ -18,6 +20,8 @@ class PokerGameModel():
         self.currentRound = None
         self.startIndex = 0
         self.inSettings = False
+        self.shuffleWait = True
+        self.dealWait = False
 
     def createRound(self) -> bool:
         # creates a new round (calls PokerRound constructor) and makes it the current round
@@ -29,6 +33,14 @@ class PokerGameModel():
         # ends the current round and moves it to the previous rounds
         # returns true if successful, false if not
         self.previousRounds.append(self.currentRound)
+        self.currentRound = None
+        return True
+
+    def startRound(self) -> bool:
+        # Starts the current round
+        # returns true if successful, false if not
+        self.currentRound.startRound()
+        return True
 
     def getPlayerFromSeat(self, seat) -> Player | None:
         # Returns the player object from the seat number
@@ -101,21 +113,25 @@ class PokerGameModel():
         # return true if successful, false if not
         player = self.getPlayerFromSeat(seat)
         if (self.isPlayerTurn(player)):
-            self.currentRound.makeBet()
+            self.currentRound.makeBet(player)
             return True
         else:
             return False
 
     def fold(self, seat) -> bool:
-        # Based on the seat mapping, fold that player
+        # Based on the seat mapping, fold that player if they have no potential bet
+        # if their potential bet is not 0, set it to 0 
         # call getPlayerFromSeat
         # pass return value into isPlayerTurn
         # if returns true, calls the rounds's fold method with the player
         # return true if successful, false if not
         player = self.getPlayerFromSeat(seat)
-        if (self.isPlayerTurn(player)):
+        if (self.isPlayerTurn(player) and self.player.potentialBet == 0):
             self.currentRound.fold()
             return True
+        elif (self.isPlayerTurn(player) and self.player.potentialBet != 0):
+            player.potentialBet = 0
+            return False
         else:
             return False
 
