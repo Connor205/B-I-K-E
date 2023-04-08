@@ -33,7 +33,7 @@ constexpr uint8_t CONFIRMATION_BUTTON_PIN = 11;
 constexpr uint8_t DROPPER_DIAMETER = 11; // [mm] TUNE THIS VALUE
 constexpr float DROPPER_MM_PER_REV = PI * DROPPER_DIAMETER; // [mm]
 constexpr uint8_t DROPPER_MM_PER_CARD = 63; // [mm] TUNE THIS VALUE
-constexpr uint16_t DROPPER_STEPS_PER_CARD = 1.75 * DROPPER_MOTOR_STEPS_PER_REVOLUTION; // [steps]
+constexpr uint16_t DROPPER_STEPS_PER_CARD = 1.255 * DROPPER_MOTOR_STEPS_PER_REVOLUTION; // [steps]
 
 constexpr uint8_t NUM_THREE_WIDE_LINKS = 8;
 constexpr uint8_t NUM_TWO_WIDE_LINKS = (52 - NUM_THREE_WIDE_LINKS * 3) / 2; // 12
@@ -60,3 +60,5 @@ constexpr long BELT_LENGTH_STEPS = BELT_LENGTH_MM * BELT_STEPS_PER_MM;
 constexpr int BELT_DEFAULT_POSITION = 0; // TODO:: Find this value using calibration method
 
 constexpr int ELEVATOR_TOP_STEP = 0; // TODO:: Find this value using calibration method
+
+constexpr int DISPENSER_PHOTOSENSOR_PIN = A0;

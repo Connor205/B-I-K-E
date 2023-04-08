@@ -55,7 +55,18 @@ void Shuffler::resetBelt() { this->beltMotor.moveToTarget(BELT_DEFAULT_POSITION)
 void Shuffler::dropCard()
 {
     this->dropperMotor.setDirection(false); // Drop card direction
-    for (uint16_t i = 0; i < DROPPER_STEPS_PER_CARD; i++) {
+
+    // Set the speed to max speed
+    this->dropperMotor.setSpeed(DROPPER_MOTOR_MAX_STEPS_PER_SECOND);
+    // Make sure that we are like at least halfway done
+    for (uint16_t i = 0; i < DROPPER_STEPS_PER_CARD / 4 * 3; i++) {
+        this->dropperMotor.stepMotor();
+    }
+
+    // Set the speed to half the max speed
+    this->dropperMotor.setSpeed(DROPPER_MOTOR_MAX_STEPS_PER_SECOND / 2);
+    // Then we read the photo sensor until it is light enough to mean that the card has fallen
+    while (analogRead(DISPENSER_PHOTOSENSOR_PIN) < 40) {
         this->dropperMotor.stepMotor();
     }
 }

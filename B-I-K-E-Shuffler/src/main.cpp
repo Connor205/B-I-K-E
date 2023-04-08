@@ -17,13 +17,14 @@ void serialReactions()
     String input = Serial.readStringUntil('\n');
     writeInfo("Received - " + input);
     // Check if string is equal to yAxis
-    if (input.equals("resetConveyor")) {
+    if (input.equals("reset")) {
         shuffler.resetBelt();
-    } else if (input.equals("ejectCards")) {
+        shuffler.moveDispenserToSlot(1);
+    } else if (input.equals("eject")) {
         shuffler.ejectCards();
-    } else if (input.equals("drop")) {
+    } else if (input.equals("dispense")) {
         shuffler.dropCard();
-    } else if (input.equals("slot")) {
+    } else if (input.equals("move")) {
         waitForSerialInput();
         int x = Serial.parseInt();
         // Write info to serial
@@ -33,6 +34,11 @@ void serialReactions()
         elevator.moveToTarget(ELEVATOR_TOP_STEP);
     } else if (input.equals("elevatorDown")) {
         elevator.moveToTarget(100);
+    } else if (input.equals("wait")) {
+        writeInfo("Waiting for confirmation button press");
+        while (digitalRead(CONFIRMATION_BUTTON_PIN) == HIGH) {
+            delay(50);
+        }
     } else {
         writeError("Invalid Command");
     }
@@ -49,12 +55,4 @@ void setup()
     digitalWrite(DROPPER_MOTOR_DIR_PIN, HIGH);
 }
 
-void loop()
-{
-    // digitalWrite(DROPPER_MOTOR_STEP_PIN, HIGH);
-    // delayMicroseconds(1000);
-    // digitalWrite(DROPPER_MOTOR_STEP_PIN, LOW);
-    // delayMicroseconds(1000);
-    shuffler.dropCard();
-    delay(5000);
-}
+void loop() { serialReactions(); }
