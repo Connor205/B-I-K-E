@@ -3,7 +3,6 @@ import sys
 from PokerGameModel import PokerGameModel
 from PokerGameView import PokerGameView
 from Turret import Turret
-from Shuffler import Shuffler
 from Enums import Button, Seat, GameState
 from Constants import *
 from typing import Tuple
@@ -13,9 +12,8 @@ class PokerGameController():
     model: PokerGameModel
     view: PokerGameView
     turret: Turret
-    shuffler: Shuffler
 
-    def __init__(self, model, view, turret, shuffler) -> None:
+    def __init__(self, model, view, turret) -> None:
         # init the logger
         self.logger = logging.getLogger(__name__)
         self.logger.addHandler(logging.StreamHandler(sys.stdout))
@@ -24,7 +22,6 @@ class PokerGameController():
         self.model = model
         self.view = view
         self.turret = turret
-        self.shuffler = shuffler
 
         # Create a round
         self.model.createRound()
@@ -325,8 +322,7 @@ if __name__ == "__main__":
     model = PokerGameModel()
     view = PokerGameView(model)
     turret = Turret("/dev/tty.Bluetooth-Incoming-Port")
-    shuffler = Shuffler("/dev/tty.Bluetooth-Incoming-Port")
-    controller = PokerGameController(model, view, turret, shuffler)
+    controller = PokerGameController(model, view, turret)
 
     playerNum = 0
     while True:
