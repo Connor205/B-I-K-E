@@ -15,6 +15,7 @@ class Deck():
         # init the logger
         self.logger = logging.getLogger(__name__)
         self.logger.addHandler(logging.StreamHandler(sys.stdout))
+        self.logger.setLevel(logging.DEBUG)
 
         self.cards = []
         for suit in Suit:

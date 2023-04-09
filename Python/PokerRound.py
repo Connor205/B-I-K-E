@@ -1,61 +1,87 @@
+import logging
+import sys
+from Constants import *
 from Deck import Deck
 from Card import Card
 from PlayerHand import PlayerHand
-from Enums import GameState
+from Enums import GameState, Seat
 from Player import Player
+from typing import Tuple
 
 class PokerRound():
     potSize: int
     state: GameState
     communityCards: list[Card]
+    burnCards: list[Card]
     deck: Deck
     players: list[Player]
     turnIndex: int # keeps track of who's turn it is to bet
     startBettingRoundIndex: int # keeps track of who's starts betting each round
     smallBlindIndex: int # keeps track of who has the blinds each round
     currentPlayer: Player # keeps track of who's turn it is to bet
-    turnIndex: int # keeps track of who's turn it is to bet
     betToMatch: int # the current bet to match
     overallPlayers: list[Player] # Tracking the players between hands
     smallBlind: int # the size of the small blind
     bigBlind: int # the size of the big blind
+    logger: logging.Logger
+    cardsDealt: int # the number of cards dealt so far
 
     def __init__(self) -> None:
-        self.players = []
+        # init the logger
+        self.logger = logging.getLogger(__name__)
+        self.logger.addHandler(logging.StreamHandler(sys.stdout))
+        self.logger.setLevel(logging.DEBUG)
+
+        self.initFourPlayers()
         self.potSize = 0
         self.state = GameState.PREPARING
         self.deck = Deck()
         self.communityCards = []
+        self.burnCards = []
         self.turnIndex = 0
         self.startBettingRoundIndex = 0
         self.smallBlindIndex = 0
         self.betToMatch = 0
-        self.currentPlayer = None
+        self.currentPlayer = self.players[0]
+        self.smallBlind = SMALL_BLIND
+        self.bigBlind = BIG_BLIND
+        self.cardsDealt = 0
+
+    def initFourPlayers(self) -> None:
+        self.players = [Player("Player 1", Seat.ONE), Player("Player 2", Seat.TWO), Player("Player 3", Seat.THREE), Player("Player 4", Seat.FOUR)]
+        self.overallPlayers = self.players
 
     def playerFolds(self) -> bool:
         origSize = len(self.players)
         self.players.remove(self.currentPlayer)
         self.currentPlayer = self.players[self.turnIndex % len(self.players)]
         if len(self.players) == 1:
-            self.playerWins(self.players(0))
+            self.playerWins(self.players[0])
+            return True
         if self.startBettingRoundIndex > self.turnIndex:
             self.startBettingRoundIndex -= 1
         if self.checkAllMatched():
             self.advanceRound()
         return len(self.players) == origSize - 1
     
-    def makeBet(self, player) -> bool:
+    def makeBet(self, player: Player) -> Tuple[bool, int]:
+        if player != self.currentPlayer:
+            return (False, 0)
+
         playerBet = player.potentialBet
+        if playerBet < self.betToMatch and playerBet != player.stackSize:
+            return (False, 0)
         if player.makeBet():
             self.potSize += playerBet
             if player.commitment > self.betToMatch:
                 self.betToMatch = player.commitment
-            self.currentPlayer = self.players[(self.turnIndex + 1) % len(self.players)]
+            self.turnIndex = (self.turnIndex + 1) % len(self.players)
+            self.currentPlayer = self.players[self.turnIndex]
             if self.checkAllMatched():
                 self.advanceRound()
-            return True
+            return (True, playerBet)
         else:
-            return False
+            return (False, 0)
         
     def checkAllMatched(self) -> bool:
         allMatched = True
@@ -63,47 +89,78 @@ class PokerRound():
             allMatched = allMatched and player.commitment == self.betToMatch
         return allMatched
     
-    def startRound(self) -> bool:
+    def allReadyStatus(self) -> bool:
         allReady = True
         for player in self.players:
             allReady = allReady and player.isReady
-        if allReady:
-            return self.advanceRound()
-        return False
+        return allReady
 
     def advanceRound(self) -> bool:
+        self.logger.debug("Called advance round. Current round is: " + str(self.state))
         self.state = GameState(self.state.value + 1)
+        self.logger.debug("New round is: " + str(self.state))
         match self.state:
-            case GameState.SHOWDOWN:
-                self.playerWins(self.determineWinner())
-                return True
             case GameState.PREFLOP:
+                self.logger.debug("Advancing state to PREFLOP")
                 self.resetForBettingRound()
+                # Make bets for blinds
                 smallBlindPlayer = self.players[self.smallBlindIndex]
                 bigBlindPlayer = self.players[(self.smallBlindIndex + 1) % len(self.players)]
                 smallBlindPlayer.setBet(self.smallBlind)
                 self.makeBet(smallBlindPlayer)
                 bigBlindPlayer.setBet(self.bigBlind)
                 self.makeBet(bigBlindPlayer)
+
+                # Deal cards
+                for i in range(2):
+                    for player in self.players:
+                        card = self.deck.drawCard()
+                        print("Dealt " + str(card) + " to " + player.name)
+                        self.cardsDealt += 1
+                        player.addCard(card)
+                        # player.hand.holeCards.append(card)
+                        for card in player.hand.holeCards:
+                            print(card)
+                        # print(player.hand.holeCards[i])
+                # debug print all the players' cards
+                for player in self.players:
+                    print(player.name + " has " + str(player.hand.getHoleCards()[0]) + " and " + str(player.hand.getHoleCards()[1]))
                 return True
             case GameState.FLOP:
-                # TODO Deal 1 burn card and 3 community cards
+                self.logger.debug("Advancing state to FLOP")
                 self.resetForBettingRound()
-                self.communityCards.append(self.deck[9])
-                self.communityCards.append(self.deck[10])
-                self.communityCards.append(self.deck[11])
+                # Deal burn card
+                self.burnCards.append(self.deck.drawCard())
+                # Deal community cards
+                self.communityCards.append(self.deck.drawCard())
+                self.communityCards.append(self.deck.drawCard())
+                self.communityCards.append(self.deck.drawCard())
+                self.cardsDealt += 4
                 return True
             case GameState.TURN:
-                # TODO Deal 1 burn card and 1 community card
+                self.logger.debug("Advancing state to TURN")
                 self.resetForBettingRound()
-                self.communityCards.append(self.deck[13])
+                # Deal burn card
+                self.burnCards(self.deck.drawCard())
+                # Deal community card
+                self.communityCards.append(self.deck.drawCard())
+                self.cardsDealt += 2
                 return True
             case GameState.RIVER:
-                # TODO Deal 1 burn card and 1 community card
+                self.logger.debug("Advancing state to RIVER")
                 self.resetForBettingRound()
-                self.communityCards.append(self.deck[15])
+                # Deal burn card
+                self.burnCards(self.deck.drawCard())
+                # Deal community card
+                self.communityCards.append(self.deck.drawCard())
+                self.cardsDealt += 2
+                return True
+            case GameState.SHOWDOWN:
+                self.logger.debug("Advancing state to SHOWDOWN")
+                self.playerWins(self.determineWinner())
                 return True
             case _:
+                self.logger.debug("Case didn't match")
                 return False
     
     def resetForBettingRound(self) -> bool:
@@ -113,6 +170,7 @@ class PokerRound():
         for player in self.players:
             player.resetCommitment()
         return True
+
     def addPlayer(self, player: Player) -> bool:
         """
         Adds a player to the round
@@ -187,6 +245,19 @@ class PokerRound():
         """Returns the active players in the round"""
         return self.activePlayers
     
+    def getPlayerFromSeat(self, seat: Seat) -> Player | None:
+        """
+        Gets the player from a seat number
+        Args:
+            seat (int): The seat number
+        Returns:
+            Player: The player at the seat number
+        """
+        for player in self.players:
+            if player.seatNumber == seat:
+                return player
+        return None
+    
     def getPotSize(self) -> int:
         """Returns the pot size"""
         return self.potSize
@@ -212,17 +283,68 @@ class PokerRound():
         return self.communityCards
     
     def determineWinner(self) -> Player:
-        #TODO
-        return Player
+        """
+        Determines the winner of the round
+
+        Returns:
+            Player: The winner of the round
+        """
+        playerRanks = {}
+        for player in self.players:
+            player.determineBestHand(self.communityCards)
+            playerRanks[player] = player.getHand().getRanking()
+
+        bestRank = max(playerRanks.values())
+        bestPlayers = [player for player, rank in playerRanks.items() if rank == bestRank]
+
+        if len(bestPlayers) == 1:
+            return bestPlayers[0]
+        else:
+            return self.determineWinnerByKickers(bestPlayers)
     
-    def playerWins(self, player) -> bool:
+    def determineWinnerByKickers(self, players: list[Player]) -> Player:
+        """
+        Determines the winner of the round by kickers
+
+        Args:
+            players (list[Player]): The players to determine the winner of the round by kickers
+
+        Returns:
+            Player: The winner of the round
+        """
+        playerKickers = {}
+        for player in players:
+            playerKickers[player] = player.getHand().getKickers(self.communityCards)
+
+        bestKickers = max(playerKickers.values())
+        bestPlayers = [player for player, kickers in playerKickers.items() if kickers == bestKickers]
+
+        if len(bestPlayers) == 1:
+            return bestPlayers[0]
+        else:
+            return self.determineWinnerByKickers(bestPlayers)
+    
+    def playerWins(self, player: Player) -> bool:
         player.stackSize += self.potSize
         self.state = GameState.POSTHAND
         #self.resetRound()
         return True
     
+    def resetBet(self, player: Player) -> bool:
+        if player != self.currentPlayer:
+            return False
+        player.resetBet()
+        return True
+    
+    def call(self, player: Player) -> Tuple[bool, int]:
+        if player != self.currentPlayer:
+            return False
+        player.setBet(self.betToMatch)
+        return self.makeBet(player)
+    
     def resetRound(self) -> bool:
         self.state = GameState.PREPARING
+        self.players = []
         for player in self.overallPlayers:
             if player.stackSize != 0:
                 self.players.append(player)
@@ -235,166 +357,15 @@ class PokerRound():
         self.betToMatch = 0
         self.currentPlayer = self.players[self.smallBlindIndex]
 
+    def getSmallBlindPlayer(self) -> Player:
+        return self.players[self.smallBlindIndex]
 
-    def startRound(self) -> tuple[bool, list[Card]]:
-        """
-        Starts the round. This will deal the cards to the players and set the state to PREFLOP. 
-        The dealing of cards will be done 1 to each player at a time.
-
-        Returns:
-            bool: True if the round was started, false if not (e.g. if the round has already started or if not all players are ready)
-            list[Card]: The player cards that were dealt
-        """
-        cardsDealt = []
-        if self.state == GameState.PREPARING:
-            # Check if all players are ready
-            allReady = True
-            for player in self.activePlayers:
-                allReady = allReady and player.isReady
-            if allReady:
-                # Deal cards to players
-                for _ in range(2):
-                    for player in self.activePlayers:
-                        card = self.deck.dealCard()
-                        player.addCard(card)
-                        cardsDealt.append(card)
-                self.state = GameState.PREFLOP
-                self.currentPlayer = self.activePlayers[self.turnIndex]
-                return (True, cardsDealt)
-        return (False, cardsDealt)
+    def getBigBlindPlayer(self) -> Player:
+        return self.players[(self.smallBlindIndex + 1) % len(self.players)]
     
-    def nextTurn(self) -> bool:
-        """
-        Moves to the next turn. This will increment the turn index and set the current player to the next player in the list. 
-
-        Returns:
-            bool: True if the turn was moved to the next player, false if not (e.g. if the round has not started)
-        """
-        if self.state != GameState.PREPARING:
-            self.turnIndex += 1
-            if self.turnIndex >= len(self.activePlayers):
-                self.turnIndex = 0
-            self.currentPlayer = self.activePlayers[self.turnIndex]
-            return True
-        return False
-    
-    def nextRound(self) -> bool:
-        """
-        Moves to the next round. This will increment the round index and set the current player to the next player in the list. 
-
-        Returns:
-            bool: True if the round was moved to the next player, false if not (e.g. if the round has not started)
-        """
-        if self.state != GameState.PREPARING:
-            self.state = GameState(self.state.value + 1)
-            self.turnIndex = 0
-            self.currentPlayer = self.activePlayers[self.turnIndex]
-            return True
-        return False
-    
-    def dealCommunityCards(self, numCards: int) -> tuple[bool, list[Card]]:
-        """
-        Deals the specified number of community cards. 
-        The first card dealt will be burnt (i.e. discarded) and the next ones will be dealt to the community cards.
-
-        Args:
-            numCards (int): The number of cards to deal
-
-        Returns:
-            bool: True if the cards were dealt, false if not (e.g. if the round has not started) or if the number of cards is invalid
-            list[Card]: The community cards that were dealt
-        """
-        cardsDealt = []
-        if len(self.communityCards) + numCards > 5:
-            return (False, cardsDealt)
-        if self.state != GameState.PREPARING:
-            for _ in range(numCards):
-                burnt = self.deck.drawCard()
-                self.communityCards.append(self.deck.drawCard())
-                cardsDealt.append(self.communityCards[-1])
-            return (True, cardsDealt)
-        return (False, cardsDealt)
-
-    def foldCurrentPlayer(self) -> bool:
-        """
-        Folds the current player. This will remove the player from the active players list and move to the next turn.
-
-        Returns:
-            bool: True if the player was folded, false if not (e.g. if the round has not started)
-        """
-        if self.state != GameState.PREPARING:
-            self.activePlayers.remove(self.currentPlayer)
-            self.nextTurn()
-            return True
-        return False
-    
-    def updateBetCurrentPlayer(self, amount: int) -> bool:
-        """
-        Updates the current player's potential bet. This will not increment the pot size or change the bet to match.
-
-        Args:
-            amount (int): The amount to bet
-
-        Returns:
-            bool: True if the player bet, false if not (e.g. if the round has not started)
-        """
-        if self.state != GameState.PREPARING:
-            # The updateBet method will check if the amount is valid
-            self.currentPlayer.updateBet(amount)
-            return True
-        return False
-    
-    def resetBetCurrentPlayer(self) -> bool:
-        """
-        Resets the current player's potential bet. This will not increment the pot size or change the bet to match.
-
-        Returns:
-            bool: True if the player bet, false if not (e.g. if the round has not started)
-        """
-        if self.state != GameState.PREPARING:
-            self.currentPlayer.resetBet()
-            return True
-        return False
-    
-    def makeBetCurrentPlayer(self) -> bool:
-        """
-        Makes the current player bet their potential bet. This will increment the pot size and set the bet to match to the amount.
-        This method is equivalent to raising, provided the player has been using `updateBetCurrentPlayer` to update their bet.
-
-        Returns:
-            bool: True if the player bet, false if not (e.g. if the round has not started)
-        """
-        if self.state != GameState.PREPARING:
-            amount = self.currentPlayer.getPotentialBet()
-            if amount < self.betToMatch:
-                return False
-            self.potSize += amount
-            self.betToMatch = amount
-            # As the bet is updated, its validity is checked, so makeBet will be valid
-            self.currentPlayer.makeBet()
-            return True
-        return False
-    
-    def callCurrentPlayer(self) -> bool:
-        """
-        Makes the current player call the bet to match. This will increment the pot size by the bet to match.
-
-        Returns:
-            bool: True if the player called, false if not (e.g. if the round has not started)
-        """
-        if self.state != GameState.PREPARING:
-            self.potSize += self.betToMatch
-            self.currentPlayer.setBet(self.betToMatch)
-            return True
-        return False
-    
-    def checkCurrentPlayer(self) -> bool:
-        """
-        Makes the current player check. This will do nothing.
-
-        Returns:
-            bool: True if the player checked, false if not (e.g. if the round has not started)
-        """
-        if self.state != GameState.PREPARING:
-            return True
-        return False
+    def __str__(self) -> str:
+        return f"State: {self.state}, \nPot Size: {self.potSize}, \
+            \nPlayers: " + str([str(player) for player in self.players]) + ", \
+                  \nCurrent Player: {self.currentPlayer}, \nCommunity Cards: {self.communityCards}, \
+                    \nTurn Index: {self.turnIndex}, \nStart Betting Round Index: {self.startBettingRoundIndex}, \
+                        \nSmall Blind Index: {self.smallBlindIndex}, \nBet to Match: {self.betToMatch}\n"

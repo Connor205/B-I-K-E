@@ -1,25 +1,25 @@
 from Enums import Seat
+from Card import Card
 from PlayerHand import PlayerHand
+from Constants import *
 
 class Player():
     name: str
-    playerID: int
     seatNumber: Seat
     stackSize: int
     hand: PlayerHand
     potentialBet: int
     isReady: bool
-    commmitment: int # How much has the player bet during this round of betting
+    commitment: int # How much has the player bet during this round of betting
 
-    def __init__(self, name: str, playerID: int) -> None:
+    def __init__(self, name: str, seatNumber: Seat) -> None:
         self.name = name
-        self.playerID = playerID
-        self.seatNumber = None
-        self.stackSize = 0
+        self.seatNumber = seatNumber
+        self.stackSize = INITIAL_STACK_SIZE
         self.hand = PlayerHand()
         self.potentialBet = 0
         self.isReady = False
-        self.commmitment = 0
+        self.commitment = 0
 
     def getPotentialBet(self) -> int:
         """Returns the player's potential bet"""
@@ -37,7 +37,7 @@ class Player():
         """Changing stack size based off of this player's bet"""
         if self.stackSize >= self.potentialBet:
             self.stackSize -= self.potentialBet
-            self.commmitment += self.potentialBet
+            self.commitment += self.potentialBet
             self.potentialBet = 0
             return True
         else:
@@ -86,7 +86,7 @@ class Player():
         self.isReady = not self.isReady
 
     def resetCommitment(self) -> None:
-        self.commmitment = 0
+        self.commitment = 0
         
     def setReady(self, isReady: bool) -> None:
         """Player is ready to play"""
@@ -99,3 +99,10 @@ class Player():
     def addCard(self, card) -> None:
         """Adds a card to the player's hand"""
         self.hand.addHoleCard(card)
+
+    def determineBestHand(self, communityCards: list[Card]) -> None:
+        """Determines the player's best hand"""
+        self.hand.determineBestHand(communityCards)
+
+    def __str__(self) -> str:
+        return f"{self.name} is sitting at seat {self.seatNumber} with a stack size of {self.stackSize} and a potential bet of {self.potentialBet} with hand {self.hand.getHoleCards()[0] if len(self.hand.getHoleCards()) > 0 else ''} and {self.hand.getHoleCards()[1] if len(self.hand.getHoleCards()) > 1 else ''}"

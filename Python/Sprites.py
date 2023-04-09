@@ -1,5 +1,6 @@
 import pygame
 from Card import Card
+from typing import Tuple
 
 class CardSprite(pygame.sprite.Sprite):
     """Class representing a playing card sprite in poker."""
@@ -14,7 +15,7 @@ class CardSprite(pygame.sprite.Sprite):
     speed: float
 
     # Constants
-    CARD_BACK_PATH = "img/card_back_black.png"
+    CARD_BACK_PATH = "Python/img/card_back_black.png"
 
     def __init__(self, card: Card, cardSize: list[int], srcPos: list[int],  destPos: list[int], speed: float=0.6, showCard: bool=False, group: pygame.sprite.Group=None):
         """
@@ -113,7 +114,7 @@ class CardSprite(pygame.sprite.Sprite):
         elif suit.value == 4:
             suit_str = 'diamonds'
 
-        path = 'img/' + value_str + suit_str + '.png'
+        path = 'Python/img/' + value_str + suit_str + '.png'
         return path
     
     def flip(self) -> None:
@@ -135,7 +136,7 @@ class CardSprite(pygame.sprite.Sprite):
 
 class TableSprite(pygame.sprite.Sprite):
     """Sprite representing the table."""
-    TABLE_PATH = "img/Table.png"
+    TABLE_PATH = "Python/img/Table.png"
     srcImage: pygame.Surface
     image: pygame.Surface
     rect: pygame.Rect
@@ -169,7 +170,7 @@ class TextSprite(pygame.sprite.Sprite):
     fontSize: int
     prevFontSize: int
     destFontSize: int
-    color: tuple[int, int, int]
+    color: Tuple[int, int, int]
     image: pygame.Surface
     rect: pygame.Rect
     pos: list[int]
@@ -177,14 +178,14 @@ class TextSprite(pygame.sprite.Sprite):
     timesCalled: int
     state: str
 
-    def __init__(self, text: str, fontPath: str, fontSize: int, color: tuple[int, int, int], pos: list[int], group: pygame.sprite.Group=None):
+    def __init__(self, text: str, fontPath: str, fontSize: int, color: Tuple[int, int, int], pos: list[int], group: pygame.sprite.Group=None):
         """
         Initialize the text sprite.
         
         Args:
             text (str): Text to display
             font (pygame.font.Font): Font to use
-            color (tuple[int, int, int]): Color of the text
+            color (Tuple[int, int, int]): Color of the text
             pos (list[int]): Position of the text
             group (pygame.sprite.Group, optional): Group to add this sprite to. Defaults to None.
         """
@@ -292,22 +293,22 @@ class PopUpWindow(pygame.sprite.Sprite):
     """Sprite representing a pop-up window."""
     text: str
     font: pygame.font.Font
-    color: tuple[int, int, int]
+    color: Tuple[int, int, int]
     image: pygame.Surface
     rect: pygame.Rect
     pos: list[int]
     size: list[int]
 
-    IMG_PATH = "img/popup.png"
+    IMG_PATH = "Python/img/popup.png"
 
-    def __init__(self, text: str, font: pygame.font.Font, color: tuple[int, int, int], pos: list[int], size: list[int], group: pygame.sprite.Group=None):
+    def __init__(self, text: str, font: pygame.font.Font, color: Tuple[int, int, int], pos: list[int], size: list[int], group: pygame.sprite.Group=None):
         """
         Initialize the pop-up window.
         
         Args:
             text (str): Text to display
             font (pygame.font.Font): Font to use
-            color (tuple[int, int, int]): Color of the text
+            color (Tuple[int, int, int]): Color of the text
             pos (list[int]): Position of the text
             size (int): Size (width, height) of the window
             group (pygame.sprite.Group, optional): Group to add this sprite to. Defaults to None.

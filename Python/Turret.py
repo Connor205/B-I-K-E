@@ -1,5 +1,6 @@
 from Arduino import Arduino
 from typing import *
+from Enums import Seat
 
 
 class Turret(Arduino):
@@ -33,3 +34,22 @@ class Turret(Arduino):
 
     def return_cards(self):
         raise NotImplementedError("return_cards is not implemented")
+    
+    def waitForConfirmation(self):
+        # TODO: Blocking call to wait 
+        self.logger.debug("Waiting for confirmation")
+
+    def dealToSeat(self, seat: Seat):
+        # TODO: Given a seat, deal a card to that seat
+        # raise NotImplementedError("dealToSeat is not implemented")
+        self.logger.debug("Dealing to seat: {}".format(seat))
+    
+    def dealCommunityCards(self, cardsToDeal: int):
+        # TODO: Deal the given number of community cards
+        # raise NotImplementedError("dealCommunityCards is not implemented")
+        self.logger.debug("Dealing {} community cards".format(cardsToDeal))
+    
+    def dealDiscard(self, cardsToDiscard: int):
+        # TODO: Discard the given number of cards
+        # raise NotImplementedError("dealDiscard is not implemented")
+        self.logger.debug("Dealing {} discard cards".format(cardsToDiscard))

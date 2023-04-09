@@ -10,7 +10,7 @@ from Enums import *
 
 class PokerGameView:
     # CONSTANTS
-    FONT_PATH = "fonts/Designer.otf"
+    FONT_PATH = "Python/fonts/Designer.otf"
     FONT_COLOR = (0, 0, 0)
     POPUP_FONT_COLOR = (0, 0, 0)
     # Sizes denote the actual sizes/lengths
@@ -99,10 +99,11 @@ class PokerGameView:
     menuSprites: pygame.sprite.RenderUpdates # Sprite group for the menu-related sprites
     popupSprites: pygame.sprite.RenderUpdates # Sprite group for the popup-related sprites
 
-    def __init__(self, model) -> None:
+    def __init__(self, model: PokerGameModel) -> None:
         # init the logger
         self.logger = logging.getLogger(__name__)
         self.logger.addHandler(logging.StreamHandler(sys.stdout))
+        self.logger.setLevel(logging.DEBUG)
 
         # init pygame
         pygame.init()
@@ -137,134 +138,6 @@ class PokerGameView:
         newSprite = TableSprite(self.TABLE_SIZE, self.backSprites)
 
         print("Screen size: " + str(self.screen.get_size()))
-
-    def testDealCommunity(self, show: bool) -> None:
-        # Create five random cards to test each community card position
-        card = Card(random.choice(list(Value)), random.choice(list(Suit)))
-        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.COMMUNITY_1_POSITION, showCard=show, group=self.communityCardSprites)
-        newSprite = None
-        card = Card(random.choice(list(Value)), random.choice(list(Suit)))
-        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.COMMUNITY_2_POSITION, showCard=show, group=self.communityCardSprites)
-        newSprite = None
-        card = Card(random.choice(list(Value)), random.choice(list(Suit)))
-        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.COMMUNITY_3_POSITION, showCard=show, group=self.communityCardSprites)
-        newSprite = None
-        card = Card(random.choice(list(Value)), random.choice(list(Suit)))
-        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.COMMUNITY_4_POSITION, showCard=show, group=self.communityCardSprites)
-        newSprite = None
-        card = Card(random.choice(list(Value)), random.choice(list(Suit)))
-        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.COMMUNITY_5_POSITION, showCard=show, group=self.communityCardSprites)
-        newSprite = None
-    
-    def testDealPlayer(self, show: bool) -> None:
-        # Create eight random cards to test each player position
-        card = Card(random.choice(list(Value)), random.choice(list(Suit)))
-        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.PLAYER_1_CARD_1_POSITION, showCard=show, group=self.player1CardSprites)
-        newSprite = None
-        card = Card(random.choice(list(Value)), random.choice(list(Suit)))
-        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.PLAYER_1_CARD_2_POSITION, showCard=show, group=self.player1CardSprites)
-        newSprite = None
-        card = Card(random.choice(list(Value)), random.choice(list(Suit)))
-        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.PLAYER_2_CARD_1_POSITION, showCard=show, group=self.player2CardSprites)
-        newSprite = None
-        card = Card(random.choice(list(Value)), random.choice(list(Suit)))
-        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.PLAYER_2_CARD_2_POSITION, showCard=show, group=self.player2CardSprites)
-        newSprite = None
-        card = Card(random.choice(list(Value)), random.choice(list(Suit)))
-        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.PLAYER_3_CARD_1_POSITION, showCard=show, group=self.player3CardSprites)
-        newSprite = None
-        card = Card(random.choice(list(Value)), random.choice(list(Suit)))
-        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.PLAYER_3_CARD_2_POSITION, showCard=show, group=self.player3CardSprites)
-        newSprite = None
-        card = Card(random.choice(list(Value)), random.choice(list(Suit)))
-        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.PLAYER_4_CARD_1_POSITION, showCard=show, group=self.player4CardSprites)
-        newSprite = None
-        card = Card(random.choice(list(Value)), random.choice(list(Suit)))
-        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.PLAYER_4_CARD_2_POSITION, showCard=show, group=self.player4CardSprites)
-        newSprite = None
-
-    def testPlayerText(self) -> None:
-        # Create the text for the player names
-        newSprite = TextSprite("Player 1", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, self.PLAYER_1_NAME_POSITION, self.player1Sprites)
-        newSprite = None
-        newSprite = TextSprite("Player 2", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, self.PLAYER_2_NAME_POSITION, self.player2Sprites)
-        newSprite = None
-        newSprite = TextSprite("Player 3", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, self.PLAYER_3_NAME_POSITION, self.player3Sprites)
-        newSprite = None
-        newSprite = TextSprite("Player 4", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, self.PLAYER_4_NAME_POSITION, self.player4Sprites)
-        newSprite = None
-
-        # Create the text for the player chips
-        newSprite = TextSprite("Chips: 1000", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, self.PLAYER_1_STACK_POSITION, self.player1Sprites)
-        newSprite = None
-        newSprite = TextSprite("Chips: 1000", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, self.PLAYER_2_STACK_POSITION, self.player2Sprites)
-        newSprite = None
-        newSprite = TextSprite("Chips: 1000", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, self.PLAYER_3_STACK_POSITION, self.player3Sprites)
-        newSprite = None
-        newSprite = TextSprite("Chips: 1000", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, self.PLAYER_4_STACK_POSITION, self.player4Sprites)
-        newSprite = None
-
-        # Create the text for the player bets
-        newSprite = TextSprite("Bet: 0", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, self.PLAYER_1_BET_POSITION, self.player1Sprites)
-        newSprite = None
-        newSprite = TextSprite("Bet: 0", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, self.PLAYER_2_BET_POSITION, self.player2Sprites)
-        newSprite = None
-        newSprite = TextSprite("Bet: 0", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, self.PLAYER_3_BET_POSITION, self.player3Sprites)
-        newSprite = None
-        newSprite = TextSprite("Bet: 0", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, self.PLAYER_4_BET_POSITION, self.player4Sprites)
-        newSprite = None
-
-        # Create the text for if the player is small or big blind
-        newSprite = TextSprite("Small Blind", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, self.PLAYER_1_BLIND_POSITION, self.player1Sprites)
-        newSprite = None
-        newSprite = TextSprite("Big Blind", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, self.PLAYER_2_BLIND_POSITION, self.player2Sprites)
-        newSprite = None
-        newSprite = TextSprite("Small Blind", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, self.PLAYER_3_BLIND_POSITION, self.player3Sprites)
-        newSprite = None
-        newSprite = TextSprite("Big Blind", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, self.PLAYER_4_BLIND_POSITION, self.player4Sprites)
-        newSprite = None
-
-    def testDrawOther(self) -> None:
-        # Create the text for the pot
-        newSprite = TextSprite("Pot: 0", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, self.POT_POSITION, self.communitySprites)
-        newSprite = None
-
-        # Deal card to the burn pile
-        card = Card(random.choice(list(Value)), random.choice(list(Suit)))
-        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.BURN_POSITION, showCard=False, group=self.communitySprites)
-        newSprite = None
-
-        # Deal card to the deal position
-        card = Card(random.choice(list(Value)), random.choice(list(Suit)))
-        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, self.DEAL_POSITION, showCard=False, group=self.communitySprites)
-        newSprite = None
-
-    def testDrawMenu(self) -> None:
-        itemCount = 0
-        pos = [self.MENU_CENTER_POSITION[0], self.MENU_CENTER_POSITION[1] + itemCount * 2 * self.FONT_HEIGHT]
-        # Create the text for the menu
-        newSprite = TextSprite("Menu", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, pos, self.menuSprites)
-        newSprite = None
-
-        itemCount += 1
-        pos = [self.MENU_CENTER_POSITION[0], self.MENU_CENTER_POSITION[1] + itemCount * 2 * self.FONT_HEIGHT]
-        newSprite = TextSprite("Press Settings to edit settings", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, pos, self.menuSprites)
-        newSprite = None
-
-        itemCount += 1
-        pos = [self.MENU_CENTER_POSITION[0], self.MENU_CENTER_POSITION[1] + itemCount * 2 * self.FONT_HEIGHT]
-        newSprite = TextSprite("Small Blind: 1", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, pos, self.menuSprites)
-        newSprite = None
-
-        itemCount += 1
-        pos = [self.MENU_CENTER_POSITION[0], self.MENU_CENTER_POSITION[1] + itemCount * 2 * self.FONT_HEIGHT]
-        newSprite = TextSprite("Big Blind: 2", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, pos, self.menuSprites)
-        newSprite = None
-
-        itemCount += 1
-        pos = [self.MENU_CENTER_POSITION[0], self.MENU_CENTER_POSITION[1] + itemCount * 2 * self.FONT_HEIGHT]
-        newSprite = TextSprite("White Chip Value: 1", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, pos, self.menuSprites)
-        newSprite = None
 
     def getPlayerPositions(self, seatNumber: Seat) -> dict[str, list[int]]:
         """
@@ -356,6 +229,28 @@ class PokerGameView:
         elif seatNumber == Seat.FOUR:
             return self.player4CardSprites
         
+    def createFromModel(self) -> None:
+        """
+        Method to create the sprites from the model
+        """
+        currentRound = self.model.currentRound
+
+        # Create the pot
+        self.createPot()
+        self.updatePot(currentRound.potSize)
+
+        # Create the player hubs
+        for player in currentRound.players:
+            self.createPlayerHub(player.seatNumber)
+            self.updatePlayerChips(player.seatNumber, player.stackSize)
+            self.updatePlayerBet(player.seatNumber, player.potentialBet)
+            self.updatePlayerName(player.seatNumber, player.name)
+            self.setPlayerReady(player.seatNumber, player.isReady)
+
+        # Assign the small and big blind
+        self.setBlind(currentRound.getSmallBlindPlayer().seatNumber, Blind.SB)
+        self.setBlind(currentRound.getBigBlindPlayer().seatNumber, Blind.BB)
+        
     # TODO: Method to display the menu
     # Update the text menu items based on the model
     # or have the item to be updated passed as an arg but makes more sense to have the model passed
@@ -373,6 +268,21 @@ class PokerGameView:
 
         # Create the text for the pot
         newSprite = TextSprite("Pot: 0", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, self.POT_POSITION, self.communitySprites)
+        newSprite = None
+
+    def createBetToMatch(self) -> None:
+        """
+        Method to create the bet to match. 
+        The bet to match sprite will be the second sprite in the community group.
+        """
+        # The bet to match group should be empty
+        # If it isn't, log an error and return
+        if len(self.communitySprites) > 1:
+            logging.error("Trying to create a bet to match for a non-empty layer group")
+            return
+
+        # Create the text for the bet to match
+        newSprite = TextSprite("Bet to Match: 0", self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, self.BET_TO_MATCH_POSITION, self.communitySprites)
         newSprite = None
     
     def createPlayerHub(self, seatNumber: Seat) -> None:
@@ -479,7 +389,90 @@ class PokerGameView:
         newSprite = TextSprite(blindType.name, self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, positions["blind"], playerGroup)
         newSprite = None
 
-    def updatePlayerChips(self, seatNumber: Seat, newChipValue: int) -> None:
+    def removeBlind(self, seatNumber: Seat) -> None:
+        """
+        Method to remove the blind for a player
+
+        Args:
+            seatNumber (Seat): The seat number of the player
+        """
+        # Get the sprite group for the player
+        playerGroup = self.getPlayerGroup(seatNumber)
+
+        # The player group should be created and have exactly 4 sprites
+        # If it isn't, log an error and return
+        if len(playerGroup) != 4:
+            logging.error("Trying to remove a blind for a player with an invalid number of sprites")
+            return
+
+        # Remove the blind sprite
+        playerGroup.remove(playerGroup.sprites()[3])
+
+    def clearReadyStatusText(self) -> None:
+        """
+        Method to clear the ready states for all players
+        """
+        currentRound = self.model.currentRound
+
+        for player in currentRound.players:
+            self.updatePlayerName(player.seatNumber, player.name, growShrink=False)
+
+    def setPlayerReady(self, seatNumber: Seat, status: bool) -> None:
+        """
+        Method to toggle the ready state for a player
+
+        Args:
+            seatNumber (Seat): The seat number of the player
+            status (bool): The ready state
+        """
+        # Get the sprite group for the player
+        playerGroup = self.getPlayerGroup(seatNumber)
+
+        if len(playerGroup) == 0:
+            logging.error("Trying to toggle the ready state for an empty player group")
+            return
+
+        # Get the player name text sprite - at index 0
+        playerNameSprite = playerGroup.sprites()[0]
+
+        # Toggle the ready state
+        statusText = " (Ready)" if status else " (Not Ready)"
+
+        # Find within the sprite text if there's already a status text in ()
+        # If there is, remove it
+        if " (" in playerNameSprite.text:
+            playerNameSprite.text = playerNameSprite.text[:playerNameSprite.text.find(" (")]
+
+        # Update the text
+        self.updatePlayerName(seatNumber, playerNameSprite.text + statusText, growShrink=False)
+
+    def updatePlayerName(self, seatNumber: Seat, newName: str, growShrink: bool = True) -> None:
+        """
+        Method to update the player name
+
+        Args:
+            seatNumber (Seat): The seat number of the player
+            newName (str): The new name
+        """
+
+        # Get the sprite group for the player
+        playerGroup = self.getPlayerGroup(seatNumber)
+
+        if len(playerGroup) == 0:
+            logging.error("Trying to update the player name for an empty player group")
+            return
+
+        # Get the player name text sprite - at index 0
+        playerNameSprite = playerGroup.sprites()[0]
+
+        # Update the text
+        playerNameSprite.write(newName)
+
+        # Grow and shrink the text if needed
+        if growShrink:
+            playerNameSprite.growShrinkOnce()
+
+    def updatePlayerChips(self, seatNumber: Seat, newChipValue: int, growShrink: bool = True) -> None:
         """
         Method to update the player chips
 
@@ -501,8 +494,9 @@ class PokerGameView:
         # Update the text
         playerChipsSprite.write("Chips: " + str(newChipValue))
 
-        # Grow and shrink the text
-        playerChipsSprite.growShrinkOnce()
+        # Grow and shrink the text if needed
+        if growShrink:
+            playerChipsSprite.growShrinkOnce()
 
     def updatePlayerBet(self, seatNumber: Seat, newBetValue: int) -> None:
         """
@@ -533,7 +527,7 @@ class PokerGameView:
     def confirmPlayerBet(self, seatNumber: Seat) -> None:
         raise NotImplementedError("confirmPlayerBet not implemented")
 
-    def updatePot(self, newPotValue: int) -> None:
+    def updatePot(self, newPotValue: int, growShrink: bool = True) -> None:
         """
         Method to update the pot
 
@@ -551,8 +545,9 @@ class PokerGameView:
         # Update the text
         potSprite.write("Pot: " + str(newPotValue))
 
-        # Grow and shrink the text
-        potSprite.growShrinkOnce()
+        # Grow and shrink the text if needed
+        if growShrink:
+            potSprite.growShrinkOnce()
 
     def dealBurn(self, card: Card) -> None:
         """
@@ -665,7 +660,7 @@ class PokerGameView:
             self.logger.error("Trying to deal a card to a player who already has two cards")
             return
         # Deal the card
-        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, cardPosition, showCard=False, group=playerCardGroup)
+        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, cardPosition, showCard=True, group=playerCardGroup)
 
     # TODO: Method to indicate the player is the winner
     # Needs to be passed the player number
@@ -676,7 +671,9 @@ class PokerGameView:
         Method to reset the player turn indicators
         """
         # Iterate through the player groups
-        for playerGroup in self.playerGroups:
+        for seatNumber in Seat:
+            # Get the sprite group for the player
+            playerGroup = self.getPlayerGroup(seatNumber)
             if len(playerGroup) == 0:
                 continue
             # Get the player name text sprite - at index 0
@@ -764,6 +761,7 @@ class PokerGameView:
         self.player3CardSprites.empty()
         self.player4CardSprites.empty()
         self.communityCardSprites.empty()
+        self.burnSprites.empty()
 
         # Reset the pot
         self.updatePot(0)
