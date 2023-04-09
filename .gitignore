@@ -140,3 +140,11 @@ dmypy.json
 /Python/data
 
 
+/Python/suit_images
+/Python/unlabeled_images
+/Python/unlabled_images
+/Python/val_images
+/Python/labeled_images
+
+/Python/.DS_Store
+

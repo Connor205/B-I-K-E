@@ -23,6 +23,7 @@ void serialReactions()
     } else if (input.equals("eject")) {
         shuffler.ejectCards();
     } else if (input.equals("dispense")) {
+        writeState("dispensing");
         shuffler.dropCard();
     } else if (input.equals("move")) {
         waitForSerialInput();
@@ -38,6 +39,11 @@ void serialReactions()
         writeInfo("Waiting for confirmation button press");
         while (digitalRead(CONFIRMATION_BUTTON_PIN) == HIGH) {
             delay(50);
+        }
+    } else if (input.equals("test")) {
+        while (true) {
+            writeInfo("Photoresistor value: " + String(analogRead(DISPENSER_PHOTOSENSOR_PIN)));
+            delay(100);
         }
     } else {
         writeError("Invalid Command");

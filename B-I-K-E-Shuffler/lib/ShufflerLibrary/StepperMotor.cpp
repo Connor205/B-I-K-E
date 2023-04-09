@@ -1,5 +1,6 @@
 #include "StepperMotor.hpp"
 #include <Arduino.h>
+#include <Utils.h>
 
 StepperMotor::StepperMotor(int stepPin, int dirPin, int calibratePin, int maxSpeed)
 {
@@ -46,7 +47,7 @@ void StepperMotor::calibrate(bool CW)
         steps++;
     }
     // Output Step number
-    Serial.println("Calibrated " + String(steps) + " steps");
+    writeInfo("Calibrated " + String(steps) + " steps");
     // Set current to 0
     this->current = 0;
 }

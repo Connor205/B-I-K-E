@@ -1,5 +1,6 @@
 #include "Shuffler.hpp"
 #include "ShufflerConstants.hpp"
+#include <Utils.h>
 
 Shuffler::Shuffler()
 {
@@ -20,6 +21,7 @@ void Shuffler::init()
 
 void Shuffler::calibrate()
 {
+    writeInfo("Calibrating Shuffler Motors");
     this->dispenserMotor.calibrate(false);
     this->dispenserMotor.moveToTargetAccel(6400);
     this->beltMotor.calibrate(true);
@@ -65,8 +67,11 @@ void Shuffler::dropCard()
 
     // Set the speed to half the max speed
     this->dropperMotor.setSpeed(DROPPER_MOTOR_MAX_STEPS_PER_SECOND / 2);
+    writeInfo("Moving To Detection For Dispense");
     // Then we read the photo sensor until it is light enough to mean that the card has fallen
-    while (analogRead(DISPENSER_PHOTOSENSOR_PIN) < 40) {
+    int val = 0;
+    while (val < 90) { // TODO:: Tune this value
         this->dropperMotor.stepMotor();
+        val = analogRead(DISPENSER_PHOTOSENSOR_PIN);
     }
 }
