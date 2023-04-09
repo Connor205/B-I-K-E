@@ -19,8 +19,9 @@ class Arduino:
         baud=9600,
     ):
         self.logger = logging.getLogger(__name__)
-        self.logger.addHandler(logging.StreamHandler(sys.stdout))
         self.logger.setLevel(logging.DEBUG)
+        # self.logger.addHandler(logging.StreamHandler(sys.stdout))
+
         self.port = port
         self.baud = baud
         self.connect()
@@ -55,7 +56,6 @@ class Arduino:
         # This is a blocking call
         try:
             input = self.ser.read_until(b'\n').decode('utf-8').strip()
-            self.logger.debug(f'Arduino Output --{input}--')
             command, value = input.split(':')
             self.logger.debug("Command: {} | Value: {}".format(command, value))
             self.read_handler(command, value)

@@ -5,19 +5,19 @@ import random
 import cv2
 from Card import Card, Value, Suit
 import pickle
+import tensorflow as tf
+import numpy as np
 
 
 class Shuffler(Arduino):
 
     def __init__(self, port: str, baud=9600):
         super().__init__(port, baud)
-        self.logger = logging.getLogger(__name__)
 
     def read_handler(self, command: str, value: str):
         if command == 'STATE':
             with self.stateLock:
                 self.state = value
-            self.logger.debug("Updated Arduino State to: {}".format(value))
 
     def moveToSlot(self, slot: int):
         self.sendCommand("move", [slot])
@@ -41,8 +41,105 @@ class Shuffler(Arduino):
         self.waitForReady()
 
 
-def classify_card(image) -> Card:
-    return Card(Value.ACE, Suit.HEART)
+def convert_suit_string(suit: str) -> Suit:
+    if suit == "hearts":
+        return Suit.HEART
+    elif suit == "clubs":
+        return Suit.CLUB
+    elif suit == "diamonds":
+        return Suit.DIAMOND
+    elif suit == "spades":
+        return Suit.SPADE
+    else:
+        raise ValueError("Invalid suit string")
+
+
+def convert_value_string(value: str) -> Value:
+    if value == "ace":
+        return Value.ACE
+    elif value == "2":
+        return Value.TWO
+    elif value == "3":
+        return Value.THREE
+    elif value == "4":
+        return Value.FOUR
+    elif value == "5":
+        return Value.FIVE
+    elif value == "6":
+        return Value.SIX
+    elif value == "7":
+        return Value.SEVEN
+    elif value == "8":
+        return Value.EIGHT
+    elif value == "9":
+        return Value.NINE
+    elif value == "10":
+        return Value.TEN
+    elif value == "jack":
+        return Value.JACK
+    elif value == "queen":
+        return Value.QUEEN
+    elif value == "king":
+        return Value.KING
+    else:
+        raise ValueError("Invalid value string")
+
+
+# Lets load the models
+suit_model = tf.keras.models.load_model("suit_model.h5")
+suit_classes = ['clubs', 'diamonds', 'hearts', 'spades']
+value_model = tf.keras.models.load_model("val_model.h5")
+value_classes = [
+    '10', '2', '3', '4', '5', '6', '7', '8', '9', 'ace', 'jack', 'king',
+    'queen'
+]
+
+
+def classify_card(frame) -> Card:
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+    # rotate the image 15 degrees counter clockwise
+    image_center = tuple(np.array(frame.shape[1::-1]) / 2)
+
+    rot_mat = cv2.getRotationMatrix2D(image_center, -15 - 90, 1.0)
+    result = cv2.warpAffine(gray,
+                            rot_mat,
+                            frame.shape[1::-1],
+                            flags=cv2.INTER_LINEAR)
+
+    # Crop the image
+    cropped_number = result[100:475, 750:1050]
+
+    # resize to 100 by 100
+    cropped_number = cv2.resize(cropped_number, (100, 100))
+
+    cropped_suit = result[450:725, 750:1000]
+
+    # resize to 100 by 100
+    cropped_suit = cv2.resize(cropped_suit, (100, 100))
+
+    # Now lets classify the card
+    # First lets classify the suit
+    suit = suit_model.predict(cropped_suit.reshape(1, 100, 100, 1))
+    suit_index = np.argmax(suit)
+    suit = suit_classes[suit_index]
+    suit = convert_suit_string(suit)
+
+    # Now lets classify the value
+    value = value_model.predict(cropped_number.reshape(1, 100, 100, 1))
+    value_index = np.argmax(value)
+    value = value_classes[value_index]
+    value = convert_value_string(value)
+
+    ret = Card(value, suit)
+    print(ret)
+
+    cv2.imshow("Number", cropped_number)
+    cv2.imshow("Suit", cropped_suit)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+    return ret
 
 
 def main():
@@ -58,7 +155,7 @@ def main():
         shuffler.waitForConfirm()
         shuffler.logger.debug("Shuffling")
         # Generate a list of slots to put the cards in, 1-> 52
-        slots = list(range(1, 53))
+        slots = list(range(0, 52))
         # Shuffle the list
         random.shuffle(slots)
         # Create a blank list of 52 cards
@@ -70,21 +167,28 @@ def main():
             # Read the image from the camera
             ret, frame = cap.read()
             # Convert the image to grayscale
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            identified_card = classify_card(gray)
+            identified_card = classify_card(frame)
+            shuffler.logger.debug(
+                "Identified card: {}".format(identified_card))
             cards[slot] = identified_card
             # Now we want to put the card in the slot
-            shuffler.putCard(slot)
+            shuffler.dispense()
             time.sleep(0.25)
             # Wait for the shuffler to be ready
             shuffler.waitForReady()
+            # Wait for enter
+            input("Press enter to continue")
 
         # Now we want to export the cards
-        shuffler.exportCards()
+        # shuffler.exportCards()
 
         # Now we want to reset the conveyor
-        shuffler.resetConveyor()
+        # shuffler.resetConveyor()
 
         # Now lets save the list of cards to a file using pickle
         with open("cards.txt", "w") as f:
             f.write(pickle.dumps(cards))
+
+
+if __name__ == "__main__":
+    main()
