@@ -122,6 +122,11 @@ class PokerGameController():
 
                 # If in state preparing, we just advance the round to start it
                 self.model.advanceRound()
+
+        elif origState == GameState.POSTHAND:
+            # If the gamestate is posthand, any button press will reset the round
+            self.model.resetRound()
+            self.view.resetRound()
         
         else:
             match button:
@@ -170,7 +175,9 @@ class PokerGameController():
         if newState != origState:
             self.deal(newState)
 
-        self.view.indicatePlayerTurn(self.model.currentRound.currentPlayer.seatNumber)
+        if newState != GameState.PREPARING:
+            self.view.indicatePlayerTurn(self.model.currentRound.currentPlayer.seatNumber)
+
         self.updateViewText()
 
         # just debug a lot of shit

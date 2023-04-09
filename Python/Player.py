@@ -1,4 +1,5 @@
 from Enums import Seat
+from Card import Card
 from PlayerHand import PlayerHand
 from Constants import *
 
@@ -99,5 +100,9 @@ class Player():
         """Adds a card to the player's hand"""
         self.hand.addHoleCard(card)
 
+    def determineBestHand(self, communityCards: list[Card]) -> None:
+        """Determines the player's best hand"""
+        self.hand.determineBestHand(communityCards)
+
     def __str__(self) -> str:
-        return f"{self.name} is sitting at seat {self.seatNumber} with a stack size of {self.stackSize} and a potential bet of {self.potentialBet}"
+        return f"{self.name} is sitting at seat {self.seatNumber} with a stack size of {self.stackSize} and a potential bet of {self.potentialBet} with hand {self.hand.getHoleCards()[0] if len(self.hand.getHoleCards()) > 0 else ''} and {self.hand.getHoleCards()[1] if len(self.hand.getHoleCards()) > 1 else ''}"

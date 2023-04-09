@@ -23,6 +23,23 @@ class PlayerHand():
     def getHoleCards(self) -> list[Card]:
         return self.holeCards
     
+    def getKickers(self, communityCards: list[Card]) -> list[Card]:
+        """
+        Returns the kickers for the player's best hand.
+        Args:
+            communityCards (list[Card]): List of community cards.
+        Returns:
+            list[Card]: List of kickers.
+        """
+        if len(communityCards) < 3:
+            return []
+        cards = self.holeCards + communityCards
+        kickers = []
+        for card in cards:
+            if card not in self.bestHand:
+                kickers.append(card)
+        return kickers
+    
     def addHoleCard(self, card: Card) -> bool:
         """
         Adds a card to the player's hand.

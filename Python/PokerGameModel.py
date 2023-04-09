@@ -159,6 +159,12 @@ class PokerGameModel():
             return False
         return self.currentRound.resetBet(player)
     
+    def resetRound(self) -> bool:
+        # Resets the round to the initial state
+        # return true if successful, false if not
+        self.currentRound.resetRound()
+        return True
+    
     def getPlayersInHand(self) -> list[Player]:
         # Gets the players that are currently in the round
         return self.currentRound.players

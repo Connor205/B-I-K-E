@@ -761,6 +761,7 @@ class PokerGameView:
         self.player3CardSprites.empty()
         self.player4CardSprites.empty()
         self.communityCardSprites.empty()
+        self.burnSprites.empty()
 
         # Reset the pot
         self.updatePot(0)

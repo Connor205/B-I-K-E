@@ -56,7 +56,8 @@ class PokerRound():
         self.players.remove(self.currentPlayer)
         self.currentPlayer = self.players[self.turnIndex % len(self.players)]
         if len(self.players) == 1:
-            self.playerWins(self.players(0))
+            self.playerWins(self.players[0])
+            return True
         if self.startBettingRoundIndex > self.turnIndex:
             self.startBettingRoundIndex -= 1
         if self.checkAllMatched():
@@ -111,12 +112,19 @@ class PokerRound():
                 self.makeBet(bigBlindPlayer)
 
                 # Deal cards
-                for _ in range(2):
+                for i in range(2):
                     for player in self.players:
                         card = self.deck.drawCard()
+                        print("Dealt " + str(card) + " to " + player.name)
                         self.cardsDealt += 1
                         player.addCard(card)
-
+                        # player.hand.holeCards.append(card)
+                        for card in player.hand.holeCards:
+                            print(card)
+                        # print(player.hand.holeCards[i])
+                # debug print all the players' cards
+                for player in self.players:
+                    print(player.name + " has " + str(player.hand.getHoleCards()[0]) + " and " + str(player.hand.getHoleCards()[1]))
                 return True
             case GameState.FLOP:
                 self.logger.debug("Advancing state to FLOP")
@@ -275,10 +283,48 @@ class PokerRound():
         return self.communityCards
     
     def determineWinner(self) -> Player:
-        #TODO
-        return Player
+        """
+        Determines the winner of the round
+
+        Returns:
+            Player: The winner of the round
+        """
+        playerRanks = {}
+        for player in self.players:
+            player.determineBestHand(self.communityCards)
+            playerRanks[player] = player.getHand().getRanking()
+
+        bestRank = max(playerRanks.values())
+        bestPlayers = [player for player, rank in playerRanks.items() if rank == bestRank]
+
+        if len(bestPlayers) == 1:
+            return bestPlayers[0]
+        else:
+            return self.determineWinnerByKickers(bestPlayers)
     
-    def playerWins(self, player) -> bool:
+    def determineWinnerByKickers(self, players: list[Player]) -> Player:
+        """
+        Determines the winner of the round by kickers
+
+        Args:
+            players (list[Player]): The players to determine the winner of the round by kickers
+
+        Returns:
+            Player: The winner of the round
+        """
+        playerKickers = {}
+        for player in players:
+            playerKickers[player] = player.getHand().getKickers(self.communityCards)
+
+        bestKickers = max(playerKickers.values())
+        bestPlayers = [player for player, kickers in playerKickers.items() if kickers == bestKickers]
+
+        if len(bestPlayers) == 1:
+            return bestPlayers[0]
+        else:
+            return self.determineWinnerByKickers(bestPlayers)
+    
+    def playerWins(self, player: Player) -> bool:
         player.stackSize += self.potSize
         self.state = GameState.POSTHAND
         #self.resetRound()
@@ -298,6 +344,7 @@ class PokerRound():
     
     def resetRound(self) -> bool:
         self.state = GameState.PREPARING
+        self.players = []
         for player in self.overallPlayers:
             if player.stackSize != 0:
                 self.players.append(player)
@@ -318,7 +365,7 @@ class PokerRound():
     
     def __str__(self) -> str:
         return f"State: {self.state}, \nPot Size: {self.potSize}, \
-            \nPlayers: {self.players}, \
+            \nPlayers: " + str([str(player) for player in self.players]) + ", \
                   \nCurrent Player: {self.currentPlayer}, \nCommunity Cards: {self.communityCards}, \
                     \nTurn Index: {self.turnIndex}, \nStart Betting Round Index: {self.startBettingRoundIndex}, \
                         \nSmall Blind Index: {self.smallBlindIndex}, \nBet to Match: {self.betToMatch}\n"
