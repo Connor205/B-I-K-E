@@ -2,6 +2,7 @@ from itertools import combinations
 from collections import Counter
 from Card import Card, Value, Suit
 from Enums import HandRanking
+from typing import Tuple
 
 class PlayerHand():
     holeCards: list[Card]
@@ -49,14 +50,14 @@ class PlayerHand():
         self.ranking, self.bestHand = self.score(communityCards)
         return True
 
-    def score(self, communityCards: list[Card]) -> tuple[HandRanking, list[Card]]:
+    def score(self, communityCards: list[Card]) -> Tuple[HandRanking, list[Card]]:
         """
         Given a list of cards, computes the best hand and its score.
         This method must be called with at least 3 community cards.
         Args:
             cards (list[Card]): List of cards to compute the best hand from.
         Returns:
-            tuple[HandRanking, list[Card]]: Tuple containing the score and best hand.
+            Tuple[HandRanking, list[Card]]: Tuple containing the score and best hand.
         """
         cards = self.holeCards + communityCards
 

@@ -6,18 +6,19 @@ from Card import Card
 from PlayerHand import PlayerHand
 from Enums import GameState, Seat
 from Player import Player
+from typing import Tuple
 
 class PokerRound():
     potSize: int
     state: GameState
     communityCards: list[Card]
+    burnCards: list[Card]
     deck: Deck
     players: list[Player]
     turnIndex: int # keeps track of who's turn it is to bet
     startBettingRoundIndex: int # keeps track of who's starts betting each round
     smallBlindIndex: int # keeps track of who has the blinds each round
     currentPlayer: Player # keeps track of who's turn it is to bet
-    turnIndex: int # keeps track of who's turn it is to bet
     betToMatch: int # the current bet to match
     overallPlayers: list[Player] # Tracking the players between hands
     smallBlind: int # the size of the small blind
@@ -36,6 +37,7 @@ class PokerRound():
         self.state = GameState.PREPARING
         self.deck = Deck()
         self.communityCards = []
+        self.burnCards = []
         self.turnIndex = 0
         self.startBettingRoundIndex = 0
         self.smallBlindIndex = 0
@@ -61,7 +63,7 @@ class PokerRound():
             self.advanceRound()
         return len(self.players) == origSize - 1
     
-    def makeBet(self, player: Player) -> tuple[bool, int]:
+    def makeBet(self, player: Player) -> Tuple[bool, int]:
         if player != self.currentPlayer:
             return (False, 0)
 
@@ -72,7 +74,8 @@ class PokerRound():
             self.potSize += playerBet
             if player.commitment > self.betToMatch:
                 self.betToMatch = player.commitment
-            self.currentPlayer = self.players[(self.turnIndex + 1) % len(self.players)]
+            self.turnIndex = (self.turnIndex + 1) % len(self.players)
+            self.currentPlayer = self.players[self.turnIndex]
             if self.checkAllMatched():
                 self.advanceRound()
             return (True, playerBet)
@@ -119,7 +122,7 @@ class PokerRound():
                 self.logger.debug("Advancing state to FLOP")
                 self.resetForBettingRound()
                 # Deal burn card
-                burned = self.deck.drawCard()
+                self.burnCards.append(self.deck.drawCard())
                 # Deal community cards
                 self.communityCards.append(self.deck.drawCard())
                 self.communityCards.append(self.deck.drawCard())
@@ -130,7 +133,7 @@ class PokerRound():
                 self.logger.debug("Advancing state to TURN")
                 self.resetForBettingRound()
                 # Deal burn card
-                burned = self.deck.drawCard()
+                self.burnCards(self.deck.drawCard())
                 # Deal community card
                 self.communityCards.append(self.deck.drawCard())
                 self.cardsDealt += 2
@@ -139,7 +142,7 @@ class PokerRound():
                 self.logger.debug("Advancing state to RIVER")
                 self.resetForBettingRound()
                 # Deal burn card
-                burned = self.deck.drawCard()
+                self.burnCards(self.deck.drawCard())
                 # Deal community card
                 self.communityCards.append(self.deck.drawCard())
                 self.cardsDealt += 2
@@ -287,7 +290,7 @@ class PokerRound():
         player.resetBet()
         return True
     
-    def call(self, player: Player) -> tuple[bool, int]:
+    def call(self, player: Player) -> Tuple[bool, int]:
         if player != self.currentPlayer:
             return False
         player.setBet(self.betToMatch)
@@ -312,3 +315,10 @@ class PokerRound():
 
     def getBigBlindPlayer(self) -> Player:
         return self.players[(self.smallBlindIndex + 1) % len(self.players)]
+    
+    def __str__(self) -> str:
+        return f"State: {self.state}, \nPot Size: {self.potSize}, \
+            \nPlayers: {self.players}, \
+                  \nCurrent Player: {self.currentPlayer}, \nCommunity Cards: {self.communityCards}, \
+                    \nTurn Index: {self.turnIndex}, \nStart Betting Round Index: {self.startBettingRoundIndex}, \
+                        \nSmall Blind Index: {self.smallBlindIndex}, \nBet to Match: {self.betToMatch}\n"

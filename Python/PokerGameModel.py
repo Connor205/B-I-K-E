@@ -3,6 +3,7 @@ import sys
 from PokerRound import PokerRound
 from Player import Player
 from Enums import GameState, Seat
+from typing import Tuple
 
 class PokerGameModel():
     previousRounds: list[PokerRound]
@@ -88,7 +89,7 @@ class PokerGameModel():
         else:
             return False
 
-    def makeBet(self, seat) -> tuple[bool, int]:
+    def makeBet(self, seat) -> Tuple[bool, int]:
         # Confirms the bet amount made from updateBet and updates
         # both the player amount and pot size for the round
         # call getPlayerFromSeat
@@ -110,16 +111,16 @@ class PokerGameModel():
         # if returns true, calls the rounds's fold method with the player
         # return true if successful, false if not
         player = self.getPlayerFromSeat(seat)
-        if (self.isPlayerTurn(player) and self.player.potentialBet == 0):
+        if (self.isPlayerTurn(player) and player.potentialBet == 0):
             self.currentRound.playerFolds()
             return True
-        elif (self.isPlayerTurn(player) and self.player.potentialBet != 0):
+        elif (self.isPlayerTurn(player) and player.potentialBet != 0):
             player.resetBet()
             return False
         else:
             return False
 
-    def call(self, seat: Seat) -> tuple[bool, int]:
+    def call(self, seat: Seat) -> Tuple[bool, int]:
         # Based on the seat mapping, call that player
         # call makeBet with betSize = pokerRound.betToMatch
         # return true if successful, false if not
@@ -165,6 +166,7 @@ class PokerGameModel():
     def getRemainingCards(self) -> int:
         # returns the number of cards left in the deck
         return 52 - self.currentRound.cardsDealt
+
     def getPotSize(self) -> int:
         return self.currentRound.potSize
         
