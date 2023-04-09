@@ -4,25 +4,26 @@ from Card import Card, Value, Suit
 from Enums import HandRanking
 from typing import Tuple
 
+
 class PlayerHand():
     holeCards: list[Card]
     bestHand: list[Card]
     ranking: HandRanking
 
-    def __init__(self, holeCards: list[Card] = []) -> None:
+    def __init__(self, holeCards: list[Card] = list()) -> None:
         self.holeCards = holeCards
         self.bestHand = []
         self.ranking = None
 
     def getRanking(self) -> HandRanking:
         return self.ranking
-    
+
     def getBestHand(self) -> list[Card]:
         return self.bestHand
-    
+
     def getHoleCards(self) -> list[Card]:
         return self.holeCards
-    
+
     def getKickers(self, communityCards: list[Card]) -> list[Card]:
         """
         Returns the kickers for the player's best hand.
@@ -39,7 +40,7 @@ class PlayerHand():
             if card not in self.bestHand:
                 kickers.append(card)
         return kickers
-    
+
     def addHoleCard(self, card: Card) -> bool:
         """
         Adds a card to the player's hand.
@@ -52,7 +53,7 @@ class PlayerHand():
             return False
         self.holeCards.append(card)
         return True
-    
+
     def determineBestHand(self, communityCards: list[Card]) -> bool:
         """
         Given a list of cards, computes the best hand and its score.
@@ -67,7 +68,8 @@ class PlayerHand():
         self.ranking, self.bestHand = self.score(communityCards)
         return True
 
-    def score(self, communityCards: list[Card]) -> Tuple[HandRanking, list[Card]]:
+    def score(self,
+              communityCards: list[Card]) -> Tuple[HandRanking, list[Card]]:
         """
         Given a list of cards, computes the best hand and its score.
         This method must be called with at least 3 community cards.
@@ -80,7 +82,7 @@ class PlayerHand():
 
         max_score = HandRanking.HIGH_CARD
         best_hand = None
-        
+
         for combination in combinations(cards, 5):
             # Compute the score and best hand for the current combination
             values = [card.value for card in combination]
@@ -90,7 +92,7 @@ class PlayerHand():
             straight = max(values) - min(values) == 4 and len(set(values)) == 5
             straight_flush = flush and straight
             royal_flush = straight_flush and max(values) == Value.ACE
-            
+
             if royal_flush:
                 score = HandRanking.ROYAL_FLUSH
                 best_hand = combination
@@ -100,7 +102,8 @@ class PlayerHand():
             elif value_counts.most_common(1)[0][1] == 4:
                 score = HandRanking.FOUR_OF_A_KIND
                 best_hand = combination
-            elif value_counts.most_common(1)[0][1] == 3 and value_counts.most_common(2)[1][1] == 2:
+            elif value_counts.most_common(
+                    1)[0][1] == 3 and value_counts.most_common(2)[1][1] == 2:
                 score = HandRanking.FULL_HOUSE
                 best_hand = combination
             elif flush:
@@ -112,7 +115,8 @@ class PlayerHand():
             elif value_counts.most_common(1)[0][1] == 3:
                 score = HandRanking.THREE_OF_A_KIND
                 best_hand = combination
-            elif value_counts.most_common(1)[0][1] == 2 and value_counts.most_common(2)[1][1] == 2:
+            elif value_counts.most_common(
+                    1)[0][1] == 2 and value_counts.most_common(2)[1][1] == 2:
                 score = HandRanking.TWO_PAIR
                 best_hand = combination
             elif value_counts.most_common(1)[0][1] == 2:
@@ -121,15 +125,17 @@ class PlayerHand():
             else:
                 score = HandRanking.HIGH_CARD
                 best_hand = combination
-            
+
             # Update max_score and best_hand if necessary
             if score > max_score:
                 max_score = score
                 best_hand = combination
-        
+
         return (max_score, best_hand)
 
+
 if __name__ == "__main__":
+
     def testScore(cards, expected_score):
         hand = PlayerHand([])
         score, best_hand = hand.score(cards)
@@ -139,67 +145,141 @@ if __name__ == "__main__":
             return
         for card in best_hand:
             print(str(card))
-        assert score == expected_score, "Expected score: " + str(expected_score) + ", actual score: " + str(score)
+        assert score == expected_score, "Expected score: " + str(
+            expected_score) + ", actual score: " + str(score)
 
     # Test cases
     # High card
     print("High card")
-    cards = [Card(Value.TWO, Suit.HEART), Card(Value.THREE, Suit.SPADE), Card(Value.FIVE, Suit.CLUB), Card(Value.SEVEN, Suit.DIAMOND), Card(Value.ACE, Suit.HEART)]
+    cards = [
+        Card(Value.TWO, Suit.HEART),
+        Card(Value.THREE, Suit.SPADE),
+        Card(Value.FIVE, Suit.CLUB),
+        Card(Value.SEVEN, Suit.DIAMOND),
+        Card(Value.ACE, Suit.HEART)
+    ]
     testScore(cards, HandRanking.HIGH_CARD)
 
     # One pair
     print("One pair")
-    cards = [Card(Value.TWO, Suit.HEART), Card(Value.THREE, Suit.SPADE), Card(Value.TWO, Suit.CLUB), Card(Value.FIVE, Suit.DIAMOND), Card(Value.SIX, Suit.HEART)]
+    cards = [
+        Card(Value.TWO, Suit.HEART),
+        Card(Value.THREE, Suit.SPADE),
+        Card(Value.TWO, Suit.CLUB),
+        Card(Value.FIVE, Suit.DIAMOND),
+        Card(Value.SIX, Suit.HEART)
+    ]
     testScore(cards, HandRanking.PAIR)
 
     # Two pair
     print("Two pair")
-    cards = [Card(Value.TWO, Suit.HEART), Card(Value.THREE, Suit.SPADE), Card(Value.TWO, Suit.CLUB), Card(Value.THREE, Suit.DIAMOND), Card(Value.SIX, Suit.HEART)]
+    cards = [
+        Card(Value.TWO, Suit.HEART),
+        Card(Value.THREE, Suit.SPADE),
+        Card(Value.TWO, Suit.CLUB),
+        Card(Value.THREE, Suit.DIAMOND),
+        Card(Value.SIX, Suit.HEART)
+    ]
     testScore(cards, HandRanking.TWO_PAIR)
 
     # Three of a kind
     print("Three of a kind")
-    cards = [Card(Value.TWO, Suit.HEART), Card(Value.THREE, Suit.SPADE), Card(Value.TWO, Suit.CLUB), Card(Value.TWO, Suit.DIAMOND), Card(Value.SIX, Suit.HEART)]
+    cards = [
+        Card(Value.TWO, Suit.HEART),
+        Card(Value.THREE, Suit.SPADE),
+        Card(Value.TWO, Suit.CLUB),
+        Card(Value.TWO, Suit.DIAMOND),
+        Card(Value.SIX, Suit.HEART)
+    ]
     testScore(cards, HandRanking.THREE_OF_A_KIND)
 
     # Straight
     print("Straight")
-    cards = [Card(Value.TWO, Suit.HEART), Card(Value.THREE, Suit.SPADE), Card(Value.FOUR, Suit.CLUB), Card(Value.FIVE, Suit.DIAMOND), Card(Value.SIX, Suit.HEART)]
+    cards = [
+        Card(Value.TWO, Suit.HEART),
+        Card(Value.THREE, Suit.SPADE),
+        Card(Value.FOUR, Suit.CLUB),
+        Card(Value.FIVE, Suit.DIAMOND),
+        Card(Value.SIX, Suit.HEART)
+    ]
     testScore(cards, HandRanking.STRAIGHT)
 
     # Flush
     print("Flush")
-    cards = [Card(Value.TWO, Suit.HEART), Card(Value.THREE, Suit.HEART), Card(Value.FIVE, Suit.HEART), Card(Value.SEVEN, Suit.HEART), Card(Value.ACE, Suit.HEART)]
+    cards = [
+        Card(Value.TWO, Suit.HEART),
+        Card(Value.THREE, Suit.HEART),
+        Card(Value.FIVE, Suit.HEART),
+        Card(Value.SEVEN, Suit.HEART),
+        Card(Value.ACE, Suit.HEART)
+    ]
     testScore(cards, HandRanking.FLUSH)
 
     # Full house
     print("Full house")
-    cards = [Card(Value.TWO, Suit.HEART), Card(Value.THREE, Suit.SPADE), Card(Value.TWO, Suit.CLUB), Card(Value.THREE, Suit.DIAMOND), Card(Value.TWO, Suit.SPADE)]
+    cards = [
+        Card(Value.TWO, Suit.HEART),
+        Card(Value.THREE, Suit.SPADE),
+        Card(Value.TWO, Suit.CLUB),
+        Card(Value.THREE, Suit.DIAMOND),
+        Card(Value.TWO, Suit.SPADE)
+    ]
     testScore(cards, HandRanking.FULL_HOUSE)
 
     # Four of a kind
     print("Four of a kind")
-    cards = [Card(Value.TWO, Suit.HEART), Card(Value.THREE, Suit.SPADE), Card(Value.TWO, Suit.CLUB), Card(Value.TWO, Suit.DIAMOND), Card(Value.TWO, Suit.SPADE)]
+    cards = [
+        Card(Value.TWO, Suit.HEART),
+        Card(Value.THREE, Suit.SPADE),
+        Card(Value.TWO, Suit.CLUB),
+        Card(Value.TWO, Suit.DIAMOND),
+        Card(Value.TWO, Suit.SPADE)
+    ]
     testScore(cards, HandRanking.FOUR_OF_A_KIND)
 
     # Straight flush
     print("Straight flush")
-    cards = [Card(Value.TWO, Suit.HEART), Card(Value.THREE, Suit.HEART), Card(Value.FOUR, Suit.HEART), Card(Value.FIVE, Suit.HEART), Card(Value.SIX, Suit.HEART)]
+    cards = [
+        Card(Value.TWO, Suit.HEART),
+        Card(Value.THREE, Suit.HEART),
+        Card(Value.FOUR, Suit.HEART),
+        Card(Value.FIVE, Suit.HEART),
+        Card(Value.SIX, Suit.HEART)
+    ]
     testScore(cards, HandRanking.STRAIGHT_FLUSH)
 
     # Royal flush
     print("Royal flush")
-    cards = [Card(Value.TEN, Suit.HEART), Card(Value.JACK, Suit.HEART), Card(Value.QUEEN, Suit.HEART), Card(Value.KING, Suit.HEART), Card(Value.ACE, Suit.HEART)]
+    cards = [
+        Card(Value.TEN, Suit.HEART),
+        Card(Value.JACK, Suit.HEART),
+        Card(Value.QUEEN, Suit.HEART),
+        Card(Value.KING, Suit.HEART),
+        Card(Value.ACE, Suit.HEART)
+    ]
     testScore(cards, HandRanking.ROYAL_FLUSH)
 
     # > 5 cards
     print("> 5 cards")
-    cards = [Card(Value.TWO, Suit.HEART), Card(Value.THREE, Suit.SPADE), Card(Value.FOUR, Suit.CLUB), Card(Value.FIVE, Suit.DIAMOND), Card(Value.SIX, Suit.HEART), Card(Value.SEVEN, Suit.HEART), Card(Value.EIGHT, Suit.HEART)]
+    cards = [
+        Card(Value.TWO, Suit.HEART),
+        Card(Value.THREE, Suit.SPADE),
+        Card(Value.FOUR, Suit.CLUB),
+        Card(Value.FIVE, Suit.DIAMOND),
+        Card(Value.SIX, Suit.HEART),
+        Card(Value.SEVEN, Suit.HEART),
+        Card(Value.EIGHT, Suit.HEART)
+    ]
     testScore(cards, HandRanking.STRAIGHT)
 
     # < 5 cards
     print("< 5 cards")
-    cards = [Card(Value.TWO, Suit.HEART), Card(Value.THREE, Suit.SPADE), Card(Value.FOUR, Suit.CLUB), Card(Value.FIVE, Suit.DIAMOND)]
+    cards = [
+        Card(Value.TWO, Suit.HEART),
+        Card(Value.THREE, Suit.SPADE),
+        Card(Value.FOUR, Suit.CLUB),
+        Card(Value.FIVE, Suit.DIAMOND)
+    ]
     testScore(cards, HandRanking.HIGH_CARD)
 
     # No cards
