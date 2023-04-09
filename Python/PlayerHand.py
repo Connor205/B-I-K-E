@@ -50,6 +50,7 @@ class PlayerHand():
             bool: True if the card was added, false if the player already has 2 cards.
         """
         if len(self.holeCards) >= 2:
+            print("ERROR: Player already has 2 hole cards")
             return False
         self.holeCards.append(card)
         return True
