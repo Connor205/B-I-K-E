@@ -25,7 +25,11 @@ class PokerGameController():
         self.turret = turret
         self.shuffler = shuffler
 
+        # Create a round
         self.model.createRound()
+
+        # Update the view to reflect the new round
+        self.view.createFromModel()
 
     def numToSeat(self, num: int) -> Seat:
         """
@@ -100,6 +104,7 @@ class PokerGameController():
             player = self.model.getPlayerFromSeat(seat)
             if player is not None:
                 player.toggleReady()
+                self.view.setPlayerReady(seat, player.isReady)
                 self.logger.debug("Toggled ready for player: " + str(player))
             else:
                 self.logger.error("Tried to toggle ready on a non-existent player")
@@ -115,8 +120,7 @@ class PokerGameController():
                 if self.model.inSettings:
                     self.addPlayer(seat)
                 else:
-                    self.resetBet(seat)
-                    self.makeBet(seat)
+                    self.check(seat)
             case Button.CALL:
                 if self.model.inSettings:
                     self.changeBlinds(seat)
@@ -181,15 +185,18 @@ class PokerGameController():
         # Based on input from the buttons for each player
         # Update the potential bet amount in the model
         # Update the bet amount displayed in the view
-        self.model.resetBet(seat)
-        # TODO: Update the view to reflect the bet amount
+        if self.model.resetBet(seat):
+            self.view.updatePlayerBet(seat, 0)
 
     def makeBet(self, seat: Seat) -> None:
         # Based on input from the buttons for each player
         # Update the bet amount displayed in view
         # Update the model to reflect the bet amount
-        self.model.makeBet(seat)
-        # TODO: Update the view to reflect the bet amount
+        success, amount = self.model.makeBet(seat)
+        if success:
+            self.view.updatePlayerBet(seat, amount)
+            self.view.updatePlayerChips(seat, self.model.getPlayerFromSeat(seat).stackSize)
+            self.view.updatePot(self.model.getPotSize())
 
     def fold(self, seat: Seat) -> None:
         # Based on input from the buttons for each player
@@ -198,11 +205,21 @@ class PokerGameController():
         if self.model.fold(seat):
             self.view.fold(seat)
 
+    def check(self, seat: Seat) -> None:
+        # Based on input from the buttons for each player
+        # Based on the seat mapping, updates model to check those players
+        # Update the view to reflect the check
+        self.resetBet(seat)
+        self.makeBet(seat)
+
     def call(self, seat: Seat) -> None:
         # Based on input from the buttons for each player
         # Based on the seat mapping, updates model to call those players
-        # TODO: Update the view to reflect the call
-        self.model.call(seat)
+        success, amount = self.model.call(seat)
+        if success:
+            self.view.updatePlayerBet(seat, amount)
+            self.view.updatePlayerChips(seat, self.model.getPlayerFromSeat(seat).stackSize)
+            self.view.updatePot(self.model.getPotSize())
 
     def ready(self, seat: Seat) -> None:
         # Based on input from the buttons for each player
@@ -243,6 +260,9 @@ class PokerGameController():
 
         # Starting a round
         if self.model.getCurrentRoundState() == GameState.PREPARING and self.model.allReadyStatus():
+            # Remove the ready status text from all players in view
+            self.view.clearReadyStatusText()
+
             # TODO: Update the view to say "Please put cards in and press deal confirm"
 
             # Call the blocking method for the turret, waiting for confirmation button

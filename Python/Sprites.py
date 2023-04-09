@@ -135,7 +135,7 @@ class CardSprite(pygame.sprite.Sprite):
 
 class TableSprite(pygame.sprite.Sprite):
     """Sprite representing the table."""
-    TABLE_PATH = "Python/img/Table.png"
+    TABLE_PATH = "img/Table.png"
     srcImage: pygame.Surface
     image: pygame.Surface
     rect: pygame.Rect

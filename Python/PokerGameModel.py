@@ -88,7 +88,7 @@ class PokerGameModel():
         else:
             return False
 
-    def makeBet(self, seat) -> bool:
+    def makeBet(self, seat) -> tuple[bool, int]:
         # Confirms the bet amount made from updateBet and updates
         # both the player amount and pot size for the round
         # call getPlayerFromSeat
@@ -99,7 +99,7 @@ class PokerGameModel():
         # return true if successful, false if not
         player = self.getPlayerFromSeat(seat)
         if player == None:
-            return False
+            return (False, 0)
         return self.currentRound.makeBet(player)
 
     def fold(self, seat) -> bool:
@@ -111,15 +111,15 @@ class PokerGameModel():
         # return true if successful, false if not
         player = self.getPlayerFromSeat(seat)
         if (self.isPlayerTurn(player) and self.player.potentialBet == 0):
-            self.currentRound.fold()
+            self.currentRound.playerFolds()
             return True
         elif (self.isPlayerTurn(player) and self.player.potentialBet != 0):
-            player.potentialBet = 0
+            player.resetBet()
             return False
         else:
             return False
 
-    def call(self, seat: Seat) -> bool:
+    def call(self, seat: Seat) -> tuple[bool, int]:
         # Based on the seat mapping, call that player
         # call makeBet with betSize = pokerRound.betToMatch
         # return true if successful, false if not
@@ -165,4 +165,6 @@ class PokerGameModel():
     def getRemainingCards(self) -> int:
         # returns the number of cards left in the deck
         return 52 - self.currentRound.cardsDealt
+    def getPotSize(self) -> int:
+        return self.currentRound.potSize
         

@@ -357,6 +357,28 @@ class PokerGameView:
         elif seatNumber == Seat.FOUR:
             return self.player4CardSprites
         
+    def createFromModel(self) -> None:
+        """
+        Method to create the sprites from the model
+        """
+        currentRound = self.model.currentRound
+
+        # Create the pot
+        self.createPot()
+        self.updatePot(currentRound.potSize)
+
+        # Create the player hubs
+        for player in currentRound.players:
+            self.createPlayerHub(player.seatNumber)
+            self.updatePlayerChips(player.seatNumber, player.stackSize)
+            self.updatePlayerBet(player.seatNumber, player.potentialBet)
+            self.updatePlayerName(player.seatNumber, player.name)
+            self.setPlayerReady(player.seatNumber, player.isReady)
+
+        # Assign the small and big blind
+        self.setBlind(currentRound.getSmallBlindPlayer().seatNumber, Blind.SB)
+        self.setBlind(currentRound.getBigBlindPlayer().seatNumber, Blind.BB)
+        
     # TODO: Method to display the menu
     # Update the text menu items based on the model
     # or have the item to be updated passed as an arg but makes more sense to have the model passed
@@ -479,6 +501,89 @@ class PokerGameView:
         # Create the text for the player blind
         newSprite = TextSprite(blindType.name, self.FONT_PATH, self.FONT_HEIGHT, self.FONT_COLOR, positions["blind"], playerGroup)
         newSprite = None
+
+    def removeBlind(self, seatNumber: Seat) -> None:
+        """
+        Method to remove the blind for a player
+
+        Args:
+            seatNumber (Seat): The seat number of the player
+        """
+        # Get the sprite group for the player
+        playerGroup = self.getPlayerGroup(seatNumber)
+
+        # The player group should be created and have exactly 4 sprites
+        # If it isn't, log an error and return
+        if len(playerGroup) != 4:
+            logging.error("Trying to remove a blind for a player with an invalid number of sprites")
+            return
+
+        # Remove the blind sprite
+        playerGroup.remove(playerGroup.sprites()[3])
+
+    def clearReadyStatusText(self) -> None:
+        """
+        Method to clear the ready states for all players
+        """
+        currentRound = self.model.currentRound
+
+        for player in currentRound.players:
+            self.updatePlayerName(player.seatNumber, player.name, growShrink=False)
+
+    def setPlayerReady(self, seatNumber: Seat, status: bool) -> None:
+        """
+        Method to toggle the ready state for a player
+
+        Args:
+            seatNumber (Seat): The seat number of the player
+            status (bool): The ready state
+        """
+        # Get the sprite group for the player
+        playerGroup = self.getPlayerGroup(seatNumber)
+
+        if len(playerGroup) == 0:
+            logging.error("Trying to toggle the ready state for an empty player group")
+            return
+
+        # Get the player name text sprite - at index 0
+        playerNameSprite = playerGroup.sprites()[0]
+
+        # Toggle the ready state
+        statusText = " (Ready)" if status else " (Not Ready)"
+
+        # Find within the sprite text if there's already a status text in ()
+        # If there is, remove it
+        if " (" in playerNameSprite.text:
+            playerNameSprite.text = playerNameSprite.text[:playerNameSprite.text.find(" (")]
+
+        # Update the text
+        self.updatePlayerName(seatNumber, playerNameSprite.text + statusText, growShrink=False)
+
+    def updatePlayerName(self, seatNumber: Seat, newName: str, growShrink: bool = True) -> None:
+        """
+        Method to update the player name
+
+        Args:
+            seatNumber (Seat): The seat number of the player
+            newName (str): The new name
+        """
+
+        # Get the sprite group for the player
+        playerGroup = self.getPlayerGroup(seatNumber)
+
+        if len(playerGroup) == 0:
+            logging.error("Trying to update the player name for an empty player group")
+            return
+
+        # Get the player name text sprite - at index 0
+        playerNameSprite = playerGroup.sprites()[0]
+
+        # Update the text
+        playerNameSprite.write(newName)
+
+        # Grow and shrink the text if needed
+        if growShrink:
+            playerNameSprite.growShrinkOnce()
 
     def updatePlayerChips(self, seatNumber: Seat, newChipValue: int) -> None:
         """

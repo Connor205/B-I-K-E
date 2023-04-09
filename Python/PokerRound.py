@@ -61,13 +61,13 @@ class PokerRound():
             self.advanceRound()
         return len(self.players) == origSize - 1
     
-    def makeBet(self, player: Player) -> bool:
+    def makeBet(self, player: Player) -> tuple[bool, int]:
         if player != self.currentPlayer:
-            return False
+            return (False, 0)
 
         playerBet = player.potentialBet
         if playerBet < self.betToMatch and playerBet != player.stackSize:
-            return False
+            return (False, 0)
         if player.makeBet():
             self.potSize += playerBet
             if player.commitment > self.betToMatch:
@@ -75,9 +75,9 @@ class PokerRound():
             self.currentPlayer = self.players[(self.turnIndex + 1) % len(self.players)]
             if self.checkAllMatched():
                 self.advanceRound()
-            return True
+            return (True, playerBet)
         else:
-            return False
+            return (False, 0)
         
     def checkAllMatched(self) -> bool:
         allMatched = True
@@ -159,6 +159,7 @@ class PokerRound():
         for player in self.players:
             player.resetCommitment()
         return True
+
     def addPlayer(self, player: Player) -> bool:
         """
         Adds a player to the round
@@ -286,7 +287,7 @@ class PokerRound():
         player.resetBet()
         return True
     
-    def call(self, player: Player) -> bool:
+    def call(self, player: Player) -> tuple[bool, int]:
         if player != self.currentPlayer:
             return False
         player.setBet(self.betToMatch)
@@ -305,3 +306,9 @@ class PokerRound():
         self.smallBlindIndex += 1 % len(self.players)
         self.betToMatch = 0
         self.currentPlayer = self.players[self.smallBlindIndex]
+
+    def getSmallBlindPlayer(self) -> Player:
+        return self.players[self.smallBlindIndex]
+
+    def getBigBlindPlayer(self) -> Player:
+        return self.players[(self.smallBlindIndex + 1) % len(self.players)]
