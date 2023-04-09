@@ -112,19 +112,11 @@ class PokerRound():
                 self.makeBet(bigBlindPlayer)
 
                 # Deal cards
-                for i in range(2):
+                for _ in range(2):
                     for player in self.players:
                         card = self.deck.drawCard()
-                        print("Dealt " + str(card) + " to " + player.name)
                         self.cardsDealt += 1
                         player.addCard(card)
-                        # player.hand.holeCards.append(card)
-                        for card in player.hand.holeCards:
-                            print(card)
-                        # print(player.hand.holeCards[i])
-                # debug print all the players' cards
-                for player in self.players:
-                    print(player.name + " has " + str(player.hand.getHoleCards()[0]) + " and " + str(player.hand.getHoleCards()[1]))
                 return True
             case GameState.FLOP:
                 self.logger.debug("Advancing state to FLOP")

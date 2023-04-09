@@ -10,7 +10,7 @@ from Enums import *
 
 class PokerGameView:
     # CONSTANTS
-    FONT_PATH = "Python/fonts/Designer.otf"
+    FONT_PATH = "fonts/Designer.otf"
     FONT_COLOR = (0, 0, 0)
     POPUP_FONT_COLOR = (0, 0, 0)
     # Sizes denote the actual sizes/lengths
@@ -660,7 +660,7 @@ class PokerGameView:
             self.logger.error("Trying to deal a card to a player who already has two cards")
             return
         # Deal the card
-        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, cardPosition, showCard=True, group=playerCardGroup)
+        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, cardPosition, showCard=False, group=playerCardGroup)
 
     # TODO: Method to indicate the player is the winner
     # Needs to be passed the player number
