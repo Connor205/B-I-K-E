@@ -56,6 +56,9 @@ class Arduino:
         # This is a blocking call
         try:
             input = self.ser.read_until(b'\n').decode('utf-8').strip()
+            if ':' not in input:
+                self.logger.warning("Invalid Input: {}".format(input))
+                return
             command, value = input.split(':')
             self.logger.debug("Command: {} | Value: {}".format(command, value))
             self.read_handler(command, value)
