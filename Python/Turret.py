@@ -43,19 +43,17 @@ class Turret(Arduino):
         self.sendCommand("player", [seat.value])
         self.logger.debug("Dealing to seat: {}".format(seat))
 
-    def dealCommunityCards(self, cardsToDeal: int):
-        # TODO: Deal the given number of community cards
-        # raise NotImplementedError("dealCommunityCards is not implemented")
-        self.logger.debug("Dealing {} community cards".format(cardsToDeal))
-
     def dealRiver(self):
         self.logger.debug("Dealing river")
+        self.sendCommand("river")
 
     def dealFlop(self):
         self.logger.debug("Dealing flop")
+        self.sendCommand("flop")
 
     def dealTurn(self):
         self.logger.debug("Dealing turn")
+        self.sendCommand("turn")
 
     def dealDiscard(self, cardsToDiscard: int):
         for i in range(cardsToDiscard):
