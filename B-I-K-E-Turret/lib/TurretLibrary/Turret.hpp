@@ -21,10 +21,15 @@ public:
     bool cardInFlywheelBarrel();
 
     // Turret Actions
-    void dealSingleCard();
+    void dealSingleCard(bool player = true);
+    void dealToCommunity();
 
     void dealToPlayer(int playerNumber);
     void dealToAllPlayers();
+    void dealFlop();
+    void dealTurn();
+    void dealRiver();
+    void discard();
 
 private:
     StepperMotor turretMotor;

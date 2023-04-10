@@ -1,6 +1,7 @@
 from Arduino import Arduino
 from typing import *
 from Enums import Seat
+import time
 
 
 class Turret(Arduino):
@@ -17,9 +18,6 @@ class Turret(Arduino):
     def turn_to_angle(self, angle: int):
         self.sendCommand("TURN", values=[angle])
 
-    def shoot_card(self, distance: int):
-        self.sendCommand("FIRE", [distance])
-
     def activateFlywheel(self):
         self.sendCommand("flywheelOn")
 
@@ -34,22 +32,24 @@ class Turret(Arduino):
 
     def return_cards(self):
         raise NotImplementedError("return_cards is not implemented")
-    
+
     def waitForConfirmation(self):
-        # TODO: Blocking call to wait 
         self.logger.debug("Waiting for confirmation")
+        self.sendCommand("waitForConfirmation")
+        time.sleep(0.25)
+        self.waitForReady()
 
     def dealToSeat(self, seat: Seat):
-        # TODO: Given a seat, deal a card to that seat
-        # raise NotImplementedError("dealToSeat is not implemented")
+        self.sendCommand("player", [seat.value])
         self.logger.debug("Dealing to seat: {}".format(seat))
-    
+
     def dealCommunityCards(self, cardsToDeal: int):
         # TODO: Deal the given number of community cards
         # raise NotImplementedError("dealCommunityCards is not implemented")
         self.logger.debug("Dealing {} community cards".format(cardsToDeal))
-    
+
     def dealDiscard(self, cardsToDiscard: int):
-        # TODO: Discard the given number of cards
-        # raise NotImplementedError("dealDiscard is not implemented")
+        for i in range(cardsToDiscard):
+            self.sendCommand("discard")
+            time.sleep(0.25)
         self.logger.debug("Dealing {} discard cards".format(cardsToDiscard))

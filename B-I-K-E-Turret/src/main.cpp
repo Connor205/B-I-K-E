@@ -11,22 +11,6 @@ void stopForever()
     }
 }
 
-void testTurretAccuracy() { }
-
-void photoTest()
-{
-    while (true) {
-        int reading = turret.getBarrelReading();
-        writeInfo("Photoresistor reading: " + String(reading));
-        // if (reading < FLYWHEEL_BARREL_SENSOR_THRESHOLD) {
-        //     writeInfo("Card Firing");
-        //     turret.powerFlywheel(false);
-        //     turret.powerIndexer(false);
-        //     break;
-        // }
-    }
-}
-
 void sprayCards()
 {
     turret.powerFlywheel(true);
@@ -61,20 +45,34 @@ void serialReactions()
     } else if (input.equals("off")) {
         turret.powerFlywheel(false);
         turret.powerIndexer(false);
-    } else if (input.equals("test")) {
-        testTurretAccuracy();
     } else if (input.equals("move")) {
         waitForSerialInput();
         int x = Serial.parseInt();
         // Write info to serial
         writeInfo("Moving to " + String(x));
         turret.turnToAngle(x);
-    } else if (input.equals("photoTest")) {
-        photoTest();
+    } else if (input.equals("player")) {
+        waitForSerialInput();
+        int x = Serial.parseInt();
+        // Write info to serial
+        turret.dealToPlayer(x);
     } else if (input.equals("deal")) {
         turret.dealSingleCard();
     } else if (input.equals("players")) {
         turret.dealToAllPlayers();
+    } else if (input.equals("flop")) {
+        turret.dealFlop();
+    } else if (input.equals("turn")) {
+        turret.dealTurn();
+    } else if (input.equals("river")) {
+        turret.dealRiver();
+    } else if (input.equals("discard")) {
+        turret.discard();
+    } else if (input.equals("waitForConfirmation")) {
+        writeState("Waiting For Confirmation");
+        while (digitalRead(CONFIRMATION_BUTTON_PIN) == HIGH) {
+            delay(50);
+        }
     } else {
         writeError("Invalid Command");
     }
@@ -85,13 +83,7 @@ void setup()
     Serial.begin(9600);
     turret.init();
     turret.calibrate();
+    pinMode(CONFIRMATION_BUTTON_PIN, INPUT_PULLUP);
 }
 
-void loop()
-{
-    serialReactions();
-    // turret.dealSingleCard();
-    // turret.powerFlywheel(true);
-    // turret.powerIndexer(true);
-    // stopForever();
-}
+void loop() { serialReactions(); }

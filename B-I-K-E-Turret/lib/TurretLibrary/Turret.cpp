@@ -110,20 +110,61 @@ int Turret::getBarrelReading()
     return map(sensorValue, 0, 1023, 0, 255);
 }
 
-void Turret::dealSingleCard()
+void Turret::dealSingleCard(bool player)
 {
+    analogWrite(INDEXER_SPEED_PIN, 1023);
     this->powerFlywheel(true);
-    delay(250);
+    delay(100);
     this->powerIndexer(true);
     while (this->cardInFlywheelBarrel()) {
-        writeInfo("Waiting for card to leave barrel" + String(this->getBarrelReading()));
+        // writeInfo("Waiting for card to leave barrel" + String(this->getBarrelReading()));
         delay(5);
     }
-    analogWrite(INDEXER_SPEED_PIN, 255);
     this->powerIndexer(true, true);
     delay(500);
     this->powerIndexer(false);
-    // this->powerFlywheel(false);
+}
+
+void Turret::dealToCommunity()
+{
+    analogWrite(INDEXER_SPEED_PIN, 210);
+    this->powerFlywheel(true);
+    delay(100);
+    this->powerIndexer(true);
+    while (this->cardInFlywheelBarrel()) {
+        // writeInfo("Waiting for card to leave barrel" + String(this->getBarrelReading()));
+        delay(5);
+    }
+    this->powerIndexer(true, true);
+    delay(500);
+    this->powerIndexer(false);
+}
+
+void Turret::dealFlop()
+{
+    this->turnToAngle(120);
+    delay(100);
+    this->dealToCommunity();
+    this->turnToAngle(105);
+    delay(100);
+    this->dealToCommunity();
+    this->turnToAngle(90);
+    delay(100);
+    this->dealToCommunity();
+}
+
+void Turret::dealTurn()
+{
+    this->turnToAngle(75);
+    delay(100);
+    this->dealToCommunity();
+}
+
+void Turret::dealRiver()
+{
+    this->turnToAngle(60);
+    delay(100);
+    this->dealToCommunity();
 }
 
 void Turret::dealToPlayer(int playerNumber)
@@ -133,8 +174,15 @@ void Turret::dealToPlayer(int playerNumber)
         return;
     }
     this->turnToAngle(PLAYER_ANGLES[playerNumber]);
-    delay(250);
+    delay(100);
     this->dealSingleCard();
+}
+
+void Turret::discard()
+{
+    this->turnToAngle(180);
+    delay(100);
+    this->dealToCommunity();
 }
 
 void Turret::dealToAllPlayers()

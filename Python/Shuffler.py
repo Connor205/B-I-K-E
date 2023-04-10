@@ -131,15 +131,16 @@ def classify_card(frame) -> Card:
     value = value_classes[value_index]
     value = convert_value_string(value)
 
+    accuracy = np.max(suit) * np.max(value)
+
     ret = Card(value, suit)
-    print(ret)
 
     cv2.imshow("Number", cropped_number)
     cv2.imshow("Suit", cropped_suit)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-    return ret
+    return ret, accuracy
 
 
 def main():
@@ -154,22 +155,27 @@ def main():
     while (True):
         shuffler.waitForConfirm()
         shuffler.logger.debug("Shuffling")
-        # Generate a list of slots to put the cards in, 1-> 52
-        slots = list(range(0, 52))
-        # Shuffle the list
-        random.shuffle(slots)
         # Create a blank list of 52 cards
         cards = [None] * 52
         # now for each slot in the list, put a card in it
-        for i, slot in enumerate(slots):
-            shuffler.logger.debug("Putting card {} in slot {}".format(i, slot))
+        for i in range(52):
             # First we want to take a photo and identify the card
             # Read the image from the camera
             ret, frame = cap.read()
             # Convert the image to grayscale
-            identified_card = classify_card(frame)
+            identified_card, confidence = classify_card(frame)
             shuffler.logger.debug(
-                "Identified card: {}".format(identified_card))
+                "Identified card: {} with confidence: {}".format(
+                    identified_card, confidence))
+            if confidence < 0.9:
+                # put the card as far back as possible
+                slot = 51
+                while cards[slot] is not None:
+                    slot -= 1
+            else:
+                # Randomly select a slot of the remaining slots
+                possible_slots = [i for i, x in enumerate(cards) if x is None]
+                slot = random.choice(possible_slots)
             cards[slot] = identified_card
             # Now we want to put the card in the slot
             shuffler.dispense()
