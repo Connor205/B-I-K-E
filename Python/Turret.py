@@ -40,7 +40,7 @@ class Turret(Arduino):
         self.waitForReady()
 
     def dealToSeat(self, seat: Seat):
-        self.sendCommand("player", [seat.value])
+        self.sendCommand("player", [seat.value - 1])
         self.logger.debug("Dealing to seat: {}".format(seat))
 
     def dealRiver(self):
