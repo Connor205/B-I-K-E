@@ -144,17 +144,20 @@ class PokerGameController():
                 match button:
                     case Button.FOLD:
                         if self.model.inSettings:
-                            self.removePlayer(seat)
+                            # self.removePlayer(seat)
+                            pass
                         else:
                             self.fold(seat)
                     case Button.CHECK:
                         if self.model.inSettings:
-                            self.addPlayer(seat)
+                            # self.addPlayer(seat)
+                            pass
                         else:
                             self.check(seat)
                     case Button.CALL:
                         if self.model.inSettings:
-                            self.changeBlinds(seat)
+                            # self.changeBlinds(seat)
+                            pass
                         else:
                             self.call(seat)
                     case Button.BET:
@@ -334,7 +337,11 @@ class PokerGameController():
     def settings(self) -> None:
         # Toggle the settings menu
         self.model.toggleSettings()
-        # TODO: Update the view to reflect the settings menu
+        
+        if self.model.inSettings:
+            self.view.createPopup("Settings Menu Active", "Press settings button to return to game")
+        else:
+            self.view.clearPopups()
 
     def update(self) -> None:
 
