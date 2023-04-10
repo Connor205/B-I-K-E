@@ -12,7 +12,7 @@ class Interface(Arduino):
                  buttonFunction: Callable = None,
                  baud=115200):
         super().__init__(port, baud)
-        self.logger = logging.getLogger(__name__)
+        self.logger.info("Interface Initialized")
         self.buttonFunction = buttonFunction
 
     def read_handler(self, command: str, value: str):

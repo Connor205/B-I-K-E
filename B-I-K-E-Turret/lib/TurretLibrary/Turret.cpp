@@ -123,6 +123,7 @@ void Turret::dealSingleCard(bool player)
     this->powerIndexer(true, true);
     delay(500);
     this->powerIndexer(false);
+    this->powerFlywheel(false);
 }
 
 void Turret::dealToCommunity()
@@ -138,6 +139,7 @@ void Turret::dealToCommunity()
     this->powerIndexer(true, true);
     delay(500);
     this->powerIndexer(false);
+    this->powerFlywheel(false);
 }
 
 void Turret::dealFlop()

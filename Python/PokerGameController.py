@@ -6,6 +6,7 @@ from Turret import Turret
 from Enums import Button, Seat, GameState
 from Constants import *
 from typing import Tuple
+from Interface import Interface
 
 class PokerGameController():
     logger: logging.Logger
@@ -22,6 +23,7 @@ class PokerGameController():
         self.model = model
         self.view = view
         self.turret = turret
+        self.interface = Interface("/dev/ttyUSB0", self.buttonListener)
 
         # Create a round
         self.model.createRound()
@@ -326,6 +328,7 @@ if __name__ == "__main__":
     model = PokerGameModel()
     view = PokerGameView(model)
     turret = Turret("/dev/tty.Bluetooth-Incoming-Port")
+    
     controller = PokerGameController(model, view, turret)
 
     playerNum = 0
