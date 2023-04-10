@@ -20,7 +20,7 @@ class Arduino:
     ):
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(logging.DEBUG)
-        # self.logger.addHandler(logging.StreamHandler(sys.stdout))
+        self.logger.addHandler(logging.StreamHandler(sys.stdout))
 
         self.port = port
         self.baud = baud
