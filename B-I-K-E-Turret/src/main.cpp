@@ -68,6 +68,16 @@ void serialReactions()
         turret.dealRiver();
     } else if (input.equals("discard")) {
         turret.discard();
+    } else if (input.equals("spray")) {
+        sprayCards();
+    } else if (input.equals("eject")) {
+        writeState("Ejecting");
+        turret.powerFlywheel(true);
+        turret.turnToAngle(180);
+        turret.powerIndexer(true);
+        delay(8000);
+        turret.powerIndexer(false);
+        turret.powerFlywheel(false);
     } else if (input.equals("waitForConfirmation")) {
         writeState("Waiting For Confirmation");
         while (digitalRead(CONFIRMATION_BUTTON_PIN) == HIGH) {

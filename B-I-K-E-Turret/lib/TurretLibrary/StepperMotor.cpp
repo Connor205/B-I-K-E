@@ -1,6 +1,7 @@
 #include "StepperMotor.hpp"
 #include "TurretConstants.hpp"
 #include <Arduino.h>
+#include <Utils.h>
 
 StepperMotor::StepperMotor(int stepPin, int dirPin, int calibrationPin, int maxSpeed)
 {
@@ -31,7 +32,7 @@ void StepperMotor::init()
 void StepperMotor::calibrate()
 {
     // Step until limit switch is hit
-    Serial.println("Calibrating...");
+    writeInfo("Calibrating...");
     setDirection(true);
     float speed = this->currentSpeed;
     setSpeed(this->currentSpeed / 6.0f);
@@ -43,7 +44,7 @@ void StepperMotor::calibrate()
         }
         stepMotor();
     }
-    Serial.println("Calibration Complete");
+    writeInfo("Calibration Complete");
     setSpeed(speed);
     // Set current to 0
     this->current = 0;

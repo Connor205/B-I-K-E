@@ -56,7 +56,11 @@ class Turret(Arduino):
         self.sendCommand("turn")
 
     def dealDiscard(self, cardsToDiscard: int):
-        for i in range(cardsToDiscard):
-            self.sendCommand("discard")
-            time.sleep(0.25)
         self.logger.debug("Dealing {} discard cards".format(cardsToDiscard))
+        if cardsToDiscard > 3:
+            self.sendCommand("eject")
+            self.waitForReady()
+        else:
+            for i in range(cardsToDiscard):
+                self.sendCommand("discard")
+                time.sleep(0.25)
