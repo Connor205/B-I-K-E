@@ -7,12 +7,15 @@ from Enums import Button, Seat, GameState
 from Constants import *
 from typing import Tuple
 from Interface import Interface
+from threading import Lock 
 
 class PokerGameController():
     logger: logging.Logger
     model: PokerGameModel
     view: PokerGameView
     turret: Turret
+    lock: Lock
+
 
     def __init__(self, model, view, turret) -> None:
         # init the logger
@@ -24,6 +27,8 @@ class PokerGameController():
         self.view = view
         self.turret = turret
         self.interface = Interface("/dev/ttyUSB0", self.buttonListener)
+
+        self.lock = Lock()
 
         # Create a round
         self.model.createRound()
@@ -94,94 +99,95 @@ class PokerGameController():
         Args:
             buttonStatus (Tuple[int, int]): Tuple containing the button number and the panel number
         """
-        button = self.numToButton(buttonStatus[0])
-        seat = self.numToSeat(buttonStatus[1])
+        with self.lock:
+            button = self.numToButton(buttonStatus[0])
+            seat = self.numToSeat(buttonStatus[1])
 
-        origState = self.model.getCurrentRoundState()
-        self.logger.debug("origState: " + str(origState))
+            origState = self.model.getCurrentRoundState()
+            self.logger.debug("origState: " + str(origState))
 
-        # If the gamestate is preparing, any button press will ready the player
-        if origState == GameState.PREPARING:
-            player = self.model.getPlayerFromSeat(seat)
-            if player is not None:
-                player.toggleReady()
-                self.view.setPlayerReady(seat, player.isReady)
-                self.logger.debug("Toggled ready for player: " + str(player))
-            else:
-                self.logger.error("Tried to toggle ready on a non-existent player")
-             # Starting a round
-            if self.model.allReadyStatus():
-                # Remove the ready status text from all players in view
-                self.view.clearReadyStatusText()
+            # If the gamestate is preparing, any button press will ready the player
+            if origState == GameState.PREPARING:
+                player = self.model.getPlayerFromSeat(seat)
+                if player is not None:
+                    player.toggleReady()
+                    self.view.setPlayerReady(seat, player.isReady)
+                    self.logger.debug("Toggled ready for player: " + str(player))
+                else:
+                    self.logger.error("Tried to toggle ready on a non-existent player")
+                # Starting a round
+                if self.model.allReadyStatus():
+                    # Remove the ready status text from all players in view
+                    self.view.clearReadyStatusText()
 
-                # TODO: Update the view to say "Please put cards in and press deal confirm"
+                    # TODO: Update the view to say "Please put cards in and press deal confirm"
 
-                # Call the blocking method for the turret, waiting for confirmation button
-                self.turret.waitForConfirmation()
+                    # Call the blocking method for the turret, waiting for confirmation button
+                    self.turret.waitForConfirmation()
 
-                # If in state preparing, we just advance the round to start it
-                self.model.advanceRound()
+                    # If in state preparing, we just advance the round to start it
+                    self.model.advanceRound()
 
-        elif origState == GameState.POSTHAND:
-            # If the gamestate is posthand, any button press will reset the round
-            if self.model.resetRound():
-                self.view.resetRound()
-                self.view.updateFromModel()
-        
-        else:
-            match button:
-                case Button.FOLD:
-                    if self.model.inSettings:
-                        self.removePlayer(seat)
-                    else:
-                        self.fold(seat)
-                case Button.CHECK:
-                    if self.model.inSettings:
-                        self.addPlayer(seat)
-                    else:
-                        self.check(seat)
-                case Button.CALL:
-                    if self.model.inSettings:
-                        self.changeBlinds(seat)
-                    else:
-                        self.call(seat)
-                case Button.BET:
-                    if not self.model.inSettings:
-                        self.makeBet(seat)
-                case Button.WHITE_CHIP:
-                    if not self.model.inSettings:
-                        self.updateBet(seat, WHITE_CHIP_VALUE)
-                case Button.RED_CHIP:
-                    if not self.model.inSettings:
-                        self.updateBet(seat, RED_CHIP_VALUE)
-                case Button.BLUE_CHIP:
-                    if not self.model.inSettings:
-                        self.updateBet(seat, BLUE_CHIP_VALUE)
-                case Button.SETTINGS:
-                    self.settings()
-                case Button.SHUFFLECONFIRM:
-                    if self.model.shuffleWait:
-                        self.shuffle()
-                case Button.DEALCONFIRM:
-                    if self.model.dealWait:
-                        self.deal()
-                case _:
-                    raise NotImplementedError("Unrecognized button")
+            elif origState == GameState.POSTHAND:
+                # If the gamestate is posthand, any button press will reset the round
+                if self.model.resetRound():
+                    self.view.resetRound()
+                    self.view.updateFromModel()
             
-        newState = self.model.getCurrentRoundState()
-        self.logger.debug("newState: " + str(newState))
-        self.logger.debug("game potsize: " + str(self.model.currentRound.potSize))
+            else:
+                match button:
+                    case Button.FOLD:
+                        if self.model.inSettings:
+                            self.removePlayer(seat)
+                        else:
+                            self.fold(seat)
+                    case Button.CHECK:
+                        if self.model.inSettings:
+                            self.addPlayer(seat)
+                        else:
+                            self.check(seat)
+                    case Button.CALL:
+                        if self.model.inSettings:
+                            self.changeBlinds(seat)
+                        else:
+                            self.call(seat)
+                    case Button.BET:
+                        if not self.model.inSettings:
+                            self.makeBet(seat)
+                    case Button.WHITE_CHIP:
+                        if not self.model.inSettings:
+                            self.updateBet(seat, WHITE_CHIP_VALUE)
+                    case Button.RED_CHIP:
+                        if not self.model.inSettings:
+                            self.updateBet(seat, RED_CHIP_VALUE)
+                    case Button.BLUE_CHIP:
+                        if not self.model.inSettings:
+                            self.updateBet(seat, BLUE_CHIP_VALUE)
+                    case Button.SETTINGS:
+                        self.settings()
+                    case Button.SHUFFLECONFIRM:
+                        if self.model.shuffleWait:
+                            self.shuffle()
+                    case Button.DEALCONFIRM:
+                        if self.model.dealWait:
+                            self.deal()
+                    case _:
+                        raise NotImplementedError("Unrecognized button")
+                
+            newState = self.model.getCurrentRoundState()
+            self.logger.debug("newState: " + str(newState))
+            self.logger.debug("game potsize: " + str(self.model.currentRound.potSize))
 
-        if newState != origState:
-            self.deal(newState)
+            if newState != origState:
+                self.deal(newState)
 
-        if newState != GameState.PREPARING:
-            self.view.indicatePlayerTurn(self.model.currentRound.currentPlayer.seatNumber)
+            if newState != GameState.PREPARING:
+                self.view.indicatePlayerTurn(self.model.currentRound.currentPlayer.seatNumber)
 
-        self.updateViewText()
+            self.updateViewText()
 
-        # just debug a lot of shit
-        self.logger.debug(str(self.model.currentRound.currentPlayer))
+            # just debug a lot of shit
+            self.logger.debug(str(self.model.currentRound.currentPlayer))
 
     def updatePlayers(self, seat: Seat) -> None:
         # Based on input from the Arduino-side,
@@ -316,7 +322,8 @@ class PokerGameController():
     def update(self) -> None:
 
         # Update the view to reflect the model
-        view.update()
+        with self.lock:
+            view.update()
 
     def debug(self) -> None:
         print(str(self.model.currentRound))
