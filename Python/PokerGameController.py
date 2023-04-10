@@ -242,7 +242,7 @@ class PokerGameController():
         if success:
             self.view.updatePlayerBet(seat, amount)
             self.view.updatePlayerChips(seat, self.model.getPlayerFromSeat(seat).stackSize)
-            self.view.updatePot(self.model.getPotSize())
+            self.view.updatePot(self.model.getPotSize(), growShrink=True)
             self.logger.debug("Made bet for player: " + str(seat))
 
     def fold(self, seat: Seat) -> None:
@@ -268,7 +268,7 @@ class PokerGameController():
         if success:
             self.view.updatePlayerBet(seat, amount)
             self.view.updatePlayerChips(seat, self.model.getPlayerFromSeat(seat).stackSize)
-            self.view.updatePot(self.model.getPotSize())
+            self.view.updatePot(self.model.getPotSize(), growShrink=True)
             self.logger.debug("Called player: " + str(seat))
 
     def ready(self, seat: Seat) -> None:
@@ -332,7 +332,11 @@ class PokerGameController():
         # Update each of the players' chips and bet amounts in the view based on the model
         for player in self.model.getPlayersInHand():
             self.view.updatePlayerChips(player.seatNumber, player.stackSize, growShrink=False)
-            self.view.updatePlayerBet(player.seatNumber, player.potentialBet)
+            # If the player's potential bet is 0, display their "to call" amount instead
+            if player.potentialBet == 0:
+                self.view.updatePlayerToCall(player.seatNumber, self.model.currentRound.betToMatch - player.commitment)
+            else:
+                self.view.updatePlayerBet(player.seatNumber, player.potentialBet)
     
     def settings(self) -> None:
         # Toggle the settings menu

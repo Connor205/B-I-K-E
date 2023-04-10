@@ -56,7 +56,7 @@ class PokerGameView:
     PLAYER_1_BET_POSITION = [int(PLAYER_1_HUB_POSITION[0]), int(PLAYER_1_STACK_POSITION[1] + 1.25 * FONT_HEIGHT)]
     PLAYER_1_BLIND_POSITION = [int(PLAYER_1_HUB_POSITION[0]), int(PLAYER_1_NAME_POSITION[1] - 1.25 * FONT_HEIGHT)]
 
-    PLAYER_2_HUB_POSITION = [int(TURRET_POSITION[0] - 0.13 * TABLE_SIZE[0]), int(TURRET_POSITION[1] + 0.45 * TABLE_SIZE[1])]
+    PLAYER_2_HUB_POSITION = [int(TURRET_POSITION[0] - 0.12 * TABLE_SIZE[0]), int(TURRET_POSITION[1] + 0.45 * TABLE_SIZE[1])]
     PLAYER_2_NAME_POSITION = [int(PLAYER_2_HUB_POSITION[0]), int(PLAYER_2_HUB_POSITION[1] - 0.75 * CARD_SIZE[1])]
     PLAYER_2_CARD_1_POSITION = [int(PLAYER_2_HUB_POSITION[0] - 0.6 * CARD_SIZE[0]), int(PLAYER_2_HUB_POSITION[1])]
     PLAYER_2_CARD_2_POSITION = [int(PLAYER_2_HUB_POSITION[0] + 0.6 * CARD_SIZE[0]), int(PLAYER_2_HUB_POSITION[1])]
@@ -64,7 +64,7 @@ class PokerGameView:
     PLAYER_2_BET_POSITION = [int(PLAYER_2_HUB_POSITION[0]), int(PLAYER_2_STACK_POSITION[1] + 1.25 * FONT_HEIGHT)]
     PLAYER_2_BLIND_POSITION = [int(PLAYER_2_HUB_POSITION[0]), int(PLAYER_2_NAME_POSITION[1] - 1.25 * FONT_HEIGHT)]
 
-    PLAYER_3_HUB_POSITION = [int(TURRET_POSITION[0] + 0.13 * TABLE_SIZE[0]), int(TURRET_POSITION[1] + 0.45 * TABLE_SIZE[1])]
+    PLAYER_3_HUB_POSITION = [int(TURRET_POSITION[0] + 0.12 * TABLE_SIZE[0]), int(TURRET_POSITION[1] + 0.45 * TABLE_SIZE[1])]
     PLAYER_3_NAME_POSITION = [int(PLAYER_3_HUB_POSITION[0]), int(PLAYER_3_HUB_POSITION[1] - 0.75 * CARD_SIZE[1])]
     PLAYER_3_CARD_1_POSITION = [int(PLAYER_3_HUB_POSITION[0] - 0.6 * CARD_SIZE[0]), int(PLAYER_3_HUB_POSITION[1])]
     PLAYER_3_CARD_2_POSITION = [int(PLAYER_3_HUB_POSITION[0] + 0.6 * CARD_SIZE[0]), int(PLAYER_3_HUB_POSITION[1])]
@@ -492,7 +492,7 @@ class PokerGameView:
         if growShrink:
             playerNameSprite.growShrinkOnce()
 
-    def updatePlayerChips(self, seatNumber: Seat, newChipValue: int, growShrink: bool = True) -> None:
+    def updatePlayerChips(self, seatNumber: Seat, newChipValue: int, growShrink: bool = False) -> None:
         """
         Method to update the player chips
 
@@ -540,6 +540,28 @@ class PokerGameView:
         # Update the text
         playerBetSprite.write("Bet: " + str(newBetValue))
 
+    def updatePlayerToCall(self, seatNumber: Seat, callAmount: int) -> None:
+        """
+        Method to update the player to call amount displayed where the bet is
+
+        Args:
+            seatNumber (Seat): The seat number of the player
+            callAmount (int): The amount to call
+        """
+
+        # Get the sprite group for the player
+        playerGroup = self.getPlayerGroup(seatNumber)
+
+        if len(playerGroup) == 0:
+            logging.error("Trying to update the player bet for an empty player group")
+            return
+
+        # Get the player bet text sprite - at index 2
+        playerBetSprite = playerGroup.sprites()[2]
+
+        # Update the text
+        playerBetSprite.write("To Call: " + str(callAmount))
+
     # TODO: Method to confirm the player bet
     # Needs to be passed the seat number of the player
     # Should display the bet text moving to the pot
@@ -547,7 +569,7 @@ class PokerGameView:
     def confirmPlayerBet(self, seatNumber: Seat) -> None:
         raise NotImplementedError("confirmPlayerBet not implemented")
 
-    def updatePot(self, newPotValue: int, growShrink: bool = True) -> None:
+    def updatePot(self, newPotValue: int, growShrink: bool = False) -> None:
         """
         Method to update the pot
 
