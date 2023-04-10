@@ -27,5 +27,9 @@ class Interface(Arduino):
 
         # Value is panel, buttonIndex
         panel, buttonIndex = value.split(',')
+        # Cast to ints
+        panel = int(panel)
+        buttonIndex = int(buttonIndex)
+
         self.logger.debug("Panel: {} | Button: {}".format(panel, buttonIndex))
         self.buttonFunction([buttonIndex, panel])
