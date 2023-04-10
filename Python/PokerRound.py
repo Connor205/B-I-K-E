@@ -36,6 +36,8 @@ class PokerRound():
         self.potSize = 0
         self.state = GameState.PREPARING
         self.deck = Deck()
+        # TODO: revert
+        self.deck.shuffleDeck()
         self.communityCards = []
         self.burnCards = []
         self.turnIndex = 0
@@ -49,14 +51,16 @@ class PokerRound():
 
     def initFourPlayers(self) -> None:
         self.players = [Player("Player 1", Seat.ONE), Player("Player 2", Seat.TWO), Player("Player 3", Seat.THREE), Player("Player 4", Seat.FOUR)]
-        self.overallPlayers = self.players
+        self.players = sorted(self.players, key=lambda x: x.seatNumber.value)
+        self.overallPlayers = self.players.copy()
 
     def playerFolds(self) -> bool:
         origSize = len(self.players)
         self.players.remove(self.currentPlayer)
-        self.currentPlayer = self.players[self.turnIndex % len(self.players)]
+        self.turnIndex = self.turnIndex % len(self.players)
+        self.currentPlayer = self.players[self.turnIndex]
         if len(self.players) == 1:
-            self.playerWins(self.players[0])
+            self.playerWins(self.currentPlayer)
             return True
         if self.startBettingRoundIndex > self.turnIndex:
             self.startBettingRoundIndex -= 1
@@ -69,12 +73,13 @@ class PokerRound():
             return (False, 0)
 
         playerBet = player.potentialBet
-        if playerBet < self.betToMatch and playerBet != player.stackSize:
+        if playerBet < self.betToMatch - player.commitment and playerBet != player.stackSize:
             return (False, 0)
         if player.makeBet():
             self.potSize += playerBet
             if player.commitment > self.betToMatch:
                 self.betToMatch = player.commitment
+                self.startBettingRoundIndex = self.turnIndex
             self.turnIndex = (self.turnIndex + 1) % len(self.players)
             self.currentPlayer = self.players[self.turnIndex]
             if self.checkAllMatched():
@@ -86,7 +91,7 @@ class PokerRound():
     def checkAllMatched(self) -> bool:
         allMatched = True
         for player in self.players:
-            allMatched = allMatched and player.commitment == self.betToMatch
+            allMatched = allMatched and player.commitment == self.betToMatch and player.madeMove
         return allMatched
     
     def allReadyStatus(self) -> bool:
@@ -112,19 +117,11 @@ class PokerRound():
                 self.makeBet(bigBlindPlayer)
 
                 # Deal cards
-                for i in range(2):
+                for _ in range(2):
                     for player in self.players:
                         card = self.deck.drawCard()
-                        print("Dealt " + str(card) + " to " + player.name)
                         self.cardsDealt += 1
                         player.addCard(card)
-                        # player.hand.holeCards.append(card)
-                        for card in player.hand.holeCards:
-                            print(card)
-                        # print(player.hand.holeCards[i])
-                # debug print all the players' cards
-                for player in self.players:
-                    print(player.name + " has " + str(player.hand.getHoleCards()[0]) + " and " + str(player.hand.getHoleCards()[1]))
                 return True
             case GameState.FLOP:
                 self.logger.debug("Advancing state to FLOP")
@@ -141,7 +138,7 @@ class PokerRound():
                 self.logger.debug("Advancing state to TURN")
                 self.resetForBettingRound()
                 # Deal burn card
-                self.burnCards(self.deck.drawCard())
+                self.burnCards.append(self.deck.drawCard())
                 # Deal community card
                 self.communityCards.append(self.deck.drawCard())
                 self.cardsDealt += 2
@@ -150,14 +147,18 @@ class PokerRound():
                 self.logger.debug("Advancing state to RIVER")
                 self.resetForBettingRound()
                 # Deal burn card
-                self.burnCards(self.deck.drawCard())
+                self.burnCards.append(self.deck.drawCard())
                 # Deal community card
                 self.communityCards.append(self.deck.drawCard())
                 self.cardsDealt += 2
                 return True
             case GameState.SHOWDOWN:
                 self.logger.debug("Advancing state to SHOWDOWN")
-                self.playerWins(self.determineWinner())
+                winners = self.determineWinners()
+                if len(winners) == 1:
+                    self.playerWins(winners[0])
+                else:
+                    self.playersTie(winners)
                 return True
             case _:
                 self.logger.debug("Case didn't match")
@@ -169,6 +170,7 @@ class PokerRound():
         self.betToMatch = 0
         for player in self.players:
             player.resetCommitment()
+            player.madeMove = False
         return True
 
     def addPlayer(self, player: Player) -> bool:
@@ -282,50 +284,48 @@ class PokerRound():
         """Returns the community cards"""
         return self.communityCards
     
-    def determineWinner(self) -> Player:
+    def determineWinners(self) -> list[Player]:
         """
-        Determines the winner of the round
-
+        Determines the winner(s) of the round
         Returns:
-            Player: The winner of the round
+            List[Player]: The winner(s) of the round
         """
         playerRanks = {}
         for player in self.players:
             player.determineBestHand(self.communityCards)
-            playerRanks[player] = player.getHand().getRanking()
+            playerRanks[player] = player.getHand().getRanking(), player.getHand().getTiebreakers()
 
-        bestRank = max(playerRanks.values())
-        bestPlayers = [player for player, rank in playerRanks.items() if rank == bestRank]
+        # Find the highest ranking hand
+        bestRank = max(rank for rank, tiebreakers in playerRanks.values())
 
+        # Find the players with the highest ranking hand
+        bestPlayers = [player for player, (rank, tiebreakers) in playerRanks.items() if rank == bestRank]
+
+        # If there's only one player with the best hand, they are the winner
         if len(bestPlayers) == 1:
-            return bestPlayers[0]
+            return bestPlayers
+
+        # If there are multiple players with the same best hand, compare tiebreakers
         else:
-            return self.determineWinnerByKickers(bestPlayers)
-    
-    def determineWinnerByKickers(self, players: list[Player]) -> Player:
-        """
-        Determines the winner of the round by kickers
+            # Sort the players by their tiebreakers in descending order
+            bestPlayers.sort(key=lambda player: playerRanks[player][1], reverse=True)
 
-        Args:
-            players (list[Player]): The players to determine the winner of the round by kickers
-
-        Returns:
-            Player: The winner of the round
-        """
-        playerKickers = {}
-        for player in players:
-            playerKickers[player] = player.getHand().getKickers(self.communityCards)
-
-        bestKickers = max(playerKickers.values())
-        bestPlayers = [player for player, kickers in playerKickers.items() if kickers == bestKickers]
-
-        if len(bestPlayers) == 1:
-            return bestPlayers[0]
-        else:
-            return self.determineWinnerByKickers(bestPlayers)
+            # Find the first player with the highest tiebreaker value
+            highestTiebreaker = max(tiebreakers[0] for rank, tiebreakers in playerRanks.values() if rank == bestRank)
+            for i in range(len(bestPlayers)):
+                if playerRanks[bestPlayers[i]][1][0] < highestTiebreaker:
+                    return bestPlayers[:i]
+            return bestPlayers
     
     def playerWins(self, player: Player) -> bool:
         player.stackSize += self.potSize
+        self.state = GameState.POSTHAND
+        #self.resetRound()
+        return True
+    
+    def playersTie(self, players: list[Player]) -> bool:
+        for player in players:
+            player.stackSize += self.potSize // len(players)
         self.state = GameState.POSTHAND
         #self.resetRound()
         return True
@@ -339,23 +339,27 @@ class PokerRound():
     def call(self, player: Player) -> Tuple[bool, int]:
         if player != self.currentPlayer:
             return False
-        player.setBet(self.betToMatch)
+        player.setBet(self.betToMatch - player.commitment)
         return self.makeBet(player)
     
     def resetRound(self) -> bool:
         self.state = GameState.PREPARING
-        self.players = []
+        self.players = list()
         for player in self.overallPlayers:
+            player.resetPlayer()
             if player.stackSize != 0:
                 self.players.append(player)
+        self.players = sorted(self.players, key=lambda x: x.seatNumber.value)
+        self.overallPlayers = self.players.copy()
         self.potSize = 0
         self.deck = Deck()
         self.communityCards = []
-        self.turnIndex = 0
-        self.startBettingRoundIndex = 0
-        self.smallBlindIndex += 1 % len(self.players)
+        self.smallBlindIndex = (self.smallBlindIndex + 1) % len(self.players)
+        self.turnIndex = self.smallBlindIndex
+        self.startBettingRoundIndex = self.turnIndex
         self.betToMatch = 0
         self.currentPlayer = self.players[self.smallBlindIndex]
+        return True
 
     def getSmallBlindPlayer(self) -> Player:
         return self.players[self.smallBlindIndex]
@@ -365,7 +369,7 @@ class PokerRound():
     
     def __str__(self) -> str:
         return f"State: {self.state}, \nPot Size: {self.potSize}, \
-            \nPlayers: " + str([str(player) for player in self.players]) + ", \
+            \nPlayers: " + str([str(player) for player in self.players]) + f", \
                   \nCurrent Player: {self.currentPlayer}, \nCommunity Cards: {self.communityCards}, \
                     \nTurn Index: {self.turnIndex}, \nStart Betting Round Index: {self.startBettingRoundIndex}, \
                         \nSmall Blind Index: {self.smallBlindIndex}, \nBet to Match: {self.betToMatch}\n"

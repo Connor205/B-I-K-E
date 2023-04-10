@@ -4,6 +4,7 @@ from PokerRound import PokerRound
 from Player import Player
 from Enums import GameState, Seat
 from typing import Tuple
+from Card import Card
 
 class PokerGameModel():
     previousRounds: list[PokerRound]
@@ -162,8 +163,7 @@ class PokerGameModel():
     def resetRound(self) -> bool:
         # Resets the round to the initial state
         # return true if successful, false if not
-        self.currentRound.resetRound()
-        return True
+        return self.currentRound.resetRound()
     
     def getPlayersInHand(self) -> list[Player]:
         # Gets the players that are currently in the round
@@ -175,4 +175,7 @@ class PokerGameModel():
 
     def getPotSize(self) -> int:
         return self.currentRound.potSize
+    
+    def getCommunityCards(self) -> list[Card]:
+        return self.currentRound.communityCards
         

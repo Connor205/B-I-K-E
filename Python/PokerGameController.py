@@ -122,8 +122,9 @@ class PokerGameController():
 
         elif origState == GameState.POSTHAND:
             # If the gamestate is posthand, any button press will reset the round
-            self.model.resetRound()
-            self.view.resetRound()
+            if self.model.resetRound():
+                self.view.resetRound()
+                self.view.updateFromModel()
         
         else:
             match button:
@@ -271,28 +272,31 @@ class PokerGameController():
                 self.view.indicatePlayerTurn(self.model.currentRound.currentPlayer.seatNumber)
             case GameState.FLOP:
                 self.turret.dealDiscard(1)
-                self.turret.dealCommunity(3)
+                self.turret.dealFlop()
                 self.view.dealBurn(self.model.currentRound.burnCards[0])
                 self.view.dealFlop()
                 self.view.indicatePlayerTurn(self.model.currentRound.currentPlayer.seatNumber)
             case GameState.TURN:
                 self.turret.dealDiscard(1)
-                self.turret.dealCommunity(1)
+                self.turret.dealTurn()
                 self.view.dealBurn(self.model.currentRound.burnCards[1])
                 self.view.dealTurn()
                 self.view.indicatePlayerTurn(self.model.currentRound.currentPlayer.seatNumber)
             case GameState.RIVER:
                 self.turret.dealDiscard(1)
-                self.turret.dealCommunity(1)
+                self.turret.dealRiver()
                 self.view.dealBurn(self.model.currentRound.burnCards[2])
                 self.view.dealRiver()
                 self.view.indicatePlayerTurn(self.model.currentRound.currentPlayer.seatNumber)
             case GameState.SHOWDOWN:
                 # TODO: Have view display winner, wait for button confirmation from winner to end hand
+                for player in self.model.currentRound.determineWinners():
+                    self.view.indicatePlayerTurn(player.seatNumber)
                 pass
             case GameState.POSTHAND:
                 remainingCards = self.model.getRemainingCards()
                 self.turret.dealDiscard(remainingCards)
+                self.turret.waitForConfirmation()
 
     def updateViewText(self) -> None:
         # Update the pot size in the view based on the model

@@ -11,6 +11,7 @@ class Player():
     potentialBet: int
     isReady: bool
     commitment: int # How much has the player bet during this round of betting
+    madeMove: bool
 
     def __init__(self, name: str, seatNumber: Seat) -> None:
         self.name = name
@@ -20,6 +21,7 @@ class Player():
         self.potentialBet = 0
         self.isReady = False
         self.commitment = 0
+        self.madeMove = False
 
     def getPotentialBet(self) -> int:
         """Returns the player's potential bet"""
@@ -39,6 +41,7 @@ class Player():
             self.stackSize -= self.potentialBet
             self.commitment += self.potentialBet
             self.potentialBet = 0
+            self.madeMove = True
             return True
         else:
             return False
@@ -103,6 +106,21 @@ class Player():
     def determineBestHand(self, communityCards: list[Card]) -> None:
         """Determines the player's best hand"""
         self.hand.determineBestHand(communityCards)
+
+    def resetPlayer(self) -> None:
+        """Resets the player's hand and potential bet"""
+        self.hand.resetHand()
+        self.potentialBet = 0
+        self.isReady = False
+        self.madeMove = False
+
+    def __eq__(self, other) -> bool:
+        if isinstance(other, Player):
+            return self.name == other.name and self.seatNumber == other.seatNumber
+        return False
+    
+    def __hash__(self) -> int:
+        return hash((self.name, self.seatNumber))
 
     def __str__(self) -> str:
         return f"{self.name} is sitting at seat {self.seatNumber} with a stack size of {self.stackSize} and a potential bet of {self.potentialBet} with hand {self.hand.getHoleCards()[0] if len(self.hand.getHoleCards()) > 0 else ''} and {self.hand.getHoleCards()[1] if len(self.hand.getHoleCards()) > 1 else ''}"

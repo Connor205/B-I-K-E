@@ -15,7 +15,7 @@ class CardSprite(pygame.sprite.Sprite):
     speed: float
 
     # Constants
-    CARD_BACK_PATH = "Python/img/card_back_black.png"
+    CARD_BACK_PATH = "img/card_back_black.png"
 
     def __init__(self, card: Card, cardSize: list[int], srcPos: list[int],  destPos: list[int], speed: float=0.6, showCard: bool=False, group: pygame.sprite.Group=None):
         """
@@ -114,7 +114,7 @@ class CardSprite(pygame.sprite.Sprite):
         elif suit.value == 4:
             suit_str = 'diamonds'
 
-        path = 'Python/img/' + value_str + suit_str + '.png'
+        path = 'img/' + value_str + suit_str + '.png'
         return path
     
     def flip(self) -> None:
@@ -136,7 +136,7 @@ class CardSprite(pygame.sprite.Sprite):
 
 class TableSprite(pygame.sprite.Sprite):
     """Sprite representing the table."""
-    TABLE_PATH = "Python/img/Table.png"
+    TABLE_PATH = "img/Table.png"
     srcImage: pygame.Surface
     image: pygame.Surface
     rect: pygame.Rect
@@ -299,7 +299,7 @@ class PopUpWindow(pygame.sprite.Sprite):
     pos: list[int]
     size: list[int]
 
-    IMG_PATH = "Python/img/popup.png"
+    IMG_PATH = "img/popup.png"
 
     def __init__(self, text: str, font: pygame.font.Font, color: Tuple[int, int, int], pos: list[int], size: list[int], group: pygame.sprite.Group=None):
         """
