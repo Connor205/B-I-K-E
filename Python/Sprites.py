@@ -292,6 +292,9 @@ class TextSprite(pygame.sprite.Sprite):
 class PopUpWindow(pygame.sprite.Sprite):
     """Sprite representing a pop-up window."""
     text: str
+    continueText: str
+    fontPath: str
+    fontSize: int
     font: pygame.font.Font
     color: Tuple[int, int, int]
     image: pygame.Surface
@@ -299,15 +302,18 @@ class PopUpWindow(pygame.sprite.Sprite):
     pos: list[int]
     size: list[int]
 
-    IMG_PATH = "img/popup.png"
+    IMG_PATH = "img/popup_window.png"
 
-    def __init__(self, text: str, font: pygame.font.Font, color: Tuple[int, int, int], pos: list[int], size: list[int], group: pygame.sprite.Group=None):
+    # def __init__(self, text: str, font: pygame.font.Font, color: Tuple[int, int, int], pos: list[int], size: list[int], group: pygame.sprite.Group=None):
+    def __init__(self, text: str, continueText: str, fontPath: str, fontSize: int, color: Tuple[int, int, int], pos: list[int], size: list[int], group: pygame.sprite.Group=None):
         """
         Initialize the pop-up window.
         
         Args:
             text (str): Text to display
-            font (pygame.font.Font): Font to use
+            continueText (str): Text to display on the continue button
+            fontPath (str): Path to the font file
+            fontSize (int): Size of the font
             color (Tuple[int, int, int]): Color of the text
             pos (list[int]): Position of the text
             size (int): Size (width, height) of the window
@@ -315,7 +321,10 @@ class PopUpWindow(pygame.sprite.Sprite):
         """
         pygame.sprite.Sprite.__init__(self, group)
         self.text = text
-        self.font = font
+        self.continueText = continueText
+        self.fontPath = fontPath
+        self.fontSize = fontSize
+        self.font = pygame.font.Font(fontPath, fontSize)
         self.color = color
         self.pos = pos
         self.size = size
@@ -324,6 +333,7 @@ class PopUpWindow(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = pos
         self.write(self.text)
+        self.writeContinue(self.continueText)
 
     def write(self, text):
         """
@@ -356,7 +366,7 @@ class PopUpWindow(pygame.sprite.Sprite):
 
         # we'll render each line below the last, so we need to keep track of
         # the culmative height of the lines we've rendered so far
-        y_offset = 0.1 * self.size[1]
+        y_offset = 0.2 * self.size[1]
         for line in lines:
             # Render each line centered on this popup's self.image
             fw, fh = self.font.size(line)
@@ -364,6 +374,60 @@ class PopUpWindow(pygame.sprite.Sprite):
             self.image.blit(textRender, (self.size[0] / 2 - fw / 2, y_offset))
             y_offset += fh
 
+    def writeContinue(self, text):
+        """
+        Write the continue text centered on this popup window.
+        """
+        # The continue text should be have the size of the original font size
+        font = pygame.font.Font(self.fontPath, int (0.5 * self.fontSize))
+
+        fw, fh = font.size(text)
+        textRender = font.render(text, True, self.color)
+        self.image.blit(textRender, (self.size[0] / 2 - fw / 2, self.size[1] - 0.25 * self.size[1]))
+
+
+    def writeContinue(self, text):
+        """
+        Write the given text centered on this popup window.
+        
+        Args:
+            text (str): Text to write
+        """
+        self.continueText = text
+        # first, split the text into words
+        words = text.split()
+
+        # The continue text should be have the size of the original font size
+        font = pygame.font.Font(self.fontPath, int (0.5 * self.fontSize))
+
+        # now, construct lines out of these words
+        lines = []
+        while len(words) > 0:
+            # get as many words as will fit within allowed_width
+            line_words = []
+            while len(words) > 0:
+                line_words.append(words.pop(0))
+                fw, fh = font.size(' '.join(line_words + words[:1]))
+                if fw > self.size[0] * 0.75:
+                    break
+
+            # add a line consisting of those words
+            line = ' '.join(line_words)
+            lines.append(line)
+
+        # now we've split our text into lines that fit into the width, actually
+        # render them
+
+        # we'll render each line below the last, so we need to keep track of
+        # the culmative height of the lines we've rendered so far
+        # y_offset = 0.2 * self.size[1]
+        y_offset = self.size[1] - 0.25 * self.size[1]
+        for line in lines:
+            # Render each line centered on this popup's self.image
+            fw, fh = font.size(line)
+            textRender = font.render(line, True, self.color)
+            self.image.blit(textRender, (self.size[0] / 2 - fw / 2, y_offset))
+            y_offset += fh
 
     def update(self, seconds):
         """Updates the pop-up window."""

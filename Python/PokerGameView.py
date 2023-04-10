@@ -20,9 +20,9 @@ class PokerGameView:
     # Full monitor size: 1920x1080
     # Desired resolution: 1280x720
     SCREEN_SIZE = [1280, 720]
-    TABLE_SIZE = [int(SCREEN_SIZE[0] * 4/5), SCREEN_SIZE[1]]
+    TABLE_SIZE = [int(SCREEN_SIZE[0]), SCREEN_SIZE[1]]
     MENU_SIZE = [int(SCREEN_SIZE[0] * 1/5), SCREEN_SIZE[1]]
-    POPUP_SIZE = [int(0.5 * SCREEN_SIZE[1]), int(0.5 * SCREEN_SIZE[1])]
+    POPUP_SIZE = [int(0.7 * SCREEN_SIZE[1]), int(0.5 * SCREEN_SIZE[1])]
 
     # Sizes
     # Keeping it slightly to scale, table width is 60 inches, 
@@ -809,15 +809,16 @@ class PokerGameView:
 
         self.resetPlayerTurns()
 
-    def createPopup(self, text: str) -> None:
+    def createPopup(self, text: str, continueText: str) -> None:
         """
         Method to create a popup
 
         Args:
             text (str): The text to display in the popup
+            continueText (str): The text to display on the continue button
         """
         # Create the popup
-        popup = PopUpWindow(text, self.FONT_PATH, self.POPUP_FONT_HEIGHT, self.FONT_COLOR, self.POPUP_POSITION, self.POPUP_SIZE, self.popupSprites)
+        popup = PopUpWindow(text, continueText, self.FONT_PATH, self.POPUP_FONT_HEIGHT, self.FONT_COLOR, self.POPUP_POSITION, self.POPUP_SIZE, self.popupSprites)
 
     def clearPopups(self) -> None:
         """
