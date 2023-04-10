@@ -327,7 +327,7 @@ if __name__ == "__main__":
     # Test code
     model = PokerGameModel()
     view = PokerGameView(model)
-    turret = Turret("/dev/tty.Bluetooth-Incoming-Port")
+    turret = Turret("/dev/ttyACM0")
     
     controller = PokerGameController(model, view, turret)
 
