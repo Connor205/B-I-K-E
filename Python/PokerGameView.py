@@ -250,6 +250,26 @@ class PokerGameView:
         # Assign the small and big blind
         self.setBlind(currentRound.getSmallBlindPlayer().seatNumber, Blind.SB)
         self.setBlind(currentRound.getBigBlindPlayer().seatNumber, Blind.BB)
+
+    def updateFromModel(self) -> None:
+        """
+        Method to update the sprites from the model
+        """
+        currentRound = self.model.currentRound
+
+        # Update the pot
+        self.updatePot(currentRound.potSize)
+
+        # Update the player hubs
+        for player in currentRound.players:
+            self.updatePlayerChips(player.seatNumber, player.stackSize)
+            self.updatePlayerBet(player.seatNumber, player.potentialBet)
+            self.updatePlayerName(player.seatNumber, player.name)
+            self.setPlayerReady(player.seatNumber, player.isReady)
+
+        # Update the small and big blind
+        self.setBlind(currentRound.getSmallBlindPlayer().seatNumber, Blind.SB)
+        self.setBlind(currentRound.getBigBlindPlayer().seatNumber, Blind.BB)
         
     # TODO: Method to display the menu
     # Update the text menu items based on the model
@@ -415,7 +435,7 @@ class PokerGameView:
         currentRound = self.model.currentRound
 
         for player in currentRound.players:
-            self.updatePlayerName(player.seatNumber, player.name, growShrink=False)
+            self.updatePlayerName(player.seatNumber, player.name)
 
     def setPlayerReady(self, seatNumber: Seat, status: bool) -> None:
         """
@@ -444,9 +464,9 @@ class PokerGameView:
             playerNameSprite.text = playerNameSprite.text[:playerNameSprite.text.find(" (")]
 
         # Update the text
-        self.updatePlayerName(seatNumber, playerNameSprite.text + statusText, growShrink=False)
+        self.updatePlayerName(seatNumber, playerNameSprite.text + statusText)
 
-    def updatePlayerName(self, seatNumber: Seat, newName: str, growShrink: bool = True) -> None:
+    def updatePlayerName(self, seatNumber: Seat, newName: str, growShrink: bool = False) -> None:
         """
         Method to update the player name
 
@@ -660,7 +680,7 @@ class PokerGameView:
             self.logger.error("Trying to deal a card to a player who already has two cards")
             return
         # Deal the card
-        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, cardPosition, showCard=False, group=playerCardGroup)
+        newSprite = CardSprite(card, self.CARD_SIZE, self.TURRET_POSITION, cardPosition, showCard=True, group=playerCardGroup)
 
     # TODO: Method to indicate the player is the winner
     # Needs to be passed the player number
@@ -786,6 +806,8 @@ class PokerGameView:
             self.player3Sprites.remove(self.player3Sprites.sprites()[3])
         if len(self.player4Sprites) > 3:
             self.player4Sprites.remove(self.player4Sprites.sprites()[3])
+
+        self.resetPlayerTurns()
 
     def createPopup(self, text: str) -> None:
         """

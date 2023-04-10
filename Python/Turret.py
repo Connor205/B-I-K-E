@@ -48,6 +48,15 @@ class Turret(Arduino):
         # TODO: Deal the given number of community cards
         # raise NotImplementedError("dealCommunityCards is not implemented")
         self.logger.debug("Dealing {} community cards".format(cardsToDeal))
+
+    def dealRiver(self):
+        self.logger.debug("Dealing river")
+
+    def dealFlop(self):
+        self.logger.debug("Dealing flop")
+
+    def dealTurn(self):
+        self.logger.debug("Dealing turn")
     
     def dealDiscard(self, cardsToDiscard: int):
         # TODO: Discard the given number of cards

@@ -9,11 +9,19 @@ class PlayerHand():
     holeCards: list[Card]
     bestHand: list[Card]
     ranking: HandRanking
+    tiebreakers: list[int]
 
     def __init__(self) -> None:
         self.holeCards = list()
         self.bestHand = []
         self.ranking = None
+        self.tiebreakers = []
+
+    def resetHand(self) -> None:
+        self.holeCards = list()
+        self.bestHand = []
+        self.ranking = None
+        self.tiebreakers = []
 
     def getRanking(self) -> HandRanking:
         return self.ranking
@@ -23,23 +31,9 @@ class PlayerHand():
 
     def getHoleCards(self) -> list[Card]:
         return self.holeCards
-
-    def getKickers(self, communityCards: list[Card]) -> list[Card]:
-        """
-        Returns the kickers for the player's best hand.
-        Args:
-            communityCards (list[Card]): List of community cards.
-        Returns:
-            list[Card]: List of kickers.
-        """
-        if len(communityCards) < 3:
-            return []
-        cards = self.holeCards + communityCards
-        kickers = []
-        for card in cards:
-            if card not in self.bestHand:
-                kickers.append(card)
-        return kickers
+    
+    def getTiebreakers(self) -> list[int]:
+        return self.tiebreakers
 
     def addHoleCard(self, card: Card) -> bool:
         """
@@ -66,23 +60,24 @@ class PlayerHand():
         """
         if len(communityCards) < 3:
             return False
-        self.ranking, self.bestHand = self.score(communityCards)
+        self.ranking, self.bestHand, self.tiebreakers = self.score(communityCards)
         return True
 
     def score(self,
-              communityCards: list[Card]) -> Tuple[HandRanking, list[Card]]:
+              communityCards: list[Card]) -> Tuple[HandRanking, list[Card], list[Card]]:
         """
         Given a list of cards, computes the best hand and its score.
         This method must be called with at least 3 community cards.
         Args:
             cards (list[Card]): List of cards to compute the best hand from.
         Returns:
-            Tuple[HandRanking, list[Card]]: Tuple containing the score and best hand.
+            Tuple[HandRanking, list[Card], list[Card]]: Tuple containing the score, best hand, and tiebreakers.
         """
         cards = self.holeCards + communityCards
 
         max_score = HandRanking.HIGH_CARD
         best_hand = None
+        tiebreakers = []
 
         for combination in combinations(cards, 5):
             # Compute the score and best hand for the current combination
@@ -97,42 +92,61 @@ class PlayerHand():
             if royal_flush:
                 score = HandRanking.ROYAL_FLUSH
                 best_hand = combination
+                tiebreakers = []
             elif straight_flush:
                 score = HandRanking.STRAIGHT_FLUSH
                 best_hand = combination
+                tiebreakers = [max(values)]
             elif value_counts.most_common(1)[0][1] == 4:
                 score = HandRanking.FOUR_OF_A_KIND
                 best_hand = combination
+                tiebreakers = [value_counts.most_common(1)[0][0], value_counts.most_common(2)[1][0]]
             elif value_counts.most_common(
                     1)[0][1] == 3 and value_counts.most_common(2)[1][1] == 2:
                 score = HandRanking.FULL_HOUSE
                 best_hand = combination
+                tiebreakers = [value_counts.most_common(1)[0][0], value_counts.most_common(2)[1][0]]
             elif flush:
                 score = HandRanking.FLUSH
                 best_hand = combination
+                tiebreakers = sorted(values, reverse=True)
             elif straight:
                 score = HandRanking.STRAIGHT
                 best_hand = combination
+                tiebreakers = [max(values)]
             elif value_counts.most_common(1)[0][1] == 3:
                 score = HandRanking.THREE_OF_A_KIND
                 best_hand = combination
+                tiebreakers = [value_counts.most_common(1)[0][0], *sorted(set(values) - {value_counts.most_common(1)[0][0]}, reverse=True)]
             elif value_counts.most_common(
                     1)[0][1] == 2 and value_counts.most_common(2)[1][1] == 2:
                 score = HandRanking.TWO_PAIR
                 best_hand = combination
+                tiebreakers = [value_counts.most_common(1)[0][0], value_counts.most_common(2)[1][0], value_counts.most_common(2)[1][0]]
             elif value_counts.most_common(1)[0][1] == 2:
                 score = HandRanking.PAIR
                 best_hand = combination
+                tiebreakers = [value_counts.most_common(1)[0][0], *sorted(set(values) - {value_counts.most_common(1)[0][0]}, reverse=True)]
             else:
                 score = HandRanking.HIGH_CARD
                 best_hand = combination
+                tiebreakers = sorted(values, reverse=True)
 
-            # Update max_score and best_hand if necessary
+            # Update the maximum score and best hand if necessary
             if score > max_score:
                 max_score = score
                 best_hand = combination
+                tiebreakers = tiebreakers
+            elif score == max_score:
+                for i, tiebreaker in enumerate(tiebreakers):
+                    if tiebreaker > tiebreakers[i]:
+                        best_hand = combination
+                        tiebreakers = tiebreakers
+                        break
+                    elif tiebreaker < tiebreakers[i]:
+                        break
 
-        return (max_score, best_hand)
+        return (max_score, best_hand, tiebreakers)
 
 
 if __name__ == "__main__":
