@@ -134,7 +134,28 @@ class HandRanking(Enum):
         return hash(self.value)
     
     def __str__(self) -> str:
-        return f"{self.name}"
+        if self == HandRanking.HIGH_CARD:
+            return "High Card"
+        elif self == HandRanking.PAIR:
+            return "Pair"
+        elif self == HandRanking.TWO_PAIR:
+            return "Two Pair"
+        elif self == HandRanking.THREE_OF_A_KIND:
+            return "Three of a Kind"
+        elif self == HandRanking.STRAIGHT:
+            return "Straight"
+        elif self == HandRanking.FLUSH:
+            return "Flush"
+        elif self == HandRanking.FULL_HOUSE:
+            return "Full House"
+        elif self == HandRanking.FOUR_OF_A_KIND:
+            return "Four of a Kind"
+        elif self == HandRanking.STRAIGHT_FLUSH:
+            return "Straight Flush"
+        elif self == HandRanking.ROYAL_FLUSH:
+            return "Royal Flush"
+        else:
+            return "Unknown"
 
 
 class GameState(Enum):

@@ -120,10 +120,16 @@ class PokerGameController():
                     # Remove the ready status text from all players in view
                     self.view.clearReadyStatusText()
 
-                    # TODO: Update the view to say "Please put cards in and press deal confirm"
+                    # Update the view to say "Please put cards in and press deal confirm"
+                    self.view.createPopup("Please put the cards in the turret", "Press the dealer confirmation button to continue")
+                    # The turret call is blocking, so let's update the view before calling it
+                    self.view.update()
 
                     # Call the blocking method for the turret, waiting for confirmation button
                     self.turret.waitForConfirmation()
+
+                    # Once confirmed, we can clear the popup and start the round
+                    self.view.clearPopups()
 
                     # If in state preparing, we just advance the round to start it
                     self.model.advanceRound()
@@ -138,17 +144,20 @@ class PokerGameController():
                 match button:
                     case Button.FOLD:
                         if self.model.inSettings:
-                            self.removePlayer(seat)
+                            # self.removePlayer(seat)
+                            pass
                         else:
                             self.fold(seat)
                     case Button.CHECK:
                         if self.model.inSettings:
-                            self.addPlayer(seat)
+                            # self.addPlayer(seat)
+                            pass
                         else:
                             self.check(seat)
                     case Button.CALL:
                         if self.model.inSettings:
-                            self.changeBlinds(seat)
+                            # self.changeBlinds(seat)
+                            pass
                         else:
                             self.call(seat)
                     case Button.BET:
@@ -233,7 +242,7 @@ class PokerGameController():
         if success:
             self.view.updatePlayerBet(seat, amount)
             self.view.updatePlayerChips(seat, self.model.getPlayerFromSeat(seat).stackSize)
-            self.view.updatePot(self.model.getPotSize())
+            self.view.updatePot(self.model.getPotSize(), growShrink=True)
             self.logger.debug("Made bet for player: " + str(seat))
 
     def fold(self, seat: Seat) -> None:
@@ -259,7 +268,7 @@ class PokerGameController():
         if success:
             self.view.updatePlayerBet(seat, amount)
             self.view.updatePlayerChips(seat, self.model.getPlayerFromSeat(seat).stackSize)
-            self.view.updatePot(self.model.getPotSize())
+            self.view.updatePot(self.model.getPotSize(), growShrink=True)
             self.logger.debug("Called player: " + str(seat))
 
     def ready(self, seat: Seat) -> None:
@@ -297,14 +306,25 @@ class PokerGameController():
                 self.view.dealRiver()
                 self.view.indicatePlayerTurn(self.model.currentRound.currentPlayer.seatNumber)
             case GameState.SHOWDOWN:
-                # TODO: Have view display winner, wait for button confirmation from winner to end hand
-                for player in self.model.currentRound.determineWinners():
-                    self.view.indicatePlayerTurn(player.seatNumber)
-                pass
+                # Have view display winner, wait for button confirmation from winner to end hand
+                winners = self.model.currentRound.determineWinners()
+                if len(winners) == 1:
+                    self.view.createPopup(winners[0].name + " wins with " + str(winners[0].getHand().getRanking()) + " and gets " + str(self.model.getPotSize()) + " chips!", "Press any button to continue")
+                else:
+                    # Print out all the winners with their winning and the overall pot size
+                    winnerString = ""
+                    for winner in winners:
+                        winnerString += winner.name + " with " + str(winner.getHand().getRanking()) + ", "
+                    winnerString = winnerString[:-2]
+                    self.view.createPopup(winnerString + " split the pot of " + str(self.model.getPotSize()) + " chips!", "Press any button to continue")
             case GameState.POSTHAND:
                 remainingCards = self.model.getRemainingCards()
                 self.turret.dealDiscard(remainingCards)
+                self.view.createPopup("Please put the cards in the shuffler", "Press the shuffler confirmation button to continue")
+                # Turret waits for confirmation from the shuffler and is blocking so update the view
+                self.view.update()
                 self.turret.waitForConfirmation()
+                self.view.clearPopups()
 
     def updateViewText(self) -> None:
         # Update the pot size in the view based on the model
@@ -312,12 +332,20 @@ class PokerGameController():
         # Update each of the players' chips and bet amounts in the view based on the model
         for player in self.model.getPlayersInHand():
             self.view.updatePlayerChips(player.seatNumber, player.stackSize, growShrink=False)
-            self.view.updatePlayerBet(player.seatNumber, player.potentialBet)
+            # If the player's potential bet is 0, display their "to call" amount instead
+            if player.potentialBet == 0:
+                self.view.updatePlayerToCall(player.seatNumber, self.model.currentRound.betToMatch - player.commitment)
+            else:
+                self.view.updatePlayerBet(player.seatNumber, player.potentialBet)
     
     def settings(self) -> None:
         # Toggle the settings menu
         self.model.toggleSettings()
-        # TODO: Update the view to reflect the settings menu
+        
+        if self.model.inSettings:
+            self.view.createPopup("Settings Menu Active", "Press settings button to return to game")
+        else:
+            self.view.clearPopups()
 
     def update(self) -> None:
 
