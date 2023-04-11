@@ -5,12 +5,12 @@
 // Stepper Motor Constants
 constexpr uint8_t ELEVATOR_STEP_PIN = 2;
 constexpr uint8_t ELEVATOR_DIR_PIN = 3;
-constexpr uint16_t ELEVATOR_MOTOR_MAX_STEPS_PER_SECOND = 10000 * 3;
+constexpr uint32_t ELEVATOR_MOTOR_MAX_STEPS_PER_SECOND = 30000;
 constexpr uint16_t ELEVATOR_STEPS_PER_REVOLUTION = 3200; // Set on the digital driver
 
 constexpr uint8_t DISPENSER_RAIL_STEP_PIN = 4;
 constexpr uint8_t DISPENSER_RAIL_DIR_PIN = 5;
-constexpr uint16_t DISPENSER_RAIL_MAX_STEPS_PER_SECOND = 6400 * 3;
+constexpr uint16_t DISPENSER_RAIL_MAX_STEPS_PER_SECOND = 6400 * 5;
 constexpr uint16_t DISPENSER_RAIL_STEPS_PER_REVOLUTION = 6400; // Set on the digital driver
 
 constexpr uint8_t BELT_STEP_PIN = 6;
@@ -50,15 +50,29 @@ constexpr int STEPS_PER_THREE_WIDE_SLOT = DISPENSER_STEPS_PER_MM * 2;
 constexpr int STEPS_PER_TWO_WIDE_SLOT = DISPENSER_STEPS_PER_MM * 3.5;
 
 constexpr float BELT_MM_PER_REVOLUTION
-= 88.0f; // Find this value by testing, the length of the belt travelled in 1 stepper motor revolution
+    = 88.0f; // Find this value by testing, the length of the belt travelled in 1 stepper motor revolution
 constexpr int BELT_STEPS_PER_MM
-= BELT_STEPS_PER_REVOLUTION / BELT_MM_PER_REVOLUTION; // This number should be pretty large
+    = BELT_STEPS_PER_REVOLUTION / BELT_MM_PER_REVOLUTION; // This number should be pretty large
 
 constexpr float BELT_LENGTH_MM = (20 * 11) + (11 * 2); // Find this value by testing, the length of the belt in mm
 constexpr long BELT_LENGTH_STEPS = BELT_LENGTH_MM * BELT_STEPS_PER_MM;
 
 constexpr int BELT_DEFAULT_POSITION = 0; // TODO:: Find this value using calibration method
 
-constexpr int ELEVATOR_TOP_STEP = 0; // TODO:: Find this value using calibration method
+constexpr long ELEVATOR_TOP_STEP = -84807; // TODO:: Find this value using calibration method
 
 constexpr int DISPENSER_PHOTOSENSOR_PIN = A0;
+
+constexpr long STEP_1 = 46878;
+constexpr long STEP_2 = 50657;
+constexpr long STEP_3 = 52815;
+constexpr long STEP_4 = 56279;
+constexpr long STEP_5 = 60698;
+
+constexpr long SLOT_CONSTANTS[] = {
+    STEP_1,
+    STEP_5,
+    STEP_2,
+    STEP_4,
+    STEP_3,
+};

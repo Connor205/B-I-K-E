@@ -2,14 +2,16 @@
 #include <Arduino.h>
 #include <Utils.h>
 
-StepperMotor::StepperMotor(int stepPin, int dirPin, int calibratePin, int maxSpeed) {
+StepperMotor::StepperMotor(int stepPin, int dirPin, int calibratePin, int maxSpeed)
+{
     this->stepPin = stepPin;
     this->dirPin = dirPin;
     this->calibratePin = calibratePin;
     this->maxSpeed = maxSpeed;
 }
 
-void StepperMotor::init() {
+void StepperMotor::init()
+{
     // Setup pins
     pinMode(stepPin, OUTPUT);
     pinMode(dirPin, OUTPUT);
@@ -27,8 +29,9 @@ void StepperMotor::init() {
     this->currentlyRunning = false;
 }
 
-void StepperMotor::calibrate(bool CW) {
-    int steps = 0;
+void StepperMotor::calibrate(bool CW)
+{
+    long steps = 0;
     // Step until limit switch is hit
     setDirection(CW);
     int startingLimit = digitalRead(this->calibratePin);
@@ -57,7 +60,8 @@ long StepperMotor::getDelay() { return this->currentDelay; }
  *
  * @param speed speed in steps per second
  */
-void StepperMotor::setSpeed(float speed) {
+void StepperMotor::setSpeed(float speed)
+{
     this->currentSpeed = speed;
     this->currentDelay = getDelayFromSpeed(this->currentSpeed);
 }
@@ -67,7 +71,8 @@ void StepperMotor::setSpeed(float speed) {
  *
  * @param CW True -> CW, False -> CCW
  */
-void StepperMotor::setDirection(bool CW) {
+void StepperMotor::setDirection(bool CW)
+{
     if (CW) {
         digitalWrite(this->dirPin, HIGH);
     } else { // CCW
@@ -84,7 +89,8 @@ void StepperMotor::setDirection(bool CW) {
  *
  * @param targetStep the absolute target step
  */
-void StepperMotor::setTarget(int targetStep) {
+void StepperMotor::setTarget(int targetStep)
+{
     if (isMoving()) {
         return; // Motor is currently moving
     }
@@ -99,7 +105,8 @@ bool StepperMotor::isMoving() { return this->current != this->target; }
  * @brief Provides a pulse to the motor using the current delay calculated from the current speed
  *
  */
-void StepperMotor::stepMotor() {
+void StepperMotor::stepMotor()
+{
     digitalWrite(this->stepPin, HIGH);
     delayMicroseconds(this->currentDelay);
     digitalWrite(this->stepPin, LOW);
@@ -114,7 +121,8 @@ void StepperMotor::stepMotor() {
  * as motion occurs.
  *
  */
-void StepperMotor::update() {
+void StepperMotor::update()
+{
     // If the motor has reached its target, do nothing
     if (this->current == this->target) {
         return;
@@ -152,33 +160,39 @@ void StepperMotor::update() {
  *
  * @param targetStep the target step to acheive. Represents an absolute position
  */
-void StepperMotor::moveToTarget(int targetStep) {
+void StepperMotor::moveToTarget(long targetStep)
+{
+    writeInfo("Moving to target: " + String(targetStep));
     setDirection(targetStep > this->current); // True -> CW, False -> CCW
-    int stepsToMove = abs(targetStep - this->current);
-    for (int i = 0; i < stepsToMove; i++) {
+    long stepsToMove = abs(targetStep - this->current);
+    for (long i = 0; i < stepsToMove; i++) {
         stepMotor();
     }
     this->current = targetStep;
 }
 
-void StepperMotor::moveToTargetAccel(int targetStep) {
+void StepperMotor::moveToTargetAccel(long targetStep)
+{
+    writeInfo("Moving to target: " + String(targetStep));
     // So this shit is mad basic. We are going to do a trapazoidal velocity profile
     // We will start at 0 and accelerate to a max speed, then decelerate to 0
+    long minSpeed = maxSpeed / 3;
+    long diff = maxSpeed - minSpeed;
     setDirection(targetStep > this->current); // True -> CW, False -> CCW
-    int stepsToMove = abs(targetStep - this->current);
-    int quarterSteps = stepsToMove / 4;
-    for (int i = 0; i < stepsToMove / 4; i++) {
-        setSpeed(maxSpeed * (float(i) / quarterSteps));
+    long stepsToMove = abs(targetStep - this->current);
+    long quarterSteps = stepsToMove / 4;
+    for (long i = 0; i < stepsToMove / 4; i++) {
+        setSpeed(diff * (float(i) / quarterSteps) + minSpeed);
         stepMotor();
     }
 
-    for (int i = 0; i < stepsToMove / 2 + stepsToMove % 4; i++) {
+    for (long i = 0; i < stepsToMove / 2 + stepsToMove % 4; i++) {
         setSpeed(maxSpeed);
         stepMotor();
     }
 
-    for (int i = 0; i < stepsToMove / 4; i++) {
-        setSpeed(maxSpeed * (1.0 - (float(i) / quarterSteps)));
+    for (long i = 0; i < stepsToMove / 4; i++) {
+        setSpeed(diff * (1.0 - (float(i) / quarterSteps)) + minSpeed);
         stepMotor();
     }
 
@@ -193,7 +207,8 @@ void StepperMotor::moveToTargetAccel(int targetStep) {
  *
  * @return true on function termination
  */
-bool StepperMotor::updateToTarget() {
+bool StepperMotor::updateToTarget()
+{
     if (this->current == this->target) {
         return true;
     }

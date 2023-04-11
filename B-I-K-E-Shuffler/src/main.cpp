@@ -31,10 +31,11 @@ void serialReactions()
         // Write info to serial
         writeInfo("Moving to slot" + String(x));
         shuffler.moveDispenserToSlot(x);
-    } else if (input.equals("elevatorUp")) {
+    } else if (input.equals("up")) {
         elevator.moveToTarget(ELEVATOR_TOP_STEP);
-    } else if (input.equals("elevatorDown")) {
-        elevator.moveToTarget(100);
+    } else if (input.equals("down")) {
+        elevator.moveToTarget(-1000);
+        elevator.moveToTarget(ELEVATOR_TOP_STEP);
     } else if (input.equals("wait")) {
         writeInfo("Waiting for confirmation button press");
         while (digitalRead(CONFIRMATION_BUTTON_PIN) == HIGH) {
@@ -44,6 +45,12 @@ void serialReactions()
         while (true) {
             writeInfo("Photoresistor value: " + String(analogRead(DISPENSER_PHOTOSENSOR_PIN)));
             delay(100);
+        }
+    } else if (input.equals("demo")) {
+        for (int i = 0; i < 5; i++) {
+            long s = SLOT_CONSTANTS[i];
+            shuffler.dispenserMotor.moveToTargetAccel(s);
+            shuffler.dropCard();
         }
     } else {
         writeError("Invalid Command");
@@ -57,8 +64,8 @@ void setup()
     shuffler.calibrate();
     elevator.init();
     elevator.calibrate(true);
-    elevator.moveToTargetAccel(-1000);
     digitalWrite(DROPPER_MOTOR_DIR_PIN, HIGH);
+    elevator.moveToTarget(-1000);
 }
 
 void loop() { serialReactions(); }

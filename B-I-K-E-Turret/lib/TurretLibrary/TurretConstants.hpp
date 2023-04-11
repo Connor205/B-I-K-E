@@ -5,7 +5,7 @@
 constexpr uint8_t TURRET_STEP_PIN = 2;
 constexpr uint8_t TURRET_DIR_PIN = 3;
 constexpr uint16_t STEPS_PER_REV = 6400;
-constexpr float TURRET_BASE_RPM = 30.0f; // RPM of the base motor
+constexpr float TURRET_BASE_RPM = 32.0f; // RPM of the base motor
 constexpr int TURRET_MAX_SPEED = STEPS_PER_REV * TURRET_BASE_RPM / 60.0f;
 
 // DC Motor Constants

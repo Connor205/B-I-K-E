@@ -122,23 +122,26 @@ def classify_card(frame) -> Card:
     # First lets classify the suit
     suit = suit_model.predict(cropped_suit.reshape(1, 100, 100, 1))
     suit_index = np.argmax(suit)
+    suit_confidence = np.max(suit)
     suit = suit_classes[suit_index]
     suit = convert_suit_string(suit)
 
     # Now lets classify the value
     value = value_model.predict(cropped_number.reshape(1, 100, 100, 1))
     value_index = np.argmax(value)
+    value_confidence = np.max(value)
     value = value_classes[value_index]
     value = convert_value_string(value)
 
-    accuracy = np.max(suit) * np.max(value)
+    accuracy = suit_confidence * value_confidence
 
     ret = Card(value, suit)
 
     cv2.imshow("Number", cropped_number)
     cv2.imshow("Suit", cropped_suit)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    cv2.imshow("Frame", cv2.resize(frame, (400, 400)))
+    cv2.imshow("Rotated", cv2.resize(result, (400, 400)))
+    cv2.waitKey(1)
 
     return ret, accuracy
 

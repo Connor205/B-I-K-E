@@ -208,7 +208,7 @@ void StepperMotor::moveToTarget(int targetStep)
 void StepperMotor::moveToAngle(float targetAngleDegrees)
 {
     int targetSteps = degreeToSteps(targetAngleDegrees);
-    moveToTargetAccel(targetSteps);
+    moveToTarget(targetSteps);
 }
 
 /**

@@ -25,8 +25,8 @@ public:
     // Movement Methods
     void stepMotor();
     void update();
-    void moveToTarget(int targetStep);
-    void moveToTargetAccel(int targetStep);
+    void moveToTarget(long targetStep);
+    void moveToTargetAccel(long targetStep);
 
     bool updateToTarget();
 
@@ -37,9 +37,9 @@ private:
     int calibratePin;
     // Control Variables
     bool currentDir; // True -> CW, False -> CCW
-    int current;
-    int target;
-    int previous;
+    long current;
+    long target;
+    long previous;
     long previousChangeTime;
     bool currentlyRunning;
     long maxSpeed;

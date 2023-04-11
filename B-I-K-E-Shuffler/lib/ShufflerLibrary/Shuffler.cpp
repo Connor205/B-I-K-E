@@ -24,8 +24,8 @@ void Shuffler::calibrate()
     writeInfo("Calibrating Shuffler Motors");
     this->dispenserMotor.calibrate(false);
     this->dispenserMotor.moveToTargetAccel(6400);
-    this->beltMotor.calibrate(true);
-    this->beltMotor.moveToTargetAccel(-1000);
+    this->beltMotor.calibrate(false);
+    this->beltMotor.moveToTarget(500);
 }
 
 void Shuffler::moveDispenserToSlot(int slotNumber)
@@ -49,7 +49,17 @@ void Shuffler::moveDispenserToMM(float targetMM)
 
 void Shuffler::moveBeltToMM(float targetMM) { this->beltMotor.moveToTarget(targetMM * BELT_STEPS_PER_MM); }
 
-void Shuffler::ejectCards() { this->beltMotor.moveToTarget(BELT_LENGTH_STEPS); }
+void Shuffler::ejectCards()
+{
+    long difference = -1650 + 1316;
+    long current = -1316;
+    this->beltMotor.moveToTarget(-1316);
+    for (int i = 0; i < 19; i++) {
+        current += difference;
+        delay(750);
+        this->beltMotor.moveToTarget(current);
+    }
+}
 
 void Shuffler::resetBelt() { this->beltMotor.moveToTarget(BELT_DEFAULT_POSITION); }
 
@@ -66,12 +76,15 @@ void Shuffler::dropCard()
     }
 
     // Set the speed to half the max speed
-    this->dropperMotor.setSpeed(DROPPER_MOTOR_MAX_STEPS_PER_SECOND / 2);
+    this->dropperMotor.setSpeed(DROPPER_MOTOR_MAX_STEPS_PER_SECOND / 3);
     writeInfo("Moving To Detection For Dispense");
     // Then we read the photo sensor until it is light enough to mean that the card has fallen
     int val = 0;
-    while (val < 90) { // TODO:: Tune this value
+    while (val < 130) { // TODO:: Tune this value
         this->dropperMotor.stepMotor();
         val = analogRead(DISPENSER_PHOTOSENSOR_PIN);
     }
+
+    // Wait 0.1 seconds
+    delay(100);
 }

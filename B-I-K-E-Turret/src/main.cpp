@@ -4,23 +4,25 @@
 
 Turret turret = Turret();
 
-void stopForever() {
+void stopForever()
+{
     while (true) {
         delay(1000);
     }
 }
 
-void sprayCards() {
+void sprayCards()
+{
+    turret.turnToAngle(180);
     turret.powerFlywheel(true);
-    turret.turnToAngle(45);
     turret.powerIndexer(true);
-    turret.turnToAngle(-45);
+    turret.turnToAngle(0);
     turret.powerIndexer(false);
     turret.powerFlywheel(false);
-    turret.turnToAngle(0);
 }
 
-void serialReactions() {
+void serialReactions()
+{
     writeState("ready");
     // Wait for an input from the serial port
     waitForSerialInput();
@@ -80,12 +82,15 @@ void serialReactions() {
         while (digitalRead(CONFIRMATION_BUTTON_PIN) == HIGH) {
             delay(50);
         }
+    } else if (input.equals("spray")) {
+        sprayCards();
     } else {
         writeError("Invalid Command");
     }
 }
 
-void setup() {
+void setup()
+{
     Serial.begin(9600);
     turret.init();
     turret.calibrate();
