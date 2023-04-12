@@ -10,6 +10,9 @@ Members:
 <li>Jackson Heun (EE + Physics)</li>
 </ul>
 
+# Update (April 11, 2023):
+We won first place at the ECE Capstone Expo and impressed industry judges with our blend of hardware/software solutions.
+
 # Project Description
 Our goal is to build an automated robotic poker table that will handle most of the functions a human dealer would, such as shuffling, dealing, and facilitating the game.
 
