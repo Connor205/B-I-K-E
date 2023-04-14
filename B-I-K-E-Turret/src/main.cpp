@@ -4,15 +4,13 @@
 
 Turret turret = Turret();
 
-void stopForever()
-{
+void stopForever() {
     while (true) {
         delay(1000);
     }
 }
 
-void sprayCards()
-{
+void sprayCards() {
     turret.turnToAngle(180);
     turret.powerFlywheel(true);
     turret.powerIndexer(true);
@@ -21,8 +19,7 @@ void sprayCards()
     turret.powerFlywheel(false);
 }
 
-void serialReactions()
-{
+void serialReactions() {
     writeState("ready");
     // Wait for an input from the serial port
     waitForSerialInput();
@@ -89,8 +86,7 @@ void serialReactions()
     }
 }
 
-void setup()
-{
+void setup() {
     Serial.begin(9600);
     turret.init();
     turret.calibrate();
